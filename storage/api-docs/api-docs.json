@@ -16,6 +16,167 @@
         }
     ],
     "paths": {
+        "/api/about.index": {
+            "get": {
+                "tags": [
+                    "About"
+                ],
+                "summary": "Récupérer les informations",
+                "description": "Retourne les informations de l’entreprise (about)",
+                "operationId": "17aecdc1edd757ba6d00d7a5a9f80553",
+                "responses": {
+                    "200": {
+                        "description": "Données de l’entreprise",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/About"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/about.store": {
+            "post": {
+                "tags": [
+                    "About"
+                ],
+                "summary": "Créer les informations",
+                "description": "Créer les informations de l’entreprise (about)",
+                "operationId": "a0d44e120c9bfe4b7eb61b26904b06a4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "denomination"
+                                ],
+                                "properties": {
+                                    "denomination": {
+                                        "type": "string",
+                                        "example": "UHS Asbl"
+                                    },
+                                    "details": {
+                                        "type": "string",
+                                        "example": "ONG œuvrant dans l’humanitaire"
+                                    },
+                                    "register": {
+                                        "type": "string",
+                                        "example": "RCCM12345"
+                                    },
+                                    "national_id": {
+                                        "type": "string",
+                                        "example": "IDN12345"
+                                    },
+                                    "tax_number": {
+                                        "type": "string",
+                                        "example": "NIF12345"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+243900000000"
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "example": "Goma, RDC"
+                                    },
+                                    "logo": {
+                                        "type": "file"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Créé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/About"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/about.update/{id}": {
+            "post": {
+                "tags": [
+                    "About"
+                ],
+                "summary": "Mettre à jour les informations",
+                "description": "Modifier les informations de l’entreprise (about). \n     *                  Si aucun logo n’est envoyé, l’ancien reste.",
+                "operationId": "c4aede7f29d1d3037471976f493e64dc",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du about",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "denomination": {
+                                        "type": "string",
+                                        "example": "UHS Asbl"
+                                    },
+                                    "details": {
+                                        "type": "string",
+                                        "example": "ONG mise à jour"
+                                    },
+                                    "register": {
+                                        "type": "string"
+                                    },
+                                    "national_id": {
+                                        "type": "string"
+                                    },
+                                    "tax_number": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    },
+                                    "logo": {
+                                        "type": "file"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Mise à jour réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/About"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/auth/login": {
             "post": {
                 "tags": [
@@ -883,6 +1044,60 @@
     },
     "components": {
         "schemas": {
+            "About": {
+                "title": "About",
+                "required": [
+                    "id",
+                    "denomination"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "denomination": {
+                        "type": "string",
+                        "example": "UHS Asbl"
+                    },
+                    "details": {
+                        "type": "string",
+                        "example": "ONG œuvrant dans l’humanitaire"
+                    },
+                    "register": {
+                        "type": "string",
+                        "example": "RCCM12345"
+                    },
+                    "national_id": {
+                        "type": "string",
+                        "example": "IDN12345"
+                    },
+                    "tax_number": {
+                        "type": "string",
+                        "example": "NIF12345"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "+243900000000"
+                    },
+                    "address": {
+                        "type": "string",
+                        "example": "Goma, RDC"
+                    },
+                    "logo": {
+                        "type": "string",
+                        "example": "logos/uhs.png"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "User": {
                 "title": "User",
                 "required": [
@@ -936,6 +1151,10 @@
         {
             "name": "Users",
             "description": "Gestion des utilisateurs"
+        },
+        {
+            "name": "About",
+            "description": "About"
         },
         {
             "name": "Auth",

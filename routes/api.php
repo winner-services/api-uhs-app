@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\About\AboutController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Permission\PermissionController;
 use App\Http\Controllers\Api\Role\RoleController;
@@ -33,4 +34,10 @@ Route::prefix('auth')->group(function () {
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
     });
+});
+
+Route::controller(AboutController::class)->group(function () {
+    Route::get('/about.index', 'getData');
+    Route::post('/about.store', 'store');
+    Route::post('/about.update/{id}', 'update');
 });
