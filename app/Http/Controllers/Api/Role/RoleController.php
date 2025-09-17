@@ -63,60 +63,82 @@ class RoleController extends Controller
      */
     public function storeRole(Request $request)
     {
-        $rules = [
-            'name' => [
-                'required',
-                'string',
-                'unique:roles,name'
-            ],
-            'permissions' => 'required|array',
-            'permissions.*' => 'string',
-        ];
-
-        $messages = [
-            'name.unique' => 'Le rôle existe déjà.',
-        ];
-
-        $validator = Validator::make($request->all(), $rules, $messages);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Les données envoyées ne sont pas valides.',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $permissionsCount = Permission::whereIn('name', $request->permissions)->count();
-        if ($permissionsCount !== count($request->permissions)) {
-            return response()->json([
-                'message' => 'Une ou plusieurs permissions n\'ont pas été trouvées.',
-                'success' => false
-            ], 404);
-        }
-
         try {
-            DB::beginTransaction();
-
-            $role = Role::create([
-                'name' => $request->name,
-                'guard_name' => 'web'
+            // ✅ Validation
+            $request->validate([
+                'name' => 'required|string|unique:roles,name',
+                'permissions' => 'array',
             ]);
 
-            $permissions = Permission::whereIn('name', $request->permissions)->get();
-            $role->syncPermissions($permissions);
+            // ✅ Créer le rôle
+            $role = Role::create([
+                'name' => $request->name,
+                'guard_name' => 'web',
+            ]);
 
-            DB::commit();
+            $permissions = $request->permissions ?? [];
+
+            $actionMap = [
+                'Voir' => 'voir',
+                'Ajouter' => 'ajouter',
+                'Modifier' => 'modifier',
+                'Supprimer' => 'supprimer',
+            ];
+
+            foreach ($permissions as $permission) {
+                $parts = explode('_', $permission);
+
+                if (count($parts) !== 2) {
+                    // Si le format est incorrect, on ignore ou on retourne une erreur
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Format de permission invalide: $permission. Format attendu: Action_Permission (ex: Voir_User)",
+                    ], 400);
+                }
+
+                [$user_permission, $role_permission] = $parts;
+
+                // 🔎 Vérifier que la permission existe
+                $perm = Permission::where('name', $role_permission)->first();
+                if (!$perm) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Permission $role_permission non trouvée"
+                    ], 400);
+                }
+
+                $actionMap = [
+                    "Voir"     => "voir",
+                    "Ajouter"  => "ajouter",
+                    "Modifier" => "modifier",
+                    "Supprimer" => "supprimer"
+                ];
+
+                $column = $actionMap[$user_permission] ?? null;
+                if (!$column) {
+                    continue;
+                }
+
+                DB::table('role_permission_actions')->updateOrInsert(
+                    [
+                        'role_id'       => $role->id,
+                        'permission_id' => $perm->id,
+                    ],
+                    [
+                        $column => true,
+                    ]
+                );
+            }
 
             return response()->json([
-                'message' => "Rôle ajouté avec succès et permissions assignées.",
-                'success' => true
+                'success' => true,
+                'message' => 'success',
+                'data'    => $role,
             ], 201);
         } catch (\Exception $e) {
-            DB::rollBack();
-
             return response()->json([
-                'message' => 'Une erreur est survenue lors de la création du rôle.',
-                'error' => $e->getMessage()
+                'success' => false,
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -169,62 +191,95 @@ class RoleController extends Controller
      * )
      * )
      */
+
     public function updateRole(Request $request, $id)
     {
-        $role = Role::find($id);
-
-        if (!$role) {
-            return response()->json([
-                'message' => 'Rôle non trouvé.'
-            ], 404);
-        }
-
-        $rules = [
-            'name' => [
-                'sometimes',
-                'string',
-                'unique:roles,name,' . $role->id
-            ],
-            'permissions' => 'sometimes|array',
-            'permissions.*' => 'string|exists:permissions,name',
-        ];
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Les données envoyées ne sont pas valides.',
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
         try {
-            DB::beginTransaction();
+            // 🔎 Vérifier que le rôle existe
+            $role = Role::findOrFail($id);
 
-            if ($request->has('name')) {
-                $role->update(['name' => $request->name]);
+            // ✅ Validation
+            $request->validate([
+                'name' => 'required|string|unique:roles,name,' . $role->id,
+                'permissions' => 'array',
+            ]);
+
+            // ✅ Mettre à jour le rôle
+            $role->update([
+                'name' => $request->name,
+                'guard_name' => 'web',
+            ]);
+
+            $permissions = $request->permissions ?? [];
+
+            // ❌ Réinitialiser toutes les permissions (remettre à false)
+            DB::table('role_permission_actions')
+                ->where('role_id', $role->id)
+                ->update([
+                    'voir' => false,
+                    'ajouter' => false,
+                    'modifier' => false,
+                    'supprimer' => false,
+                ]);
+
+            $actionMap = [
+                'Voir' => 'voir',
+                'Ajouter' => 'ajouter',
+                'Modifier' => 'modifier',
+                'Supprimer' => 'supprimer',
+            ];
+
+            foreach ($permissions as $permission) {
+                $parts = explode('_', $permission);
+
+                if (count($parts) !== 2) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Format de permission invalide: $permission. Format attendu: Action_Permission (ex: Voir_User)",
+                    ], 400);
+                }
+
+                [$user_permission, $role_permission] = $parts;
+
+                // 🔎 Vérifier que la permission existe
+                $perm = Permission::where('name', $role_permission)->first();
+                if (!$perm) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Permission $role_permission non trouvée"
+                    ], 400);
+                }
+
+                $column = $actionMap[$user_permission] ?? null;
+                if (!$column) {
+                    continue;
+                }
+
+                // ✅ Insérer ou mettre à jour
+                DB::table('role_permission_actions')->updateOrInsert(
+                    [
+                        'role_id'       => $role->id,
+                        'permission_id' => $perm->id,
+                    ],
+                    [
+                        $column => true,
+                    ]
+                );
             }
-
-            if ($request->has('permissions')) {
-                $permissions = Permission::whereIn('name', $request->permissions)->get();
-                $role->syncPermissions($permissions);
-            }
-
-            DB::commit();
 
             return response()->json([
-                'message' => 'Rôle mis à jour avec succès.',
-                'success' => true
+                'success' => true,
+                'message' => 'Rôle mis à jour avec succès',
+                'data'    => $role,
             ], 200);
         } catch (\Exception $e) {
-            DB::rollBack();
-
             return response()->json([
-                'message' => 'Une erreur est survenue lors de la mise à jour du rôle.',
-                'error' => $e->getMessage()
+                'success' => false,
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
+
 
     /**
      * @OA\Get(
@@ -278,19 +333,51 @@ class RoleController extends Controller
      * )
      */
 
+    // public function getPermissionDataByRole($id)
+    // {
+    //     $permissions = DB::table('role_has_permissions')
+    //         ->join('permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
+    //         ->where('role_has_permissions.role_id', $id)
+    //         ->pluck('permissions.name')
+    //         ->toArray();
+    //     $result = [
+    //         'message' => "succes",
+    //         'success' => true,
+    //         'status' => 200,
+    //         'data' => $permissions
+    //     ];
+    //     return response()->json($result);
+    // }
+
     public function getPermissionDataByRole($id)
     {
-        $permissions = DB::table('role_has_permissions')
-            ->join('permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
-            ->where('role_has_permissions.role_id', $id)
-            ->pluck('permissions.name')
-            ->toArray();
-        $result = [
-            'message' => "succes",
-            'success' => true,
-            'status' => 200,
-            'data' => $permissions
+        $rows = DB::table('role_permission_actions')
+            ->join('permissions', 'permissions.id', '=', 'role_permission_actions.permission_id')
+            ->where('role_permission_actions.role_id', $id)
+            ->select('permissions.name as permission_name', 'role_permission_actions.*')
+            ->get();
+
+        $actionMap = [
+            'voir'     => "Voir",
+            'ajouter'  => "Ajouter",
+            'modifier' => "Modifier",
+            'supprimer' => "Supprimer",
         ];
-        return response()->json($result);
+
+        $result = [];
+
+        foreach ($rows as $row) {
+            foreach ($actionMap as $col => $prefix) {
+                if ($row->$col) {
+                    $result[] = $prefix . "_" . $row->permission_name;
+                }
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'success',
+            'data'    => $result
+        ]);
     }
 }

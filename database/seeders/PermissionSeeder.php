@@ -14,13 +14,9 @@ class PermissionSeeder extends Seeder
     public function run(): void
     {
         $permissions = [
-            'Voir_abonnement',
-            'Ajouter_categorie_abonnement',
-            'Modifier_categorie_abonnement',
-            'Supprimer_categorie_abonnement',
-            'Ajouter_client',
-            'Modifier_client',
-            'Supprimer_client',
+            'abonnement',
+            'categorie_abonnement',
+            'client',
         ];
         foreach ($permissions as $permission) {
             Permission::create(['name' => $permission]);
