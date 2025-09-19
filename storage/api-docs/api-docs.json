@@ -11,7 +11,7 @@
     },
     "servers": [
         {
-            "url": "http://127.0.0.1:8000",
+            "url": "https://api-uhs.uhs-rdc.org",
             "description": "Serveur principal"
         }
     ],
