@@ -43,15 +43,15 @@ class AuthController extends Controller
      * )
      */
 
-    public function login(Request $request)
+   public function login(Request $request)
     {
-        // ✅ Validation
+        // Validation
         $request->validate([
             'email'    => 'required|string',
             'password' => 'required|string|min:4',
         ]);
 
-        // ✅ Recherche de l'utilisateur
+        // Recherche de l'utilisateur
         $user = User::where('email', $request->email)
                     ->orWhere('phone', $request->email)
                     ->first();
@@ -63,7 +63,6 @@ class AuthController extends Controller
             ], 401);
         }
 
-        // ✅ Vérification si le compte est actif
         if (!$user->active) {
             return response()->json([
                 'success' => false,
@@ -71,14 +70,14 @@ class AuthController extends Controller
             ], 422);
         }
 
-        // ✅ Récupérer les permissions depuis role_permission_actions
+        // Récupérer les permissions depuis role_permission_actions
         $rolePermissions = DB::table('role_permission_actions as rpa')
             ->join('permissions as p', 'rpa.permission_id', '=', 'p.id')
             ->where('rpa.role_id', $user->role_id)
             ->select('p.name as permission_name', 'rpa.voir', 'rpa.ajouter', 'rpa.modifier', 'rpa.supprimer')
             ->get();
 
-        // Transformer en ["Action_Permission"]
+        // Transformer en ["Action_Permission"] uniquement si true
         $permissions = [];
         $actionMap = [
             'voir' => 'Voir',
@@ -89,13 +88,13 @@ class AuthController extends Controller
 
         foreach ($rolePermissions as $rp) {
             foreach ($actionMap as $col => $prefix) {
-                if ($rp->$col) {
+                if (!empty($rp->$col) && $rp->$col) { // Inclut seulement si true
                     $permissions[] = $prefix . '_' . $rp->permission_name;
                 }
             }
         }
 
-        // ✅ Générer un token Sanctum
+        // Générer un token Sanctum
         $device_name = $request->header('User-Agent') ?? 'unknown_device';
         $token = $user->createToken($device_name, ['*'])->plainTextToken;
 
@@ -109,12 +108,11 @@ class AuthController extends Controller
                 'email' => $user->email,
                 'phone' => $user->phone,
                 'active' => $user->active,
-                'role_name' => [$user->role->name ?? null], 
-                'permissions' => $permissions,
+                'role_name' => [$user->role->name ?? null],
+                'permissions' => $permissions, // Seulement les permissions valides
             ],
         ]);
     }
-
 
     // public function login(Request $request)
     // {
