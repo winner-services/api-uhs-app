@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
@@ -41,65 +42,139 @@ class AuthController extends Controller
      *   )
      * )
      */
+
     public function login(Request $request)
     {
         // ✅ Validation
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'email'    => 'required|string',
             'password' => 'required|string|min:4',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Les données envoyées ne sont pas valides.',
-                'errors'  => $validator->errors()
-            ], 422);
-        }
-
-        // ✅ Recherche de l'utilisateur (email ou téléphone)
+        // ✅ Recherche de l'utilisateur
         $user = User::where('email', $request->email)
-            ->orWhere('phone', $request->email)
-            ->first();
+                    ->orWhere('phone', $request->email)
+                    ->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
-                'message' => 'Vérifiez vos identifiants svp.',
-                'status'  => 401
+                'success' => false,
+                'message' => 'Votre email ou mot de passe est incorrect'
             ], 401);
         }
 
         // ✅ Vérification si le compte est actif
         if (!$user->active) {
             return response()->json([
-                'message' => 'Votre compte est désactivé.',
-                'status'  => 422
+                'success' => false,
+                'message' => 'Votre compte est désactivé'
             ], 422);
         }
-        // ✅ Détection du device (optionnel : tu peux simplifier en fixant un nom unique)
-        $device_name = $request->header('User-Agent') ?? 'unknown_device';
 
-        // ✅ Génération du token Sanctum
+        // ✅ Récupérer les permissions depuis role_permission_actions
+        $rolePermissions = DB::table('role_permission_actions as rpa')
+            ->join('permissions as p', 'rpa.permission_id', '=', 'p.id')
+            ->where('rpa.role_id', $user->role_id)
+            ->select('p.name as permission_name', 'rpa.voir', 'rpa.ajouter', 'rpa.modifier', 'rpa.supprimer')
+            ->get();
+
+        // Transformer en ["Action_Permission"]
+        $permissions = [];
+        $actionMap = [
+            'voir' => 'Voir',
+            'ajouter' => 'Ajouter',
+            'modifier' => 'Modifier',
+            'supprimer' => 'Supprimer'
+        ];
+
+        foreach ($rolePermissions as $rp) {
+            foreach ($actionMap as $col => $prefix) {
+                if ($rp->$col) {
+                    $permissions[] = $prefix . '_' . $rp->permission_name;
+                }
+            }
+        }
+
+        // ✅ Générer un token Sanctum
+        $device_name = $request->header('User-Agent') ?? 'unknown_device';
         $token = $user->createToken($device_name, ['*'])->plainTextToken;
 
-        $roles = $user->getRoleNames();
-        $permissions = $user->getAllPermissions()
-            ->pluck('name');
-
         return response()->json([
-            'message' => 'Connexion réussie.',
-            'token'   => $token,
-            'user'    => [
-                'id'          => $user->id,
-                'name'        => $user->name,
-                'email'       => $user->email,
-                'phone'       => $user->phone,
-                'active'      => $user->active,
-                'role_name'   => $roles,
+            'success' => true,
+            'message' => 'Connexion réussie',
+            'token' => $token,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'active' => $user->active,
+                'role_name' => [$user->role->name ?? null], 
                 'permissions' => $permissions,
             ],
-            'status' => 200
         ]);
     }
+
+
+    // public function login(Request $request)
+    // {
+    //     // ✅ Validation
+    //     $validator = Validator::make($request->all(), [
+    //         'email'    => 'required|string',
+    //         'password' => 'required|string|min:4',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'message' => 'Les données envoyées ne sont pas valides.',
+    //             'errors'  => $validator->errors()
+    //         ], 422);
+    //     }
+
+    //     // ✅ Recherche de l'utilisateur (email ou téléphone)
+    //     $user = User::where('email', $request->email)
+    //         ->orWhere('phone', $request->email)
+    //         ->first();
+
+    //     if (!$user || !Hash::check($request->password, $user->password)) {
+    //         return response()->json([
+    //             'message' => 'Vérifiez vos identifiants svp.',
+    //             'status'  => 401
+    //         ], 401);
+    //     }
+
+    //     // ✅ Vérification si le compte est actif
+    //     if (!$user->active) {
+    //         return response()->json([
+    //             'message' => 'Votre compte est désactivé.',
+    //             'status'  => 422
+    //         ], 422);
+    //     }
+    //     // ✅ Détection du device (optionnel : tu peux simplifier en fixant un nom unique)
+    //     $device_name = $request->header('User-Agent') ?? 'unknown_device';
+
+    //     // ✅ Génération du token Sanctum
+    //     $token = $user->createToken($device_name, ['*'])->plainTextToken;
+
+    //     $roles = $user->getRoleNames();
+    //     $permissions = $user->getAllPermissions()
+    //         ->pluck('name');
+
+    //     return response()->json([
+    //         'message' => 'Connexion réussie.',
+    //         'token'   => $token,
+    //         'user'    => [
+    //             'id'          => $user->id,
+    //             'name'        => $user->name,
+    //             'email'       => $user->email,
+    //             'phone'       => $user->phone,
+    //             'active'      => $user->active,
+    //             'role_name'   => $roles,
+    //             'permissions' => $permissions,
+    //         ],
+    //         'status' => 200
+    //     ]);
+    // }
 
     /**
      * @OA\Post(
