@@ -277,7 +277,8 @@ class UserController extends Controller
             return response()->json([
                 'message' => 'Agent mis à jour avec succès',
                 'success' => true,
-            ], 200);
+                'status' => 200
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -338,8 +339,10 @@ class UserController extends Controller
             DB::commit();
 
             return response()->json([
-                'message' => 'Utilisateur supprimé avec succès'
-            ], 200);
+                'message' => 'Utilisateur supprimé avec succès',
+                'status' => 200,
+                'success' => true
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
