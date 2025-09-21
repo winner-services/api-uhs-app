@@ -15,7 +15,7 @@ class PermissionSeeder extends Seeder
     {
         $permissions = [
             'abonnement',
-            'categorie_abonnement',
+            'categorie-abonnement',
             'client',
         ];
         foreach ($permissions as $permission) {

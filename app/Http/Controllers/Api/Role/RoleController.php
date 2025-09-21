@@ -70,65 +70,56 @@ class RoleController extends Controller
                 'permissions' => 'array',
             ]);
 
-            // ✅ Créer le rôle
-            $role = Role::create([
-                'name' => $request->name,
-                'guard_name' => 'web',
-            ]);
+            $role = null;
 
-            $permissions = $request->permissions ?? [];
+            // ✅ Début de la transaction
+            DB::transaction(function () use ($request, &$role) {
+                // ✅ Créer le rôle
+                $role = Role::create([
+                    'name' => $request->name,
+                    'guard_name' => 'web',
+                ]);
 
-            $actionMap = [
-                'Voir' => 'voir',
-                'Ajouter' => 'ajouter',
-                'Modifier' => 'modifier',
-                'Supprimer' => 'supprimer',
-            ];
-
-            foreach ($permissions as $permission) {
-                $parts = explode('_', $permission);
-
-                if (count($parts) !== 2) {
-                    // Si le format est incorrect, on ignore ou on retourne une erreur
-                    return response()->json([
-                        'success' => false,
-                        'message' => "Format de permission invalide: $permission. Format attendu: Action_Permission (ex: Voir_User)",
-                    ], 400);
-                }
-
-                [$user_permission, $role_permission] = $parts;
-
-                // 🔎 Vérifier que la permission existe
-                $perm = Permission::where('name', $role_permission)->first();
-                if (!$perm) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => "Permission $role_permission non trouvée"
-                    ], 400);
-                }
+                $permissions = $request->permissions ?? [];
 
                 $actionMap = [
-                    "Voir"     => "voir",
-                    "Ajouter"  => "ajouter",
-                    "Modifier" => "modifier",
-                    "Supprimer" => "supprimer"
+                    'Voir'     => 'voir',
+                    'Ajouter'  => 'ajouter',
+                    'Modifier' => 'modifier',
+                    'Supprimer' => 'supprimer',
                 ];
 
-                $column = $actionMap[$user_permission] ?? null;
-                if (!$column) {
-                    continue;
-                }
+                foreach ($permissions as $permission) {
+                    $parts = explode('_', $permission);
 
-                DB::table('role_permission_actions')->updateOrInsert(
-                    [
-                        'role_id'       => $role->id,
-                        'permission_id' => $perm->id,
-                    ],
-                    [
-                        $column => true,
-                    ]
-                );
-            }
+                    if (count($parts) !== 2) {
+                        throw new \Exception("Format de permission invalide: $permission. Format attendu: Action_Permission (ex: Voir_User)");
+                    }
+
+                    [$user_permission, $role_permission] = $parts;
+
+                    // 🔎 Vérifier que la permission existe
+                    $perm = Permission::where('name', $role_permission)->first();
+                    if (!$perm) {
+                        throw new \Exception("Permission $role_permission non trouvée");
+                    }
+
+                    $column = $actionMap[$user_permission] ?? null;
+                    if (!$column) {
+                        continue;
+                    }
+
+                    DB::table('role_permission_actions')->updateOrInsert(
+                        [
+                            'role_id'       => $role->id,
+                            'permission_id' => $perm->id,
+                        ],
+                        [
+                            $column => true,
+                        ]
+                    );
+                }
+            });
 
             return response()->json([
                 'success' => true,
@@ -142,6 +133,88 @@ class RoleController extends Controller
             ], 500);
         }
     }
+
+    // public function storeRole(Request $request)
+    // {
+    //     try {
+    //         // ✅ Validation
+    //         $request->validate([
+    //             'name' => 'required|string|unique:roles,name',
+    //             'permissions' => 'array',
+    //         ]);
+
+    //         // ✅ Créer le rôle
+    //         $role = Role::create([
+    //             'name' => $request->name,
+    //             'guard_name' => 'web',
+    //         ]);
+
+    //         $permissions = $request->permissions ?? [];
+
+    //         $actionMap = [
+    //             'Voir' => 'voir',
+    //             'Ajouter' => 'ajouter',
+    //             'Modifier' => 'modifier',
+    //             'Supprimer' => 'supprimer',
+    //         ];
+
+    //         foreach ($permissions as $permission) {
+    //             $parts = explode('_', $permission);
+
+    //             if (count($parts) !== 2) {
+    //                 // Si le format est incorrect, on ignore ou on retourne une erreur
+    //                 return response()->json([
+    //                     'success' => false,
+    //                     'message' => "Format de permission invalide: $permission. Format attendu: Action_Permission (ex: Voir_User)",
+    //                 ], 400);
+    //             }
+
+    //             [$user_permission, $role_permission] = $parts;
+
+    //             // 🔎 Vérifier que la permission existe
+    //             $perm = Permission::where('name', $role_permission)->first();
+    //             if (!$perm) {
+    //                 return response()->json([
+    //                     'success' => false,
+    //                     'message' => "Permission $role_permission non trouvée"
+    //                 ], 400);
+    //             }
+
+    //             $actionMap = [
+    //                 "Voir"     => "voir",
+    //                 "Ajouter"  => "ajouter",
+    //                 "Modifier" => "modifier",
+    //                 "Supprimer" => "supprimer"
+    //             ];
+
+    //             $column = $actionMap[$user_permission] ?? null;
+    //             if (!$column) {
+    //                 continue;
+    //             }
+
+    //             DB::table('role_permission_actions')->updateOrInsert(
+    //                 [
+    //                     'role_id'       => $role->id,
+    //                     'permission_id' => $perm->id,
+    //                 ],
+    //                 [
+    //                     $column => true,
+    //                 ]
+    //             );
+    //         }
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'success',
+    //             'data'    => $role,
+    //         ], 201);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
 
     /**
      * @OA\Put(
