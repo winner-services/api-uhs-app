@@ -5,11 +5,15 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Permission\PermissionController;
 use App\Http\Controllers\Api\Role\RoleController;
 use App\Http\Controllers\Api\User\UserController;
+use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
+Route::middleware('auth:sanctum')->get('/check-auth', function (Request $request) {
+    return response()->json(['authenticated' => true]);
+});
 
 Route::controller(UserController::class)->group(function () {
     Route::get('/users.getData', 'index');
