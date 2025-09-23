@@ -1261,6 +1261,235 @@
                 }
             }
         },
+        "/api/tickets.getAllData": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Liste des tickets",
+                "description": "Récupérer tous les tickets liés aux points d’eau",
+                "operationId": "b3b5ce8d1c6df51554550f9c4d184f34",
+                "responses": {
+                    "200": {
+                        "description": "Liste des tickets",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Ticket"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/tickets.store": {
+            "post": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Créer un ticket",
+                "description": "Ajout d’un nouveau ticket de maintenance",
+                "operationId": "5fc727f0979c4176011ed930f081c63d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "point_id",
+                                    "description",
+                                    "statut",
+                                    "priorite",
+                                    "technicien",
+                                    "date_ouverture",
+                                    "addedBy"
+                                ],
+                                "properties": {
+                                    "point_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "addedBy": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Fuite détectée dans le compteur."
+                                    },
+                                    "statut": {
+                                        "type": "string",
+                                        "example": "Ouvert"
+                                    },
+                                    "priorite": {
+                                        "type": "string",
+                                        "example": "Haute"
+                                    },
+                                    "technicien": {
+                                        "type": "string",
+                                        "example": "Jean Mukendi"
+                                    },
+                                    "date_ouverture": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-09-21"
+                                    },
+                                    "date_cloture": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-09-25"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Ticket créé avec succès"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/tickets.update/{id}": {
+            "put": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Modifier un ticket",
+                "description": "Mise à jour d’un ticket existant",
+                "operationId": "12424ff9ab5d0268021256ebbfdaa115",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du ticket",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Réparation effectuée."
+                                    },
+                                    "statut": {
+                                        "type": "string",
+                                        "example": "Clôturé"
+                                    },
+                                    "priorite": {
+                                        "type": "string",
+                                        "example": "Moyenne"
+                                    },
+                                    "technicien": {
+                                        "type": "string",
+                                        "example": "Pierre Kaseba"
+                                    },
+                                    "date_ouverture": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-09-21"
+                                    },
+                                    "date_cloture": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-09-23"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Ticket mis à jour avec succès"
+                    },
+                    "404": {
+                        "description": "Ticket non trouvé"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/tickets.delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Supprimer un ticket",
+                "description": "Suppression d’un ticket de maintenance",
+                "operationId": "eadba22cf2d6c905878041f73f2c1243",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du ticket",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ticket supprimé avec succès"
+                    },
+                    "404": {
+                        "description": "Ticket non trouvé"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/users.getData": {
             "get": {
                 "tags": [
@@ -1843,6 +2072,62 @@
                 },
                 "type": "object"
             },
+            "Ticket": {
+                "title": "Ticket",
+                "description": "Modèle de ticket de maintenance",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "point_id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "addedBy": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Fuite détectée sur le compteur."
+                    },
+                    "statut": {
+                        "type": "string",
+                        "example": "Ouvert"
+                    },
+                    "priorite": {
+                        "type": "string",
+                        "example": "Haute"
+                    },
+                    "technicien": {
+                        "type": "string",
+                        "example": "Jean Mukendi"
+                    },
+                    "date_ouverture": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2025-09-21"
+                    },
+                    "date_cloture": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2025-09-25",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-09-21T10:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-09-21T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
             "User": {
                 "title": "User",
                 "required": [
@@ -1928,6 +2213,10 @@
         {
             "name": "Role",
             "description": "Role"
+        },
+        {
+            "name": "Tickets",
+            "description": "Tickets"
         }
     ]
 }

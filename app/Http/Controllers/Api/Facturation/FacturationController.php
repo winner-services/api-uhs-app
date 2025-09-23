@@ -29,7 +29,7 @@ class FacturationController extends Controller
      */
     public function index()
     {
-        $facturations = Facturation::with('abonne')->get();
+        $facturations = Facturation::with('abonne','user')->get();
 
         return response()->json([
             'success' => true,

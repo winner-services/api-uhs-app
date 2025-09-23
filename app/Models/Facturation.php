@@ -34,4 +34,8 @@ class Facturation extends Model
     {
         return $this->belongsTo(Abonne::class);
     }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'addedBy');
+    }
 }

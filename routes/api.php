@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Facturation\FacturationController;
 use App\Http\Controllers\Api\Permission\PermissionController;
 use App\Http\Controllers\Api\PointEau\PointEauController;
 use App\Http\Controllers\Api\Role\RoleController;
+use App\Http\Controllers\Api\Ticket\TicketController;
 use App\Http\Controllers\Api\User\UserController;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
@@ -78,4 +79,11 @@ Route::controller(FacturationController::class)->group(function () {
     Route::post('/facturations.store', 'store');
     Route::put('/facturations.update/{id}', 'update');
     Route::delete('/facturations.delete/{id}', 'destroy');
+});
+
+Route::controller(TicketController::class)->group(function(){
+    Route::get('/tickets.getAllData', 'index');
+    Route::post('/tickets.store', 'store');
+    Route::put('/tickets.update/{id}', 'update');
+    Route::delete('/tickets.delete/{id}', 'destroy');
 });

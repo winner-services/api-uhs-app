@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('technicien');
             $table->date('date_ouverture');
             $table->date('date_cloture')->nullable();
+            $table->foreignId('addedBy')->constrained('users');
             $table->timestamps();
         });
     }
