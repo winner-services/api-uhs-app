@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('status', []);
             $table->date('date_emission');
             $table->date('date_paiement')->nullable();
+            $table->foreignId('addedBy')->constrained('users');
             $table->timestamps();
         });
     }

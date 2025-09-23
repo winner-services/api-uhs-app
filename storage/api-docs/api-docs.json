@@ -566,6 +566,256 @@
                 ]
             }
         },
+        "/api/facturations.getAllData": {
+            "get": {
+                "tags": [
+                    "Facturations"
+                ],
+                "summary": "Liste des facturations",
+                "description": "Récupérer toutes les facturations avec leurs abonnés",
+                "operationId": "92837833ecfbbd98d604b56990a0be60",
+                "responses": {
+                    "200": {
+                        "description": "Liste des facturations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Facturation"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/facturations.store": {
+            "post": {
+                "tags": [
+                    "Facturations"
+                ],
+                "summary": "Créer une facturation",
+                "description": "Ajout d’une nouvelle facturation pour un abonné",
+                "operationId": "fe0aae996a7b8f37d82aa816a532176a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "abonne_id",
+                                    "mois",
+                                    "montant",
+                                    "status",
+                                    "date_emission",
+                                    "addedBy"
+                                ],
+                                "properties": {
+                                    "abonne_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "mois": {
+                                        "type": "string",
+                                        "example": "09-2025"
+                                    },
+                                    "montant": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 150.75
+                                    },
+                                    "dette": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 50
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "Non payé"
+                                    },
+                                    "date_emission": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-09-01"
+                                    },
+                                    "date_paiement": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-09-10"
+                                    },
+                                    "addedBy": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Facturation créée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Facturation ajoutée avec succès"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Facturation"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/facturations.update/{id}": {
+            "put": {
+                "tags": [
+                    "Facturations"
+                ],
+                "summary": "Modifier une facturation",
+                "description": "Mettre à jour une facturation existante",
+                "operationId": "538f54d25f253d3f34159d8d9e020ab7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la facturation",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "mois": {
+                                        "type": "string",
+                                        "example": "09-2025"
+                                    },
+                                    "montant": {
+                                        "type": "number",
+                                        "example": 200.5
+                                    },
+                                    "dette": {
+                                        "type": "number",
+                                        "example": 30
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "Payé"
+                                    },
+                                    "date_emission": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-09-01"
+                                    },
+                                    "date_paiement": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-09-12"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Facturation mise à jour avec succès"
+                    },
+                    "404": {
+                        "description": "Facturation non trouvée"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/facturations.delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Facturations"
+                ],
+                "summary": "Supprimer une facturation",
+                "description": "Suppression d’une facturation par ID",
+                "operationId": "3c4f8e663d9a08ecf825ec5f71ac3dee",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la facturation",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Facturation supprimée avec succès"
+                    },
+                    "404": {
+                        "description": "Facturation non trouvée"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/permission.index": {
             "get": {
                 "tags": [
@@ -580,6 +830,142 @@
                         "content": {
                             "application/json": {}
                         }
+                    }
+                }
+            }
+        },
+        "/api/point-eaux.getAllData": {
+            "get": {
+                "tags": [
+                    "Points d’eau"
+                ],
+                "summary": "Liste des points d’eau",
+                "operationId": "0fe5dfc29e7c93c45d979b4270ff44a8",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
+        "/api/point-eaux.store": {
+            "post": {
+                "tags": [
+                    "Points d’eau"
+                ],
+                "summary": "Créer un point d’eau",
+                "operationId": "654581a9b53fb73d54ba41d0bd72d4e1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "abonne_id"
+                                ],
+                                "properties": {
+                                    "abonne_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "localisation": {
+                                        "type": "string",
+                                        "example": "-1.6789,29.2345"
+                                    },
+                                    "numero_compteur": {
+                                        "type": "string",
+                                        "example": "COMP-001"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "Actif"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Point d’eau créé avec succès"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                }
+            }
+        },
+        "/api/point-eaux.update/{id}": {
+            "put": {
+                "tags": [
+                    "Points d’eau"
+                ],
+                "summary": "Mettre à jour un point d’eau",
+                "operationId": "468b286027dfd3599955d452e2884b3d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du point d’eau",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "localisation": {
+                                        "type": "string",
+                                        "example": "-1.6789,29.2345"
+                                    },
+                                    "numero_compteur": {
+                                        "type": "string",
+                                        "example": "COMP-002"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "Inactif"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Point d’eau mis à jour avec succès"
+                    },
+                    "404": {
+                        "description": "Point d’eau non trouvé"
+                    }
+                }
+            }
+        },
+        "/api/point-eaux.delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Points d’eau"
+                ],
+                "summary": "Supprimer un point d’eau",
+                "operationId": "1ff1a61a7dd52ae4d07541151365b4ff",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du point d’eau",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Point d’eau supprimé avec succès"
+                    },
+                    "404": {
+                        "description": "Point d’eau non trouvé"
                     }
                 }
             }
@@ -1399,6 +1785,64 @@
                 },
                 "type": "object"
             },
+            "Facturation": {
+                "title": "Facturation",
+                "description": "Modèle de facturation",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "abonne_id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "addedBy": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "mois": {
+                        "type": "string",
+                        "example": "09-2025"
+                    },
+                    "montant": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 150.75
+                    },
+                    "dette": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 50
+                    },
+                    "status": {
+                        "type": "string",
+                        "example": "Non payé"
+                    },
+                    "date_emission": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2025-09-01"
+                    },
+                    "date_paiement": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2025-09-10",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-09-21T10:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-09-21T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
             "User": {
                 "title": "User",
                 "required": [
@@ -1470,8 +1914,16 @@
             "description": "Auth"
         },
         {
+            "name": "Facturations",
+            "description": "Facturations"
+        },
+        {
             "name": "Permission",
             "description": "Permission"
+        },
+        {
+            "name": "Points d’eau",
+            "description": "Points d’eau"
         },
         {
             "name": "Role",

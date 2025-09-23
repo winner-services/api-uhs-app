@@ -4,7 +4,9 @@ use App\Http\Controllers\Api\Abonnement\AbonnementCategoryController;
 use App\Http\Controllers\Api\Abonnement\AbonnementController;
 use App\Http\Controllers\Api\About\AboutController;
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\Facturation\FacturationController;
 use App\Http\Controllers\Api\Permission\PermissionController;
+use App\Http\Controllers\Api\PointEau\PointEauController;
 use App\Http\Controllers\Api\Role\RoleController;
 use App\Http\Controllers\Api\User\UserController;
 use Illuminate\Support\Facades\Request;
@@ -56,10 +58,24 @@ Route::controller(AbonnementCategoryController::class)->group(function () {
     Route::delete('/ategory_abonne.delete/{id}', 'destroy');
 });
 
-Route::controller(AbonnementController::class)->group(function(){
-    Route::get('/abonnes.getAllData','getaAbonnellData');
-    Route::get('/abonnes.getOptionsData','index');
-    Route::post('/abonnes.store','store');
-    Route::put('/abonnes.update/{id}','update');
-    Route::delete('/bonnes.delete/{id}','destroy');
+Route::controller(AbonnementController::class)->group(function () {
+    Route::get('/abonnes.getAllData', 'getaAbonnellData');
+    Route::get('/abonnes.getOptionsData', 'index');
+    Route::post('/abonnes.store', 'store');
+    Route::put('/abonnes.update/{id}', 'update');
+    Route::delete('/bonnes.delete/{id}', 'destroy');
+});
+
+Route::controller(PointEauController::class)->group(function () {
+    Route::get('/point-eaux.getAllData', 'index');
+    Route::post('/point-eaux.store', 'store');
+    Route::put('/point-eaux.update/{id}', 'update');
+    Route::delete('/point-eaux.delete/{id}', 'destroy');
+});
+
+Route::controller(FacturationController::class)->group(function () {
+    Route::get('/facturations.getAllData', 'index');
+    Route::post('/facturations.store', 'store');
+    Route::put('/facturations.update/{id}', 'update');
+    Route::delete('/facturations.delete/{id}', 'destroy');
 });
