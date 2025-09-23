@@ -81,7 +81,7 @@ class FacturationController extends Controller
             'status'        => ['required', 'string'],
             'date_emission' => ['required', 'date'],
             'date_paiement' => ['nullable', 'date'],
-            'addedBy'       => ['required', 'integer', 'exists:user,id'],
+            'addedBy'       => ['required', 'integer', 'exists:users,id'],
         ];
 
         $validator = Validator::make($request->all(), $rules);
