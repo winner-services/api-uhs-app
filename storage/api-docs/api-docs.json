@@ -30,13 +30,13 @@
                 }
             }
         },
-        "/api/category_abonne.getallData": {
+        "/api/category_abonne.getAllData": {
             "get": {
                 "tags": [
                     "Abonnement Categories"
                 ],
                 "summary": "Liste des catégories d'abonnés",
-                "operationId": "ad74acde79dcf1475e32a5b30f91fd83",
+                "operationId": "dc65a820d55169cad40c475ba1743612",
                 "responses": {
                     "200": {
                         "description": "Liste récupérée avec succès"

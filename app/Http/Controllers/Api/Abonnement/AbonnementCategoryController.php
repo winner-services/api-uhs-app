@@ -39,7 +39,7 @@ class AbonnementCategoryController extends Controller
 
     /**
      * @OA\Get(
-     * path="/api/category_abonne.getallData",
+     * path="/api/category_abonne.getAllData",
      * summary="Liste des catégories d'abonnés",
      * tags={"Abonnement Categories"},
      * @OA\Response(response=200, description="Liste récupérée avec succès"),
@@ -50,7 +50,7 @@ class AbonnementCategoryController extends Controller
         $result = [
             'message' => "OK",
             'success' => true,
-            'data' => AbonnementCategorie::latest(),
+            'data' => AbonnementCategorie::latest()->get(),
             'status' => 200
         ];
         return response()->json($result);
