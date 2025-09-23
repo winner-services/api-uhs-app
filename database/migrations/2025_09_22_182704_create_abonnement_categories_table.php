@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('abonnement_categories', function (Blueprint $table) {
             $table->id();
             $table->string('designation');   
-            $table->decimal('prix_mensuel', 8, 2);
+            $table->decimal('prix_mensuel', 8, 2)->nullable();
             $table->timestamps();
         });
     }

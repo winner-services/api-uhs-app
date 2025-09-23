@@ -16,6 +16,147 @@
         }
     ],
     "paths": {
+        "/api/category_abonne.getOptionsData": {
+            "get": {
+                "tags": [
+                    "Abonnement Categories"
+                ],
+                "summary": "Liste des catégories d'abonnés",
+                "operationId": "c3d593895ec87f8ec8bb457c610a8e27",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
+        "/api/category_abonne.getallData": {
+            "get": {
+                "tags": [
+                    "Abonnement Categories"
+                ],
+                "summary": "Liste des catégories d'abonnés",
+                "operationId": "ad74acde79dcf1475e32a5b30f91fd83",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
+        "/api/category_abonne.store": {
+            "post": {
+                "tags": [
+                    "Abonnement Categories"
+                ],
+                "summary": "Créer une catégorie d'abonné",
+                "operationId": "318c5175a91334683f6a798f6338cbfc",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "designation",
+                                    "prix_mensuel"
+                                ],
+                                "properties": {
+                                    "designation": {
+                                        "type": "string",
+                                        "example": "Église"
+                                    },
+                                    "prix_mensuel": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": "50.00"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Catégorie créée avec succès"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                }
+            }
+        },
+        "/api/category_abonne.update/{id}": {
+            "put": {
+                "tags": [
+                    "Abonnement Categories"
+                ],
+                "summary": "Mettre à jour une catégorie d'abonné",
+                "operationId": "9a146ce2e4a87d89b94a28bdcefef8c2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la catégorie",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "designation": {
+                                        "type": "string",
+                                        "example": "Hôpital"
+                                    },
+                                    "prix_mensuel": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": "30.00"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Catégorie mise à jour avec succès"
+                    },
+                    "404": {
+                        "description": "Catégorie non trouvée"
+                    }
+                }
+            }
+        },
+        "/api/category_abonne.delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Abonnement Categories"
+                ],
+                "summary": "Supprimer une catégorie d'abonné",
+                "operationId": "b10382ca229b0549b58f3f811f68ef6e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la catégorie",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Catégorie supprimée avec succès"
+                    },
+                    "404": {
+                        "description": "Catégorie non trouvée"
+                    }
+                }
+            }
+        },
         "/api/about.index": {
             "get": {
                 "tags": [
@@ -1151,6 +1292,10 @@
         {
             "name": "Users",
             "description": "Gestion des utilisateurs"
+        },
+        {
+            "name": "Abonnement Categories",
+            "description": "Abonnement Categories"
         },
         {
             "name": "About",

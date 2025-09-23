@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Abonnement\AbonnementCategoryController;
 use App\Http\Controllers\Api\About\AboutController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Permission\PermissionController;
@@ -44,4 +45,12 @@ Route::controller(AboutController::class)->group(function () {
     Route::get('/about.index', 'getData');
     Route::post('/about.store', 'store');
     Route::post('/about.update/{id}', 'update');
+});
+
+Route::controller(AbonnementCategoryController::class)->group(function () {
+    Route::get('/category_abonne.getOptionsData', 'index');
+    Route::get('/category_abonne.getallData', 'getallData');
+    Route::post('/tegory_abonne.store', 'store');
+    Route::put('/category_abonne.update/{id}', 'update');
+    Route::delete('/ategory_abonne.delete/{id}', 'destroy');
 });

@@ -12,4 +12,12 @@ class AbonnementCategorie extends Model
     {
         return $this->hasMany(Abonne::class, 'categorie_id');
     }
+
+    public function scopeSearh($query, $term)
+    {
+        $term = "%$term%";
+        $query->where(function ($query) use ($term) {
+            $query->where('designation', 'like', $term);
+        });
+    }
 }
