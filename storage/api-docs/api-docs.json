@@ -157,6 +157,166 @@
                 }
             }
         },
+        "/api/abonnes.getOptionsData": {
+            "get": {
+                "tags": [
+                    "Abonnés"
+                ],
+                "summary": "Liste des abonnés",
+                "operationId": "2c612335b51116e8659e1264b2f81555",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
+        "/api/abonnes.getAllData": {
+            "get": {
+                "tags": [
+                    "Abonnés"
+                ],
+                "summary": "Liste des abonnés",
+                "operationId": "eeafa694218bbca2879bd693a32e44f8",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
+        "/api/abonnes.store": {
+            "post": {
+                "tags": [
+                    "Abonnés"
+                ],
+                "summary": "Créer un abonné",
+                "operationId": "5e83e701c4700971be7479885ce908a7",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nom",
+                                    "categorie_id",
+                                    "addedBy"
+                                ],
+                                "properties": {
+                                    "nom": {
+                                        "type": "string",
+                                        "example": "Paroisse St Luc"
+                                    },
+                                    "categorie_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "telephone": {
+                                        "type": "string",
+                                        "example": "+243900000000"
+                                    },
+                                    "adresse": {
+                                        "type": "string",
+                                        "example": "Goma, RDC"
+                                    },
+                                    "addedBy": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Abonné créé avec succès"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                }
+            }
+        },
+        "/api/abonnes.update/{id}": {
+            "put": {
+                "tags": [
+                    "Abonnés"
+                ],
+                "summary": "Mettre à jour un abonné",
+                "operationId": "e9646e83cb52e70c074980b8c33e676f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de l'abonné",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "nom": {
+                                        "type": "string",
+                                        "example": "Hôpital Heal Africa"
+                                    },
+                                    "categorie_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "telephone": {
+                                        "type": "string",
+                                        "example": "+243991234567"
+                                    },
+                                    "adresse": {
+                                        "type": "string",
+                                        "example": "Kinshasa, RDC"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Abonné mis à jour avec succès"
+                    },
+                    "404": {
+                        "description": "Abonné non trouvé"
+                    }
+                }
+            }
+        },
+        "/api/abonnes.delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Abonnés"
+                ],
+                "summary": "Supprimer un abonné",
+                "operationId": "b6ef3e84c2b9b2a1bddb3926a9678ea9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de l'abonné",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Abonné supprimé avec succès"
+                    },
+                    "404": {
+                        "description": "Abonné non trouvé"
+                    }
+                }
+            }
+        },
         "/api/about.index": {
             "get": {
                 "tags": [
@@ -1296,6 +1456,10 @@
         {
             "name": "Abonnement Categories",
             "description": "Abonnement Categories"
+        },
+        {
+            "name": "Abonnés",
+            "description": "Abonnés"
         },
         {
             "name": "About",

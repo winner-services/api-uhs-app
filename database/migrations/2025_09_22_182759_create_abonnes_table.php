@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('categorie_id')->constrained('abonnement_categories');
             $table->string('telephone')->nullable();
             $table->string('adresse')->nullable();
+            $table->foreignId('addedBy')->constrained('users');
             $table->timestamps();
         });
     }
