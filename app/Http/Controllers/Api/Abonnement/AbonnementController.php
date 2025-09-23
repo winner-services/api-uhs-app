@@ -23,11 +23,11 @@ class AbonnementController extends Controller
 
         $page = request("paginate", 10);
         $q = request("q", "");
-        $sort_direction = request('sort_direction', 'desc');
-        $sort_field = request('sort_field', 'id');
+        // $sort_direction = request('sort_direction', 'desc');
+        // $sort_field = request('sort_field', 'id');
         $data = Abonne::with(['categorie', 'user'])->get()
             ->searh(trim($q))
-            ->orderBy($sort_field, $sort_direction)
+            // ->orderBy($sort_field, $sort_direction)
             ->paginate($page);
         $result = [
             'message' => "OK",
