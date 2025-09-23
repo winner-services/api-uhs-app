@@ -25,7 +25,9 @@ class AbonnementController extends Controller
         $q = request("q", "");
         $sort_direction = request('sort_direction', 'desc');
         $sort_field = request('sort_field', 'id');
-        $data = Abonne::with(['categorie', 'user'])
+        $data = Abonne::join('abonnement_categories', 'abonnes.categorie_id', '=', 'abonnement_categories.id')
+            ->join('users', 'abonnes.addedBy', '=', 'users.id')
+            ->select('abonnes.*', 'abonnement_categories.designation as category', 'users.name as addedBy')
             ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
             ->paginate($page);
