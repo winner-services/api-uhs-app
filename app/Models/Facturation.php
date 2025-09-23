@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Model;
 class Facturation extends Model
 {
     protected $fillable = [
-        'client_id', 'mois', 'montant', 'dette',
+        'abonne_id', 'mois', 'montant', 'dette',
         'status', 'date_emission', 'date_paiement','addedBy'
     ];
 
