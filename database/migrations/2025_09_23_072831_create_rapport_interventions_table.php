@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('description');
             $table->decimal('cout_reparation', 8, 2)->nullable();
             $table->date('date_rapport');
+            $table->foreignId('addedBy')->constrained('users');
             $table->timestamps();
         });
     }

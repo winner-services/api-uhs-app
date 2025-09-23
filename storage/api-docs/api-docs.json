@@ -816,6 +816,119 @@
                 ]
             }
         },
+        "/api/rapport-interventions.getAllData": {
+            "get": {
+                "tags": [
+                    "RapportInterventions"
+                ],
+                "summary": "Récupère tous les rapports d'intervention",
+                "description": "Retourne la liste des rapports d'intervention",
+                "operationId": "getAllRapportData",
+                "responses": {
+                    "200": {
+                        "description": "Succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/RapportIntervention"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/rapport-interventions.store": {
+            "post": {
+                "tags": [
+                    "RapportInterventions"
+                ],
+                "summary": "Créer un rapport d'intervention",
+                "operationId": "storeRapport",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RapportIntervention"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Créé avec succès"
+                    }
+                }
+            }
+        },
+        "/api/rapport-interventions.update/{id}": {
+            "put": {
+                "tags": [
+                    "RapportInterventions"
+                ],
+                "summary": "Met à jour un rapport d'intervention",
+                "operationId": "updateRapport",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RapportIntervention"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Mis à jour avec succès"
+                    },
+                    "404": {
+                        "description": "Non trouvé"
+                    }
+                }
+            }
+        },
+        "/api/rapport-interventions.delete/{id}": {
+            "delete": {
+                "tags": [
+                    "RapportInterventions"
+                ],
+                "summary": "Supprime un rapport d'intervention",
+                "operationId": "destroyRapport",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Supprimé avec succès"
+                    },
+                    "404": {
+                        "description": "Non trouvé"
+                    }
+                }
+            }
+        },
         "/api/permission.index": {
             "get": {
                 "tags": [
@@ -2072,6 +2185,46 @@
                 },
                 "type": "object"
             },
+            "RapportIntervention": {
+                "title": "RapportIntervention",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "ticket_id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "addedBy": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Pompe changée avec succès"
+                    },
+                    "cout_reparation": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 120.5
+                    },
+                    "date_rapport": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2025-09-22"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
             "Ticket": {
                 "title": "Ticket",
                 "description": "Modèle de ticket de maintenance",
@@ -2201,6 +2354,10 @@
         {
             "name": "Facturations",
             "description": "Facturations"
+        },
+        {
+            "name": "RapportInterventions",
+            "description": "RapportInterventions"
         },
         {
             "name": "Permission",

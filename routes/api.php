@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\Abonnement\AbonnementController;
 use App\Http\Controllers\Api\About\AboutController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Facturation\FacturationController;
+use App\Http\Controllers\Api\Intervention\RapportInterventionController;
 use App\Http\Controllers\Api\Permission\PermissionController;
 use App\Http\Controllers\Api\PointEau\PointEauController;
 use App\Http\Controllers\Api\Role\RoleController;
@@ -86,4 +87,11 @@ Route::controller(TicketController::class)->group(function(){
     Route::post('/tickets.store', 'store');
     Route::put('/tickets.update/{id}', 'update');
     Route::delete('/tickets.delete/{id}', 'destroy');
+});
+
+Route::controller(RapportInterventionController::class)->group(function(){
+    Route::get('/rapport-interventions.getAllData', 'getAllRapportData');
+    Route::post('/rapport-interventions.store', 'storeRapport');
+    Route::put('/rapport-interventions.update/{id}', 'updateRapport');
+    Route::delete('/rapport-interventions.delete/{id}', 'destroyRapport');
 });
