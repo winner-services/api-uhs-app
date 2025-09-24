@@ -60,12 +60,14 @@ Route::controller(AbonnementCategoryController::class)->group(function () {
     Route::delete('/category_abonne.delete/{id}', 'destroy');
 });
 
-Route::controller(AbonnementController::class)->group(function () {
-    Route::get('/abonnes.getAllData', 'getaAbonnellData');
-    Route::get('/abonnes.getOptionsData', 'index');
-    Route::post('/abonnes.store', 'store');
-    Route::put('/abonnes.update/{id}', 'update');
-    Route::delete('/bonnes.delete/{id}', 'destroy');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::controller(AbonnementController::class)->group(function () {
+        Route::get('/abonnes.getAllData', 'getaAbonnellData');
+        Route::get('/abonnes.getOptionsData', 'index');
+        Route::post('/abonnes.store', 'store');
+        Route::put('/abonnes.update/{id}', 'update');
+        Route::delete('/bonnes.delete/{id}', 'destroy');
+    });
 });
 
 Route::controller(PointEauController::class)->group(function () {
@@ -82,14 +84,14 @@ Route::controller(FacturationController::class)->group(function () {
     Route::delete('/facturations.delete/{id}', 'destroy');
 });
 
-Route::controller(TicketController::class)->group(function(){
+Route::controller(TicketController::class)->group(function () {
     Route::get('/tickets.getAllData', 'index');
     Route::post('/tickets.store', 'store');
     Route::put('/tickets.update/{id}', 'update');
     Route::delete('/tickets.delete/{id}', 'destroy');
 });
 
-Route::controller(RapportInterventionController::class)->group(function(){
+Route::controller(RapportInterventionController::class)->group(function () {
     Route::get('/rapport-interventions.getAllData', 'getAllRapportData');
     Route::post('/rapport-interventions.store', 'storeRapport');
     Route::put('/rapport-interventions.update/{id}', 'updateRapport');

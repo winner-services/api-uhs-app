@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Abonnement;
 use App\Http\Controllers\Controller;
 use App\Models\Abonne;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -79,12 +80,13 @@ class AbonnementController extends Controller
      */
     public function store(Request $request)
     {
+            
+
         $rules = [
             'nom'          => ['required', 'string', 'max:255'],
             'categorie_id' => ['required', 'integer', 'exists:abonnement_categories,id'],
             'telephone'    => ['nullable', 'string', 'max:20'],
             'adresse'      => ['nullable', 'string', 'max:255'],
-            'addedBy'      => ['required', 'integer', 'exists:users,id'],
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -99,7 +101,15 @@ class AbonnementController extends Controller
         try {
             DB::beginTransaction();
 
-            $abonne = Abonne::create($request->all());
+            $user = Auth::user();
+
+            $abonne = Abonne::create([
+                'nom' => $request->nom,
+                'categorie_id' => $request->categorie_id,
+                'telephone' => $request->telephone,
+                'adresse' => $request->adresse,
+                'addedBy' => $user->id
+            ]);
 
             DB::commit();
 
