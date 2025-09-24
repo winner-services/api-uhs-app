@@ -57,7 +57,7 @@ Route::controller(AbonnementCategoryController::class)->group(function () {
     Route::get('/category_abonne.getAllData', 'getallData');
     Route::post('/category_abonne.store', 'store');
     Route::put('/category_abonne.update/{id}', 'update');
-    Route::delete('/ategory_abonne.delete/{id}', 'destroy');
+    Route::delete('/category_abonne.delete/{id}', 'destroy');
 });
 
 Route::controller(AbonnementController::class)->group(function () {
