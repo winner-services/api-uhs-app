@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Facturation;
 use App\Http\Controllers\Controller;
 use App\Models\Facturation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -81,7 +82,6 @@ class FacturationController extends Controller
             'status'        => ['required', 'string'],
             'date_emission' => ['required', 'date'],
             'date_paiement' => ['nullable', 'date'],
-            'addedBy'       => ['required', 'integer', 'exists:users,id'],
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -95,8 +95,18 @@ class FacturationController extends Controller
 
         try {
             DB::beginTransaction();
+            $user = Auth::user();
 
-            $facturation = Facturation::create($request->all());
+            $facturation = Facturation::create([
+                'abonne_id' => $request->abonne_id,
+                'mois' => $request->mois,
+                'montant' => $request->montant,
+                'dette' => $request->dette,
+                'status' => $request->status,
+                'date_emission' => $request->date_emission,
+                'date_paiement' => $request->date_paiement,
+                'addedBy' => $user->id
+            ]);
 
             DB::commit();
 

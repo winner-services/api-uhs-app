@@ -62,11 +62,18 @@ Route::controller(AbonnementCategoryController::class)->group(function () {
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::controller(AbonnementController::class)->group(function () {
-        Route::get('/abonnes.getAllData', 'getaAbonnellData');
-        Route::get('/abonnes.getOptionsData', 'index');
+        Route::get('/abonnes.getAllData', 'index');
+        Route::get('/abonnes.getOptionsData', 'getaAbonnellData');
         Route::post('/abonnes.store', 'store');
         Route::put('/abonnes.update/{id}', 'update');
         Route::delete('/bonnes.delete/{id}', 'destroy');
+    });
+
+    Route::controller(FacturationController::class)->group(function () {
+        Route::get('/facturations.getAllData', 'index');
+        Route::post('/facturations.store', 'store');
+        Route::put('/facturations.update/{id}', 'update');
+        Route::delete('/facturations.delete/{id}', 'destroy');
     });
 });
 
@@ -77,12 +84,7 @@ Route::controller(PointEauController::class)->group(function () {
     Route::delete('/point-eaux.delete/{id}', 'destroy');
 });
 
-Route::controller(FacturationController::class)->group(function () {
-    Route::get('/facturations.getAllData', 'index');
-    Route::post('/facturations.store', 'store');
-    Route::put('/facturations.update/{id}', 'update');
-    Route::delete('/facturations.delete/{id}', 'destroy');
-});
+
 
 Route::controller(TicketController::class)->group(function () {
     Route::get('/tickets.getAllData', 'index');

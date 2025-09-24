@@ -13,7 +13,7 @@ class AbonnementController extends Controller
 {
     /**
      * @OA\Get(
-     * path="/api/abonnes.getOptionsData",
+     * path="/api/abonnes.getAllData",
      * summary="Liste des abonnés",
      * tags={"Abonnés"},
      * @OA\Response(response=200, description="Liste récupérée avec succès"),
@@ -43,7 +43,7 @@ class AbonnementController extends Controller
 
     /**
      * @OA\Get(
-     * path="/api/abonnes.getAllData",
+     * path="/api/abonnes.getOptionsData",
      * summary="Liste des abonnés",
      * tags={"Abonnés"},
      * @OA\Response(response=200, description="Liste récupérée avec succès"),
