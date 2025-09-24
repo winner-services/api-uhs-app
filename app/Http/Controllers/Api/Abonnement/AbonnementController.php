@@ -157,8 +157,8 @@ class AbonnementController extends Controller
         }
 
         $rules = [
-            'nom'          => ['required', 'string', 'max:255'],
-            'categorie_id' => ['required', 'integer', 'exists:abonnement_categories,id'],
+            'nom'          => ['nullable', 'string', 'max:255'],
+            'categorie_id' => ['nullable', 'integer', 'exists:abonnement_categories,id'],
             'telephone'    => ['nullable', 'string', 'max:20'],
             'adresse'      => ['nullable', 'string', 'max:255'],
         ];
@@ -174,8 +174,14 @@ class AbonnementController extends Controller
 
         try {
             DB::beginTransaction();
-
-            $abonne->update($request->all());
+            $user = Auth::user();
+            $abonne->update([
+                'nom' => $request->nom,
+                'categorie_id' => $request->categorie_id,
+                'telephone' => $request->telephone,
+                'adresse' => $request->adresse,
+                'addedBy' => $user->id
+            ]);
 
             DB::commit();
 
