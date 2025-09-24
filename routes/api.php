@@ -66,7 +66,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/abonnes.getOptionsData', 'getaAbonnellData');
         Route::post('/abonnes.store', 'store');
         Route::put('/abonnes.update/{id}', 'update');
-        Route::delete('/bonnes.delete/{id}', 'destroy');
+        Route::delete('/abonnes.delete/{id}', 'destroy');
     });
 
     Route::controller(FacturationController::class)->group(function () {
