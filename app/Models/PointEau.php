@@ -16,8 +16,8 @@ class PointEau extends Model
     {
         $term = "%$term%";
         $query->where(function ($query) use ($term) {
-            $query->where('abonnes.nom', 'like', $term)
-            ->orWhere('abonnes.adresse', 'like', $term)
+            $query->where('point_eaus.numero_compteur', 'like', $term)
+            ->orWhere('point_eaus.localisation', 'like', $term)
             ->orWhere('abonnes.nom', 'like', $term);
         });
     }
