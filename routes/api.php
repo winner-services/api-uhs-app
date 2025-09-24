@@ -53,8 +53,8 @@ Route::controller(AboutController::class)->group(function () {
 });
 
 Route::controller(AbonnementCategoryController::class)->group(function () {
-    Route::get('/category_abonne.getOptionsData', 'index');
-    Route::get('/category_abonne.getAllData', 'getallData');
+    Route::get('/category_abonne.getOptionsData', 'getallData');
+    Route::get('/category_abonne.getAllData', 'index');
     Route::post('/category_abonne.store', 'store');
     Route::put('/category_abonne.update/{id}', 'update');
     Route::delete('/category_abonne.delete/{id}', 'destroy');

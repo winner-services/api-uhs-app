@@ -12,7 +12,7 @@ class AbonnementCategoryController extends Controller
 {
 /**
      * @OA\Get(
-     * path="/api/category_abonne.getOptionsData",
+     * path="/api/category_abonne.getAllData",
      * summary="Liste des catégories d'abonnés",
      * tags={"Abonnement Categories"},
      * @OA\Response(response=200, description="Liste récupérée avec succès"),
@@ -39,7 +39,7 @@ class AbonnementCategoryController extends Controller
 
     /**
      * @OA\Get(
-     * path="/api/category_abonne.getAllData",
+     * path="/api/category_abonne.getOptionsData",
      * summary="Liste des catégories d'abonnés",
      * tags={"Abonnement Categories"},
      * @OA\Response(response=200, description="Liste récupérée avec succès"),
