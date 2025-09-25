@@ -28,13 +28,14 @@ class TicketController extends Controller
      *     )
      * )
      */
-    public function indexTicket()
+    public function index()
     {
         $page = request("paginate", 10);
         $q = request("q", "");
         $sort_direction = request('sort_direction', 'desc');
         $sort_field = request('sort_field', 'id');
-        $data = Ticket::latest()
+        $data = Ticket::with('point')
+            ->latest()
             // ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
             ->paginate($page);
