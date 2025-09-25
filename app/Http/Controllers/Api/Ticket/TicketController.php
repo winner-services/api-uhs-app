@@ -34,7 +34,7 @@ class TicketController extends Controller
         $q = request("q", "");
         $sort_direction = request('sort_direction', 'desc');
         $sort_field = request('sort_field', 'id');
-        $data = Ticket::with('point','user')
+        $data = Ticket::with('point', 'user')
             ->latest()
             // ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
@@ -58,11 +58,11 @@ class TicketController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"point_id","description","statut","priorite","technicien","date_ouverture","addedBy"},
+     *             required={"point_id","description","status","priorite","technicien","date_ouverture","addedBy"},
      *             @OA\Property(property="point_id", type="integer", example=1),
      *             @OA\Property(property="addedBy", type="integer", example=1),
      *             @OA\Property(property="description", type="string", example="Fuite détectée dans le compteur."),
-     *             @OA\Property(property="statut", type="string", example="Ouvert"),
+     *             @OA\Property(property="status", type="string", example="Ouvert"),
      *             @OA\Property(property="priorite", type="string", example="Haute"),
      *             @OA\Property(property="technicien", type="string", example="Jean Mukendi"),
      *             @OA\Property(property="date_ouverture", type="string", format="date", example="2025-09-21"),
@@ -82,7 +82,7 @@ class TicketController extends Controller
             'status'        => ['required', 'string'],
             'priorite'      => ['required', 'string'],
             'technicien'    => ['required', 'string'],
-            'date_ouverture'=> ['required', 'date'],
+            'date_ouverture' => ['required', 'date'],
             'date_cloture'  => ['nullable', 'date'],
         ];
 
@@ -137,7 +137,7 @@ class TicketController extends Controller
      *         required=false,
      *         @OA\JsonContent(
      *             @OA\Property(property="description", type="string", example="Réparation effectuée."),
-     *             @OA\Property(property="statut", type="string", example="Clôturé"),
+     *             @OA\Property(property="status", type="string", example="Clôturé"),
      *             @OA\Property(property="priorite", type="string", example="Moyenne"),
      *             @OA\Property(property="technicien", type="string", example="Pierre Kaseba"),
      *             @OA\Property(property="date_ouverture", type="string", format="date", example="2025-09-21"),
@@ -156,13 +156,13 @@ class TicketController extends Controller
         if (!$ticket) {
             return response()->json(['message' => "Ticket non trouvé"], 404);
         }
-
+        $user = Auth::user();
         $rules = [
             'description'   => ['sometimes', 'string'],
-            'statut'        => ['sometimes', 'string'],
+            'status'        => ['sometimes', 'string'],
             'priorite'      => ['sometimes', 'string'],
             'technicien'    => ['sometimes', 'string'],
-            'date_ouverture'=> ['sometimes', 'date'],
+            'date_ouverture' => ['sometimes', 'date'],
             'date_cloture'  => ['nullable', 'date'],
         ];
 
@@ -175,7 +175,16 @@ class TicketController extends Controller
             ], 422);
         }
 
-        $ticket->update($request->all());
+        $ticket->update([
+            'point_id' => $request->point_id,
+            'description' => $request->description,
+            'statut' => $request->status,
+            'priorite' => $request->priorite,
+            'technicien' => $request->technicien,
+            'date_ouverture' => $request->date_ouverture,
+            'date_cloture' => $request->date_cloture,
+            'addedBy' => $user->id ?? $ticket->addedBy
+        ]);
 
         return response()->json([
             'message' => "Ticket mis à jour avec succès",

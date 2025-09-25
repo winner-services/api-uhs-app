@@ -1588,7 +1588,7 @@
                                 "required": [
                                     "point_id",
                                     "description",
-                                    "statut",
+                                    "status",
                                     "priorite",
                                     "technicien",
                                     "date_ouverture",
@@ -1607,7 +1607,7 @@
                                         "type": "string",
                                         "example": "Fuite détectée dans le compteur."
                                     },
-                                    "statut": {
+                                    "status": {
                                         "type": "string",
                                         "example": "Ouvert"
                                     },
@@ -1682,7 +1682,7 @@
                                         "type": "string",
                                         "example": "Réparation effectuée."
                                     },
-                                    "statut": {
+                                    "status": {
                                         "type": "string",
                                         "example": "Clôturé"
                                     },
