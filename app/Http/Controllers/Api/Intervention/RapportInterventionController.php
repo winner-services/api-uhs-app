@@ -31,7 +31,7 @@ class RapportInterventionController extends Controller
         $q = request("q", "");
         $sort_direction = request('sort_direction', 'desc');
         $sort_field = request('sort_field', 'id');
-        $data = RapportIntervention::with(['categorie', 'user'])
+        $data = RapportIntervention::with(['ticket', 'user'])
             ->latest()
             // ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
