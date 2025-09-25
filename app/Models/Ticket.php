@@ -35,4 +35,8 @@ class Ticket extends Model
     {
         return $this->belongsTo(PointEau::class, 'point_id');
     }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'addedBy');
+    }
 }
