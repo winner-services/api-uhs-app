@@ -25,7 +25,7 @@ class PointEauController extends Controller
         $sort_direction = request('sort_direction', 'desc');
         $sort_field = request('sort_field', 'id');
         $data = PointEau::latest()
-            ->searh(trim($q))
+            // ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
             ->paginate($page);
         $result = [
