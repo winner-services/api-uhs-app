@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Facturation\FacturationController;
 use App\Http\Controllers\Api\Intervention\RapportInterventionController;
 use App\Http\Controllers\Api\Permission\PermissionController;
+use App\Http\Controllers\Api\PointEau\PointEauAbonne\PointEauAbonneController;
 use App\Http\Controllers\Api\PointEau\PointEauController;
 use App\Http\Controllers\Api\Role\RoleController;
 use App\Http\Controllers\Api\Ticket\TicketController;
@@ -86,7 +87,6 @@ Route::controller(PointEauController::class)->group(function () {
 });
 
 
-
 Route::controller(TicketController::class)->group(function () {
     Route::get('/tickets.getAllData', 'index');
     Route::post('/tickets.store', 'store');
@@ -99,4 +99,8 @@ Route::controller(RapportInterventionController::class)->group(function () {
     Route::post('/rapport-interventions.store', 'storeRapport');
     Route::put('/rapport-interventions.update/{id}', 'updateRapport');
     Route::delete('/rapport-interventions.delete/{id}', 'destroyRapport');
+});
+
+Route::controller(PointEauAbonneController::class)->group(function () {
+    Route::get('/point-eau-abonne.getAllData', 'indexPointAbonne');
 });
