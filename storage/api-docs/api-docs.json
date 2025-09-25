@@ -16,13 +16,13 @@
         }
     ],
     "paths": {
-        "/api/category_abonne.getOptionsData": {
+        "/api/category_abonne.getAllData": {
             "get": {
                 "tags": [
                     "Abonnement Categories"
                 ],
                 "summary": "Liste des catégories d'abonnés",
-                "operationId": "c3d593895ec87f8ec8bb457c610a8e27",
+                "operationId": "96b10e2c390a1f7d23466eb2baebc97a",
                 "responses": {
                     "200": {
                         "description": "Liste récupérée avec succès"
@@ -30,13 +30,13 @@
                 }
             }
         },
-        "/api/category_abonne.getAllData": {
+        "/api/category_abonne.getOptionsData": {
             "get": {
                 "tags": [
                     "Abonnement Categories"
                 ],
                 "summary": "Liste des catégories d'abonnés",
-                "operationId": "dc65a820d55169cad40c475ba1743612",
+                "operationId": "6951681a4b2afd2501c924d9874a1ff8",
                 "responses": {
                     "200": {
                         "description": "Liste récupérée avec succès"
@@ -157,13 +157,13 @@
                 }
             }
         },
-        "/api/abonnes.getOptionsData": {
+        "/api/abonnes.getAllData": {
             "get": {
                 "tags": [
                     "Abonnés"
                 ],
                 "summary": "Liste des abonnés",
-                "operationId": "2c612335b51116e8659e1264b2f81555",
+                "operationId": "2462dfa3fd748832c7bfc5f5bd8c9fec",
                 "responses": {
                     "200": {
                         "description": "Liste récupérée avec succès"
@@ -171,13 +171,13 @@
                 }
             }
         },
-        "/api/abonnes.getAllData": {
+        "/api/abonnes.getOptionsData": {
             "get": {
                 "tags": [
                     "Abonnés"
                 ],
                 "summary": "Liste des abonnés",
-                "operationId": "eeafa694218bbca2879bd693a32e44f8",
+                "operationId": "b5aac34d0e29200fc148f725516b7ed2",
                 "responses": {
                     "200": {
                         "description": "Liste récupérée avec succès"
@@ -961,6 +961,20 @@
                 }
             }
         },
+        "/api/point-eaux.getOptionsData": {
+            "get": {
+                "tags": [
+                    "Points d’eau"
+                ],
+                "summary": "Liste des points d’eau",
+                "operationId": "f425f32162147965d1d6a73136326553",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
         "/api/point-eaux.store": {
             "post": {
                 "tags": [
@@ -974,16 +988,19 @@
                         "application/json": {
                             "schema": {
                                 "required": [
-                                    "abonne_id"
+                                    "lat",
+                                    "long",
+                                    "status",
+                                    "numero_compteur"
                                 ],
                                 "properties": {
-                                    "abonne_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "localisation": {
+                                    "lat": {
                                         "type": "string",
-                                        "example": "-1.6789,29.2345"
+                                        "example": "-1.6789"
+                                    },
+                                    "long": {
+                                        "type": "string",
+                                        "example": "29.2345"
                                     },
                                     "numero_compteur": {
                                         "type": "string",
@@ -1030,17 +1047,21 @@
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "localisation": {
+                                    "lat": {
                                         "type": "string",
-                                        "example": "-1.6789,29.2345"
+                                        "example": "-1.6789"
+                                    },
+                                    "long": {
+                                        "type": "string",
+                                        "example": "29.2345"
                                     },
                                     "numero_compteur": {
                                         "type": "string",
-                                        "example": "COMP-002"
+                                        "example": "COMP-001"
                                     },
                                     "status": {
                                         "type": "string",
-                                        "example": "Inactif"
+                                        "example": "Actif"
                                     }
                                 },
                                 "type": "object"
