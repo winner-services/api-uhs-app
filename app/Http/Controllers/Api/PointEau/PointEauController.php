@@ -24,10 +24,30 @@ class PointEauController extends Controller
         $q = request("q", "");
         $sort_direction = request('sort_direction', 'desc');
         $sort_field = request('sort_field', 'id');
-        $data = PointEau::with('abonne')->latest()
+        $data = PointEau::latest()
             ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
             ->paginate($page);
+        $result = [
+            'message' => "OK",
+            'success' => true,
+            'data' => $data,
+            'status' => 200
+        ];
+        return response()->json($result);
+    }
+
+    /**
+     * @OA\Get(
+     * path="/api/point-eaux.getOptionsData",
+     * summary="Liste des points d’eau",
+     * tags={"Points d’eau"},
+     * @OA\Response(response=200, description="Liste récupérée avec succès"),
+     * )
+     */
+    public function getOptionsPointData()
+    {
+        $data = PointEau::latest()->get();
         $result = [
             'message' => "OK",
             'success' => true,
@@ -45,9 +65,9 @@ class PointEauController extends Controller
      * @OA\RequestBody(
      *    required=true,
      *    @OA\JsonContent(
-     *       required={"abonne_id"},
-     *       @OA\Property(property="abonne_id", type="integer", example=1),
-     *       @OA\Property(property="localisation", type="string", example="-1.6789,29.2345"),
+     *       required={"lat","long","status","numero_compteur"},
+     *       @OA\Property(property="lat", type="string", example="-1.6789"),
+     *       @OA\Property(property="long", type="string", example="29.2345"),
      *       @OA\Property(property="numero_compteur", type="string", example="COMP-001"),
      *       @OA\Property(property="status", type="string", example="Actif")
      *    )
@@ -59,15 +79,14 @@ class PointEauController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'abonne_id'       => ['required', 'integer', 'exists:abonnes,id'],
-            'localisation'    => ['nullable', 'string', 'max:255'],
+            'lat'             => ['nullable', 'string'],
+            'long'            => ['nullable', 'string', 'max:255'],
             'numero_compteur' => ['nullable', 'string', 'max:255', 'unique:point_eaus,numero_compteur'],
-            'status'          => ['nullable', 'string', 'in:Actif,Inactif'],
+            'status'          => ['nullable', 'string'],
         ];
 
         $messages = [
-            'numero_compteur.unique' => 'Ce numéro de compteur existe déjà.',
-            'abonne_id.exists'       => 'L’abonné spécifié n’existe pas.'
+            'numero_compteur.unique' => 'Ce numéro de compteur existe déjà.'
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -83,10 +102,10 @@ class PointEauController extends Controller
             DB::beginTransaction();
 
             $pointEau = PointEau::create([
-                'abonne_id'       => $request->input('abonne_id'),
-                'localisation'    => $request->input('localisation'),
+                'lat'             => $request->input('lat'),
+                'long'            => $request->input('long'),
                 'numero_compteur' => $request->input('numero_compteur'),
-                'status'          => $request->input('status', 'Actif'),
+                'status'          => $request->input('status'),
             ]);
 
             DB::commit();
@@ -115,9 +134,10 @@ class PointEauController extends Controller
      * @OA\RequestBody(
      *    required=true,
      *    @OA\JsonContent(
-     *       @OA\Property(property="localisation", type="string", example="-1.6789,29.2345"),
-     *       @OA\Property(property="numero_compteur", type="string", example="COMP-002"),
-     *       @OA\Property(property="status", type="string", example="Inactif")
+     *       @OA\Property(property="lat", type="string", example="-1.6789"),
+     *       @OA\Property(property="long", type="string", example="29.2345"),
+     *       @OA\Property(property="numero_compteur", type="string", example="COMP-001"),
+     *       @OA\Property(property="status", type="string", example="Actif")
      *    )
      * ),
      * @OA\Response(response=200, description="Point d’eau mis à jour avec succès"),
@@ -134,9 +154,10 @@ class PointEauController extends Controller
         }
 
         $rules = [
-            'localisation'    => ['nullable', 'string', 'max:255'],
-            'numero_compteur' => ['nullable', 'string', 'max:255', 'unique:point_eaus,numero_compteur,' . $id],
-            'status'          => ['nullable', 'string', 'in:Actif,Inactif'],
+            'lat'             => ['nullable', 'string'],
+            'long'            => ['nullable', 'string'],
+            'numero_compteur' => ['nullable', 'string'],
+            'status'          => ['nullable', 'string'],
         ];
 
         $validator = Validator::make($request->all(), $rules);

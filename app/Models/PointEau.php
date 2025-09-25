@@ -6,19 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class PointEau extends Model
 {
-    protected $fillable = ['abonne_id', 'localisation', 'numero_compteur', 'status'];
-
-    public function abonne() {
-        return $this->belongsTo(Abonne::class);
-    }
+    protected $fillable = ['lat', 'long', 'numero_compteur', 'status'];
 
     public function scopeSearh($query, $term)
     {
         $term = "%$term%";
         $query->where(function ($query) use ($term) {
             $query->where('point_eaus.numero_compteur', 'like', $term)
-            ->orWhere('point_eaus.localisation', 'like', $term)
-            ->orWhere('abonnes.nom', 'like', $term);
+            ->orWhere('lat', 'like', $term)
+            ->orWhere('status', 'like', $term)
+            ->orWhere('long', 'like', $term);
         });
     }
 }

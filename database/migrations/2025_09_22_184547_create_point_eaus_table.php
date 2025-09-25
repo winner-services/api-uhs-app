@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('point_eaus', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('abonne_id')->constrained('abonnes')->onDelete('cascade');
-            $table->string('localisation')->nullable(); // Using string for lat/long coordinates
+            $table->string('lat')->nullable();
+            $table->string('long')->nullable();
             $table->string('numero_compteur')->nullable();
             $table->string('status')->default('Actif');
             $table->timestamps();
