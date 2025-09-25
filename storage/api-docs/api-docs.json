@@ -950,7 +950,7 @@
         "/api/point-eau-abonne.getAllData": {
             "get": {
                 "tags": [
-                    "Points d’eau Abonnés"
+                    "Point d’eau abonnés"
                 ],
                 "summary": "Liste des points d’eau",
                 "operationId": "942da329a114d2555d33d333992f38c2",
@@ -2521,10 +2521,6 @@
         {
             "name": "Permission",
             "description": "Permission"
-        },
-        {
-            "name": "Points d’eau Abonnés",
-            "description": "Points d’eau Abonnés"
         },
         {
             "name": "Point d’eau abonnés",
