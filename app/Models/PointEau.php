@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class PointEau extends Model
 {
     protected $fillable = ['lat', 'long', 'numero_compteur', 'status'];
-
+    
     public function scopeSearh($query, $term)
     {
         $term = "%$term%";
