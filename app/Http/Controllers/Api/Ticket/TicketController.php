@@ -29,12 +29,22 @@ class TicketController extends Controller
      */
     public function index()
     {
-        $tickets = Ticket::with('point')->get();
-
-        return response()->json([
+        $page = request("paginate", 10);
+        $q = request("q", "");
+        $sort_direction = request('sort_direction', 'desc');
+        $sort_field = request('sort_field', 'id');
+        $data = Ticket::with('point')
+            ->latest()
+            // ->searh(trim($q))
+            ->orderBy($sort_field, $sort_direction)
+            ->paginate($page);
+        $result = [
+            'message' => "OK",
             'success' => true,
-            'data'    => $tickets
-        ], 200);
+            'data' => $data,
+            'status' => 200
+        ];
+        return response()->json($result);
     }
 
     /**
