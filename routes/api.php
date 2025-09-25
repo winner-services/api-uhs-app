@@ -88,7 +88,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/point-eau-abonnes/{id}', 'destroy');
     });
     Route::controller(TicketController::class)->group(function () {
-        Route::get('/tickets.getAllData', 'indexTicket');
+        Route::get('/tickets.getAllData', 'index');
         Route::post('/tickets.store', 'store');
         Route::put('/tickets.update/{id}', 'update');
         Route::delete('/tickets.delete/{id}', 'destroy');
