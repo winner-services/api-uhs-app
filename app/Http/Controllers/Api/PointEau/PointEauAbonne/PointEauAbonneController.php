@@ -14,7 +14,7 @@ class PointEauAbonneController extends Controller
      * @OA\Get(
      * path="/api/point-eau-abonne.getAllData",
      * summary="Liste des points d’eau",
-     * tags={"Points d’eau Abonnee"},
+     * tags={"Points d’eau Abonnés"},
      * @OA\Response(response=200, description="Liste récupérée avec succès"),
      * )
      */
