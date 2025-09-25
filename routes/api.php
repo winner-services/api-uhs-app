@@ -78,7 +78,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 Route::controller(PointEauController::class)->group(function () {
-    Route::get('/point-eaux.getAllData', 'index');
+    Route::get('/point-eaux.getAllData', 'indexPoint');
     Route::get('/point-eaux.getOptionsData', 'getOptionsPointData');
     Route::post('/point-eaux.store', 'store');
     Route::put('/point-eaux.update/{id}', 'update');

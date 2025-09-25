@@ -18,7 +18,7 @@ class PointEauController extends Controller
      * @OA\Response(response=200, description="Liste récupérée avec succès"),
      * )
      */
-    public function index()
+    public function indexPoint()
     {
         $page = request("paginate", 10);
         $q = request("q", "");

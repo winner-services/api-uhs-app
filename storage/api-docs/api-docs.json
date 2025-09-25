@@ -953,7 +953,7 @@
                     "Points d’eau"
                 ],
                 "summary": "Liste des points d’eau",
-                "operationId": "0fe5dfc29e7c93c45d979b4270ff44a8",
+                "operationId": "4f63fd7730bac4ce7dc24cbd4c97b7ef",
                 "responses": {
                     "200": {
                         "description": "Liste récupérée avec succès"
