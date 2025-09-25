@@ -15,9 +15,6 @@ use App\Http\Controllers\Api\User\UserController;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
 Route::middleware('auth:sanctum')->get('/check-auth', function (Request $request) {
     return response()->json(['authenticated' => true]);
 });
@@ -76,16 +73,21 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/facturations.update/{id}', 'update');
         Route::delete('/facturations.delete/{id}', 'destroy');
     });
-});
+    Route::controller(PointEauController::class)->group(function () {
+        Route::get('/point-eaux.getAllData', 'indexPoint');
+        Route::get('/point-eaux.getOptionsData', 'getOptionsPointData');
+        Route::post('/point-eaux.store', 'store');
+        Route::put('/point-eaux.update/{id}', 'update');
+        Route::delete('/point-eaux.delete/{id}', 'destroy');
+    });
 
-Route::controller(PointEauController::class)->group(function () {
-    Route::get('/point-eaux.getAllData', 'indexPoint');
-    Route::get('/point-eaux.getOptionsData', 'getOptionsPointData');
-    Route::post('/point-eaux.store', 'store');
-    Route::put('/point-eaux.update/{id}', 'update');
-    Route::delete('/point-eaux.delete/{id}', 'destroy');
+    Route::controller(PointEauAbonneController::class)->group(function () {
+        Route::get('/point-eau-abonne.getAllData', 'indexPointAbonne');
+        Route::post('/point-eau-abonnes.store', 'store');
+        Route::put('/point-eau-abonnes/{id}', 'update');
+        Route::delete('/point-eau-abonnes/{id}', 'destroy');
+    });
 });
-
 
 Route::controller(TicketController::class)->group(function () {
     Route::get('/tickets.getAllData', 'index');
@@ -99,8 +101,4 @@ Route::controller(RapportInterventionController::class)->group(function () {
     Route::post('/rapport-interventions.store', 'storeRapport');
     Route::put('/rapport-interventions.update/{id}', 'updateRapport');
     Route::delete('/rapport-interventions.delete/{id}', 'destroyRapport');
-});
-
-Route::controller(PointEauAbonneController::class)->group(function () {
-    Route::get('/point-eau-abonne.getAllData', 'indexPointAbonne');
 });

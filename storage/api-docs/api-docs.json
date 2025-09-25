@@ -961,6 +961,130 @@
                 }
             }
         },
+        "/api/point-eau-abonnes.store": {
+            "post": {
+                "tags": [
+                    "Point d’eau abonnés"
+                ],
+                "summary": "Lier un abonné à un point d’eau",
+                "operationId": "44dc526f999965b2ea7423dd141b7bab",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "abonne_id",
+                                    "point_eau_id"
+                                ],
+                                "properties": {
+                                    "abonne_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "point_eau_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Lien créé avec succès"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                }
+            }
+        },
+        "/api/point-eau-abonnes/{id}": {
+            "put": {
+                "tags": [
+                    "Point d’eau abonnés"
+                ],
+                "summary": "Mettre à jour un lien abonné - point d’eau",
+                "operationId": "9fd7022f1a44805e441f23ebab20491d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du lien abonné - point d’eau",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "abonne_id",
+                                    "point_eau_id"
+                                ],
+                                "properties": {
+                                    "abonne_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "point_eau_id": {
+                                        "type": "integer",
+                                        "example": 4
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Lien mis à jour avec succès"
+                    },
+                    "404": {
+                        "description": "Lien introuvable"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Point d’eau abonnés"
+                ],
+                "summary": "Supprimer le lien entre un abonné et un point d’eau",
+                "operationId": "ea6adee2597a5d02db0ad9e1a584c198",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du lien abonné - point d’eau",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lien supprimé avec succès"
+                    },
+                    "404": {
+                        "description": "Lien introuvable"
+                    }
+                }
+            }
+        },
         "/api/point-eaux.getAllData": {
             "get": {
                 "tags": [
@@ -2401,6 +2525,10 @@
         {
             "name": "Points d’eau Abonnee",
             "description": "Points d’eau Abonnee"
+        },
+        {
+            "name": "Point d’eau abonnés",
+            "description": "Point d’eau abonnés"
         },
         {
             "name": "Points d’eau",
