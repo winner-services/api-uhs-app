@@ -87,13 +87,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/point-eau-abonnes/{id}', 'update');
         Route::delete('/point-eau-abonnes/{id}', 'destroy');
     });
-});
-
-Route::controller(TicketController::class)->group(function () {
-    Route::get('/tickets.getAllData', 'index');
-    Route::post('/tickets.store', 'store');
-    Route::put('/tickets.update/{id}', 'update');
-    Route::delete('/tickets.delete/{id}', 'destroy');
+    Route::controller(TicketController::class)->group(function () {
+        Route::get('/tickets.getAllData', 'index');
+        Route::post('/tickets.store', 'store');
+        Route::put('/tickets.update/{id}', 'update');
+        Route::delete('/tickets.delete/{id}', 'destroy');
+    });
 });
 
 Route::controller(RapportInterventionController::class)->group(function () {

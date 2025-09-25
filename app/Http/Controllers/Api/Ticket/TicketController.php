@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Ticket;
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -78,7 +79,7 @@ class TicketController extends Controller
         $rules = [
             'point_id'      => ['required', 'integer', 'exists:point_eaus,id'],
             'description'   => ['required', 'string'],
-            'statut'        => ['required', 'string'],
+            'status'        => ['required', 'string'],
             'priorite'      => ['required', 'string'],
             'technicien'    => ['required', 'string'],
             'date_ouverture'=> ['required', 'date'],
@@ -96,8 +97,17 @@ class TicketController extends Controller
 
         try {
             DB::beginTransaction();
-
-            $ticket = Ticket::create($request->all());
+            $user = Auth::user();
+            $ticket = Ticket::create([
+                'point_id' => $request->point_id,
+                'description' => $request->description,
+                'statut' => $request->status,
+                'priorite' => $request->priorite,
+                'technicien' => $request->technicien,
+                'date_ouverture' => $request->date_ouverture,
+                'date_cloture' => $request->date_cloture,
+                'addedBy' => $user->id
+            ]);
 
             DB::commit();
 
