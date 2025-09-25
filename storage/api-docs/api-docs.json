@@ -1572,6 +1572,45 @@
                 ]
             }
         },
+        "/api/tickets.getOptionsData": {
+            "get": {
+                "tags": [
+                    "Tickets"
+                ],
+                "summary": "Liste des tickets",
+                "description": "Récupérer tous les tickets liés aux points d’eau",
+                "operationId": "bb50f7cc126621d71cf091344a3e88fa",
+                "responses": {
+                    "200": {
+                        "description": "Liste des tickets",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Ticket"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/tickets.store": {
             "post": {
                 "tags": [

@@ -89,15 +89,15 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::controller(TicketController::class)->group(function () {
         Route::get('/tickets.getAllData', 'index');
+        Route::get('/tickets.getOptionsData', 'getTicketOptionsData');
         Route::post('/tickets.store', 'store');
         Route::put('/tickets.update/{id}', 'update');
         Route::delete('/tickets.delete/{id}', 'destroy');
     });
-});
-
-Route::controller(RapportInterventionController::class)->group(function () {
-    Route::get('/rapport-interventions.getAllData', 'getAllRapportData');
-    Route::post('/rapport-interventions.store', 'storeRapport');
-    Route::put('/rapport-interventions.update/{id}', 'updateRapport');
-    Route::delete('/rapport-interventions.delete/{id}', 'destroyRapport');
+    Route::controller(RapportInterventionController::class)->group(function () {
+        Route::get('/rapport-interventions.getAllData', 'getAllRapportData');
+        Route::post('/rapport-interventions.store', 'storeRapport');
+        Route::put('/rapport-interventions.update/{id}', 'updateRapport');
+        Route::delete('/rapport-interventions.delete/{id}', 'destroyRapport');
+    });
 });

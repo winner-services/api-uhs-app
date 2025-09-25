@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Intervention;
 use App\Http\Controllers\Controller;
 use App\Models\RapportIntervention;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -67,7 +68,6 @@ class RapportInterventionController extends Controller
             'description'   => ['required', 'string'],
             'cout_reparation' => ['nullable', 'numeric', 'min:0'],
             'date_rapport'  => ['required', 'date'],
-            'addedBy'       => ['required', 'integer', 'exists:users,id'],
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -81,8 +81,15 @@ class RapportInterventionController extends Controller
 
         try {
             DB::beginTransaction();
+            $user = Auth::user();
 
-            $rapport = RapportIntervention::create($request->all());
+            $rapport = RapportIntervention::create([
+                'ticket_id' => $request->ticket_id,
+                'description' => $request->description,
+                'cout_reparation' => $request->cout_reparation,
+                'date_rapport' => $request->date_rapport,
+                'addedBy' => $user->id                
+            ]);
 
             DB::commit();
 
@@ -137,7 +144,6 @@ class RapportInterventionController extends Controller
             'description'   => ['sometimes', 'string'],
             'cout_reparation' => ['nullable', 'numeric', 'min:0'],
             'date_rapport'  => ['sometimes', 'date'],
-            'addedBy'       => ['sometimes', 'integer', 'exists:users,id'],
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -151,8 +157,16 @@ class RapportInterventionController extends Controller
 
         try {
             DB::beginTransaction();
+            $user = Auth::user();
 
-            $rapport->update($request->all());
+
+            $rapport->update([
+                'ticket_id' => $request->ticket_id,
+                'description' => $request->description,
+                'cout_reparation' => $request->cout_reparation,
+                'date_rapport' => $request->date_rapport,
+                'addedBy' => $user->id ?? $rapport->addedBy
+            ]);
 
             DB::commit();
 

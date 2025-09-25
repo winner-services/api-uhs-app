@@ -49,6 +49,37 @@ class TicketController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/tickets.getOptionsData",
+     *     summary="Liste des tickets",
+     *     description="Récupérer tous les tickets liés aux points d’eau",
+     *     tags={"Tickets"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des tickets",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Ticket"))
+     *         )
+     *     )
+     * )
+     */
+    public function getTicketOptionsData()
+    {
+        $data = Ticket::with('point', 'user')
+            ->latest()->get();
+        $result = [
+            'message' => "OK",
+            'success' => true,
+            'data' => $data,
+            'status' => 200
+        ];
+        return response()->json($result);
+    }
+
+
+    /**
      * @OA\Post(
      *     path="/api/tickets.store",
      *     summary="Créer un ticket",
