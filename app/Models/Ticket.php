@@ -28,7 +28,7 @@ class Ticket extends Model
 {
     protected $fillable = [
         'point_id', 'description', 'statut',
-        'priorite', 'technicien_id', 'date_ouverture', 'date_cloture','addedBy'
+        'priorite', 'technicien', 'date_ouverture', 'date_cloture','addedBy'
     ];
 
     public function point()
