@@ -1530,15 +1530,10 @@
                                     "status",
                                     "priorite",
                                     "technicien",
-                                    "date_ouverture",
-                                    "addedBy"
+                                    "date_ouverture"
                                 ],
                                 "properties": {
                                     "point_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "addedBy": {
                                         "type": "integer",
                                         "example": 1
                                     },

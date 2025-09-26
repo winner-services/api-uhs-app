@@ -89,9 +89,8 @@ class TicketController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"point_id","description","status","priorite","technicien","date_ouverture","addedBy"},
+     *             required={"point_id","description","status","priorite","technicien","date_ouverture"},
      *             @OA\Property(property="point_id", type="integer", example=1),
-     *             @OA\Property(property="addedBy", type="integer", example=1),
      *             @OA\Property(property="description", type="string", example="Fuite détectée dans le compteur."),
      *             @OA\Property(property="status", type="string", example="Ouvert"),
      *             @OA\Property(property="priorite", type="string", example="Haute"),
