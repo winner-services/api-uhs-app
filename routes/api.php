@@ -19,23 +19,6 @@ Route::middleware('auth:sanctum')->get('/check-auth', function (Request $request
     return response()->json(['authenticated' => true]);
 });
 
-Route::controller(UserController::class)->group(function () {
-    Route::get('/users.getData', 'index');
-    Route::get('/user.Options', 'getAllUsersOptions');
-    Route::post('/user.store', 'store');
-    Route::put('/user.update/{id}', 'update');
-    Route::delete('/user.delete/{id}', 'destroy');
-    Route::put('/user.activate/{id}', 'activateUser');
-    Route::put('/user.disable/{id}', 'disableUser');
-});
-
-Route::controller(RoleController::class)->group(function () {
-    Route::post('/role.store', 'storeRole');
-    Route::put('/role.update/{id}', 'updateRole');
-    Route::get('/role.Options', 'getRole');
-    Route::get('/permissionDataByRole/{id}', 'getPermissionDataByRole');
-});
-Route::get('/permission.index', [PermissionController::class, 'getPemissionData']);
 
 Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
@@ -44,21 +27,40 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-Route::controller(AboutController::class)->group(function () {
-    Route::get('/about.index', 'getData');
-    Route::post('/about.store', 'store');
-    Route::post('/about.update/{id}', 'update');
-});
-
-Route::controller(AbonnementCategoryController::class)->group(function () {
-    Route::get('/category_abonne.getOptionsData', 'getallData');
-    Route::get('/category_abonne.getAllData', 'index');
-    Route::post('/category_abonne.store', 'store');
-    Route::put('/category_abonne.update/{id}', 'update');
-    Route::delete('/category_abonne.delete/{id}', 'destroy');
-});
-
 Route::middleware('auth:sanctum')->group(function () {
+
+    Route::controller(UserController::class)->group(function () {
+        Route::get('/users.getData', 'index');
+        Route::get('/user.Options', 'getAllUsersOptions');
+        Route::post('/user.store', 'store');
+        Route::put('/user.update/{id}', 'update');
+        Route::delete('/user.delete/{id}', 'destroy');
+        Route::put('/user.activate/{id}', 'activateUser');
+        Route::put('/user.disable/{id}', 'disableUser');
+    });
+
+    Route::controller(RoleController::class)->group(function () {
+        Route::post('/role.store', 'storeRole');
+        Route::put('/role.update/{id}', 'updateRole');
+        Route::get('/role.Options', 'getRole');
+        Route::get('/permissionDataByRole/{id}', 'getPermissionDataByRole');
+    });
+    Route::get('/permission.index', [PermissionController::class, 'getPemissionData']);
+
+    Route::controller(AboutController::class)->group(function () {
+        Route::get('/about.index', 'getData');
+        Route::post('/about.store', 'store');
+        Route::post('/about.update/{id}', 'update');
+    });
+
+    Route::controller(AbonnementCategoryController::class)->group(function () {
+        Route::get('/category_abonne.getOptionsData', 'getallData');
+        Route::get('/category_abonne.getAllData', 'index');
+        Route::post('/category_abonne.store', 'store');
+        Route::put('/category_abonne.update/{id}', 'update');
+        Route::delete('/category_abonne.delete/{id}', 'destroy');
+    });
+
     Route::controller(AbonnementController::class)->group(function () {
         Route::get('/abonnes.getAllData', 'index');
         Route::get('/abonnes.getOptionsData', 'getaAbonnellData');
@@ -72,7 +74,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/facturations.store', 'store');
         Route::put('/facturations.update/{id}', 'update');
         Route::delete('/facturations.delete/{id}', 'destroy');
+        Route::post('/genererFacture.store', 'genererFacturesMensuelles');
     });
+    
     Route::controller(PointEauController::class)->group(function () {
         Route::get('/point-eaux.getAllData', 'indexPoint');
         Route::get('/point-eaux.getOptionsData', 'getOptionsPointData');

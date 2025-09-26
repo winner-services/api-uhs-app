@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('mois'); // 09-2025
             $table->decimal('montant', 8, 2);
             $table->decimal('dette', 8, 2)->default(0);
-            $table->string('status', []);
+            $table->string('status');
             $table->date('date_emission');
             $table->date('date_paiement')->nullable();
             $table->foreignId('addedBy')->constrained('users');

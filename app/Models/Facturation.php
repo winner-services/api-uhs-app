@@ -26,14 +26,21 @@ use Illuminate\Database\Eloquent\Model;
 class Facturation extends Model
 {
     protected $fillable = [
-        'abonne_id', 'mois', 'montant', 'dette',
-        'status', 'date_emission', 'date_paiement','addedBy'
+        'abonne_id',
+        'mois',
+        'montant',
+        'dette',
+        'status',
+        'date_emission',
+        'date_paiement',
+        'addedBy'
     ];
 
     public function abonne()
     {
-        return $this->belongsTo(Abonne::class);
+        return $this->belongsTo(Abonne::class, 'abonne_id');
     }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'addedBy');

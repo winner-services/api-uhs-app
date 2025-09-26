@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Api\Facturation;
 
 use App\Http\Controllers\Controller;
 use App\Models\Facturation;
+use App\Models\PointEauAbonne;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -224,5 +226,96 @@ class FacturationController extends Controller
             'message' => "Facturation supprimée avec succès",
             'success' => true
         ], 200);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/genererFacture.store",
+     *     summary="Créer une facturation",
+     *     description="Ajout d’une nouvelle facturation pour les abonnés",
+     *     tags={"Facturations"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"date_emission"},
+     *             @OA\Property(property="date_emission", type="string", format="date", example="2025-09-01"),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Facturation créée avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Facturation ajoutée avec succès"),
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", ref="#/components/schemas/Facturation")
+     *         )
+     *     ),
+     *     @OA\Response(response=422, description="Erreur de validation"),
+     *     @OA\Response(response=500, description="Erreur serveur")
+     * )
+     */
+
+    public function genererFacturesMensuelles(Request $request)
+    {
+        $request->validate([
+            'date_emission' => 'required|date',
+        ]);
+
+        $date = Carbon::parse($request->date_emission);
+        $mois = $date->format('m-Y');
+        $anneePrecedente = $date->copy()->subMonth()->format('m-Y');
+
+        DB::beginTransaction();
+        $user = Auth::user();
+        try {
+            // Récupérer tous les abonnés qui ont un point d’eau
+            $abonnes = PointEauAbonne::with('abonne.categorie')
+                ->get()
+                ->pluck('abonne')
+                ->unique('id');
+
+            foreach ($abonnes as $abonne) {
+                $prixMensuel = $abonne->categorie->prix_mensuel ?? 0;
+
+                // Vérifier si facture déjà générée pour ce mois
+                $existe = Facturation::where('abonne_id', $abonne->id)
+                    ->where('mois', $mois)
+                    ->exists();
+                if ($existe) {
+                    continue; // éviter doublon
+                }
+
+                // Vérifier dette du mois précédent
+                $facturePrecedente = Facturation::where('abonne_id', $abonne->id)
+                    ->where('mois', $anneePrecedente)
+                    ->first();
+
+                if ($facturePrecedente && $facturePrecedente->status !== 'payé') {
+                    // Il reste une dette
+                    $dette = $facturePrecedente->dette + $prixMensuel;
+                } else {
+                    // Pas de dette
+                    $dette = $prixMensuel;
+                }
+
+                // Créer la facturation
+                Facturation::create([
+                    'abonne_id'     => $abonne->id,
+                    'mois'          => $mois,
+                    'montant'       => $prixMensuel,
+                    'dette'         => $dette,
+                    'status'        => 'impayé',
+                    'date_emission' => $date->toDateString(),
+                    'addedBy'       => $user->id
+                ]);
+            }
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Factures générées avec succès']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
     }
 }

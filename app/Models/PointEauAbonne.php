@@ -11,4 +11,8 @@ class PointEauAbonne extends Model
         'point_eau_id',
         'addedBy'
     ];
+    public function abonne()
+    {
+        return $this->belongsTo(Abonne::class, 'abonne_id');
+    }
 }
