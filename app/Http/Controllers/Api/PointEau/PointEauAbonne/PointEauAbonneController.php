@@ -83,7 +83,18 @@ class PointEauAbonneController extends Controller
         try {
             DB::beginTransaction();
 
-            // Vérifier si le lien existe déjà
+            // Vérifier si ce point d’eau est déjà attribué à un autre abonné
+            $alreadyLinked = PointEauAbonne::where('point_eau_id', $request->point_eau_id)->first();
+
+            if ($alreadyLinked) {
+                return response()->json([
+                    'message' => 'Ce point d’eau est déjà attribué à un autre abonné.',
+                    'success' => false,
+                    'status'  => 409
+                ], 409);
+            }
+
+            // Vérifier si ce lien existe déjà (au cas où)
             $exists = PointEauAbonne::where('abonne_id', $request->abonne_id)
                 ->where('point_eau_id', $request->point_eau_id)
                 ->first();
@@ -99,7 +110,7 @@ class PointEauAbonneController extends Controller
             $pointEauAbonne = PointEauAbonne::create([
                 'abonne_id'    => $request->abonne_id,
                 'point_eau_id' => $request->point_eau_id,
-                'addedBy'      => 1, // si tu veux mettre l’utilisateur connecté
+                'addedBy'      => 1, // tu peux remplacer par auth()->id()
             ]);
 
             DB::commit();
