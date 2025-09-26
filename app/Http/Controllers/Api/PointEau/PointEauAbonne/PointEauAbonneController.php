@@ -26,7 +26,8 @@ class PointEauAbonneController extends Controller
         $sort_field = request('sort_field', 'id');
         $data = PointEauAbonne::join('abonnes', 'point_eau_abonnes.abonne_id', '=', 'abonnes.id')
             ->join('users', 'point_eau_abonnes.addedBy', '=', 'users.id')
-            ->select('point_eaus.*', 'abonnes.nom as abonne', 'users.name as addedBy')
+            ->join('point_eaus','point_eau_abonnes.point_eau_id','=','point_eaus.id')
+            ->select('point_eau_abonnes.*','point_eaus.numero_compteur', 'abonnes.nom as abonne', 'users.name as addedBy')
             ->latest()
             // ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
