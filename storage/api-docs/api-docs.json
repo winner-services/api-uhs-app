@@ -605,183 +605,6 @@
                 ]
             }
         },
-        "/api/facturations.store": {
-            "post": {
-                "tags": [
-                    "Facturations"
-                ],
-                "summary": "Créer une facturation",
-                "description": "Ajout d’une nouvelle facturation pour un abonné",
-                "operationId": "fe0aae996a7b8f37d82aa816a532176a",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "required": [
-                                    "abonne_id",
-                                    "mois",
-                                    "montant",
-                                    "status",
-                                    "date_emission",
-                                    "addedBy"
-                                ],
-                                "properties": {
-                                    "abonne_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
-                                    "mois": {
-                                        "type": "string",
-                                        "example": "09-2025"
-                                    },
-                                    "montant": {
-                                        "type": "number",
-                                        "format": "float",
-                                        "example": 150.75
-                                    },
-                                    "dette": {
-                                        "type": "number",
-                                        "format": "float",
-                                        "example": 50
-                                    },
-                                    "status": {
-                                        "type": "string",
-                                        "example": "Non payé"
-                                    },
-                                    "date_emission": {
-                                        "type": "string",
-                                        "format": "date",
-                                        "example": "2025-09-01"
-                                    },
-                                    "date_paiement": {
-                                        "type": "string",
-                                        "format": "date",
-                                        "example": "2025-09-10"
-                                    },
-                                    "addedBy": {
-                                        "type": "integer",
-                                        "example": 2
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "201": {
-                        "description": "Facturation créée avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Facturation ajoutée avec succès"
-                                        },
-                                        "success": {
-                                            "type": "boolean",
-                                            "example": true
-                                        },
-                                        "data": {
-                                            "$ref": "#/components/schemas/Facturation"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Erreur de validation"
-                    },
-                    "500": {
-                        "description": "Erreur serveur"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
-        "/api/facturations.update/{id}": {
-            "put": {
-                "tags": [
-                    "Facturations"
-                ],
-                "summary": "Modifier une facturation",
-                "description": "Mettre à jour une facturation existante",
-                "operationId": "538f54d25f253d3f34159d8d9e020ab7",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "description": "ID de la facturation",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": false,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "properties": {
-                                    "mois": {
-                                        "type": "string",
-                                        "example": "09-2025"
-                                    },
-                                    "montant": {
-                                        "type": "number",
-                                        "example": 200.5
-                                    },
-                                    "dette": {
-                                        "type": "number",
-                                        "example": 30
-                                    },
-                                    "status": {
-                                        "type": "string",
-                                        "example": "Payé"
-                                    },
-                                    "date_emission": {
-                                        "type": "string",
-                                        "format": "date",
-                                        "example": "2025-09-01"
-                                    },
-                                    "date_paiement": {
-                                        "type": "string",
-                                        "format": "date",
-                                        "example": "2025-09-12"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Facturation mise à jour avec succès"
-                    },
-                    "404": {
-                        "description": "Facturation non trouvée"
-                    },
-                    "422": {
-                        "description": "Erreur de validation"
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/api/facturations.delete/{id}": {
             "delete": {
                 "tags": [
@@ -816,14 +639,14 @@
                 ]
             }
         },
-        "/api/genererFacture.store": {
+        "/api/facturations.store": {
             "post": {
                 "tags": [
                     "Facturations"
                 ],
                 "summary": "Créer une facturation",
                 "description": "Ajout d’une nouvelle facturation pour les abonnés",
-                "operationId": "e7fbd7d8847d4405550dbc6051d62e49",
+                "operationId": "6bb0c070c179910d08e0ac69ad108cd5",
                 "requestBody": {
                     "required": true,
                     "content": {

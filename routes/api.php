@@ -71,10 +71,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(FacturationController::class)->group(function () {
         Route::get('/facturations.getAllData', 'index');
-        Route::post('/facturations.store', 'store');
-        Route::put('/facturations.update/{id}', 'update');
+        Route::post('/facturations.store', 'genererFacturesMensuelles');
         Route::delete('/facturations.delete/{id}', 'destroy');
-        Route::post('/genererFacture.store', 'genererFacturesMensuelles');
     });
     
     Route::controller(PointEauController::class)->group(function () {
