@@ -816,6 +816,72 @@
                 ]
             }
         },
+        "/api/genererFacture.store": {
+            "post": {
+                "tags": [
+                    "Facturations"
+                ],
+                "summary": "Créer une facturation",
+                "description": "Ajout d’une nouvelle facturation pour les abonnés",
+                "operationId": "e7fbd7d8847d4405550dbc6051d62e49",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "date_emission"
+                                ],
+                                "properties": {
+                                    "date_emission": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-09-01"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Facturation créée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Facturation ajoutée avec succès"
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Facturation"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/rapport-interventions.getAllData": {
             "get": {
                 "tags": [
