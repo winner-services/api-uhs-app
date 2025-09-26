@@ -9,6 +9,7 @@ class PointEauAbonne extends Model
     protected $fillable = [
         'abonne_id',
         'point_eau_id',
+        'date_operation',
         'addedBy'
     ];
     public function abonne()

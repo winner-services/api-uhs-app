@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('abonne_id')->constrained('abonnes');
             $table->foreignId('point_eau_id')->constrained('point_eaus');
+            $table->date('date_operation');
             $table->foreignId('addedBy')->constrained('users');
             $table->timestamps();
         });

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\PointEau\PointEauAbonne;
 use App\Http\Controllers\Controller;
 use App\Models\PointEauAbonne;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -51,7 +52,8 @@ class PointEauAbonneController extends Controller
      *    @OA\JsonContent(
      *       required={"abonne_id","point_eau_id"},
      *       @OA\Property(property="abonne_id", type="integer", example=1),
-     *       @OA\Property(property="point_eau_id", type="integer", example=1)
+     *       @OA\Property(property="point_eau_id", type="integer", example=1),
+     *       @OA\Property(property="date_operation", type="date", example="2025-09-26")
      *    )
      * ),
      * @OA\Response(response=201, description="Lien créé avec succès"),
@@ -62,7 +64,8 @@ class PointEauAbonneController extends Controller
     {
         $rules = [
             'abonne_id'    => ['required', 'exists:abonnes,id'],
-            'point_eau_id' => ['required', 'exists:point_eaus,id']
+            'point_eau_id' => ['required', 'exists:point_eaus,id'],
+            'date_operation' => 'required'
         ];
 
         $messages = [
@@ -70,6 +73,7 @@ class PointEauAbonneController extends Controller
             'abonne_id.exists'      => 'Cet abonné n’existe pas.',
             'point_eau_id.required' => 'Le point d’eau est obligatoire.',
             'point_eau_id.exists'   => 'Ce point d’eau n’existe pas.',
+            'date_operation'        => 'Vérifier la date'
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -83,7 +87,7 @@ class PointEauAbonneController extends Controller
 
         try {
             DB::beginTransaction();
-
+            $user = Auth::user();
             // Vérifier si ce point d’eau est déjà attribué à un autre abonné
             $alreadyLinked = PointEauAbonne::where('point_eau_id', $request->point_eau_id)->first();
 
@@ -111,7 +115,8 @@ class PointEauAbonneController extends Controller
             $pointEauAbonne = PointEauAbonne::create([
                 'abonne_id'    => $request->abonne_id,
                 'point_eau_id' => $request->point_eau_id,
-                'addedBy'      => 1, // tu peux remplacer par auth()->id()
+                'date_operation' => $request->date_operation,
+                'addedBy'      => $user->id
             ]);
 
             DB::commit();
@@ -146,9 +151,10 @@ class PointEauAbonneController extends Controller
      * @OA\RequestBody(
      *    required=true,
      *    @OA\JsonContent(
-     *       required={"abonne_id","point_eau_id"},
+     *       required={"abonne_id","point_eau_id","date_operation"},
      *       @OA\Property(property="abonne_id", type="integer", example=2),
-     *       @OA\Property(property="point_eau_id", type="integer", example=4)
+     *       @OA\Property(property="point_eau_id", type="integer", example=4),
+     *       @OA\Property(property="date_operation", type="date", example="2025-09-26")
      *    )
      * ),
      * @OA\Response(response=200, description="Lien mis à jour avec succès"),
@@ -160,7 +166,8 @@ class PointEauAbonneController extends Controller
     {
         $rules = [
             'abonne_id'    => ['required', 'exists:abonnes,id'],
-            'point_eau_id' => ['required', 'exists:point_eaus,id']
+            'point_eau_id' => ['required', 'exists:point_eaus,id'],
+            'date_operation' => 'required'
         ];
 
         $messages = [
@@ -168,6 +175,7 @@ class PointEauAbonneController extends Controller
             'abonne_id.exists'      => 'Cet abonné n’existe pas.',
             'point_eau_id.required' => 'Le point d’eau est obligatoire.',
             'point_eau_id.exists'   => 'Ce point d’eau n’existe pas.',
+            'date_operation'        => 'Vérifier la date'
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
@@ -191,7 +199,7 @@ class PointEauAbonneController extends Controller
             }
 
             DB::beginTransaction();
-
+            $user = Auth::user();
             // Vérifier si le nouveau couple abonne_id + point_eau_id existe déjà ailleurs
             $exists = PointEauAbonne::where('abonne_id', $request->abonne_id)
                 ->where('point_eau_id', $request->point_eau_id)
@@ -209,7 +217,8 @@ class PointEauAbonneController extends Controller
             $pointEauAbonne->update([
                 'abonne_id'    => $request->abonne_id,
                 'point_eau_id' => $request->point_eau_id,
-                'addedBy'      => $pointEauAbonne->addedBy, // conserve l’ancien si pas d’utilisateur connecté
+                'date_operation' => $request->date_operation,
+                'addedBy'      => $user->id ?? $pointEauAbonne->addedBy
             ]);
 
             DB::commit();

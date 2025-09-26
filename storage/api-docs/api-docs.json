@@ -874,6 +874,11 @@
                                     "point_eau_id": {
                                         "type": "integer",
                                         "example": 1
+                                    },
+                                    "date_operation": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-09-26"
                                     }
                                 },
                                 "type": "object"
@@ -917,7 +922,8 @@
                             "schema": {
                                 "required": [
                                     "abonne_id",
-                                    "point_eau_id"
+                                    "point_eau_id",
+                                    "date_operation"
                                 ],
                                 "properties": {
                                     "abonne_id": {
@@ -927,6 +933,11 @@
                                     "point_eau_id": {
                                         "type": "integer",
                                         "example": 4
+                                    },
+                                    "date_operation": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-09-26"
                                     }
                                 },
                                 "type": "object"
