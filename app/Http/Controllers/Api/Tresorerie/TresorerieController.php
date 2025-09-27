@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Tresorerie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TresorerieController extends Controller
 {
@@ -173,15 +174,32 @@ class TresorerieController extends Controller
      *     @OA\Response(response=404, description="Trésorerie non trouvée")
      * )
      */
-    public function destroy(int $id)
-    {
-        $tresorerie = Tresorerie::findOrFail($id);
-        $tresorerie->delete();
+    public function destroy($id)
 
-        return response()->json([
-            'message' => "success",
-            'success' => true,
-            'status'  => 200,
-        ], 200);
+    {
+        $tresorerie = Tresorerie::find($id);
+        if (!$tresorerie) {
+            return response()->json([
+                'message' => 'non trouvé'
+            ], 404);
+        }
+
+        try {
+            DB::beginTransaction();
+            $tresorerie->delete();
+            DB::commit();
+
+            return response()->json([
+                'message' => "supprimé avec succès",
+                'success' => true,
+                'status'  => 200
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Erreur lors de la suppression.',
+                'error'   => $e->getMessage()
+            ], 500);
+        }
     }
 }
