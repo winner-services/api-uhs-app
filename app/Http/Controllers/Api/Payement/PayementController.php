@@ -120,7 +120,7 @@ class PayementController extends Controller
             $solde = $lastTransaction ? $lastTransaction->solde : 0;
             $montantRestant = $dette->dette;
 
-            if ($montantFromRequet >= $montantRestant) {
+            if ($request->paid_amount >= $request->loan_amount) {
                 $updateDette = Facturation::find($request->facture_id);
                 $updateDette->dette -= $montantFromRequet;
                 $updateDette->status = 'payé';
