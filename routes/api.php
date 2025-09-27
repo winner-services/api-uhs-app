@@ -11,6 +11,8 @@ use App\Http\Controllers\Api\PointEau\PointEauAbonne\PointEauAbonneController;
 use App\Http\Controllers\Api\PointEau\PointEauController;
 use App\Http\Controllers\Api\Role\RoleController;
 use App\Http\Controllers\Api\Ticket\TicketController;
+use App\Http\Controllers\Api\Transaction\TransactionTresorerieController;
+use App\Http\Controllers\Api\Tresorerie\TresorerieController;
 use App\Http\Controllers\Api\User\UserController;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Route;
@@ -74,7 +76,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/facturations.store', 'genererFacturesMensuelles');
         Route::delete('/facturations.delete/{id}', 'destroy');
     });
-    
+
     Route::controller(PointEauController::class)->group(function () {
         Route::get('/point-eaux.getAllData', 'indexPoint');
         Route::get('/point-eaux.getOptionsData', 'getOptionsPointData');
@@ -101,5 +103,20 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/rapport-interventions.store', 'storeRapport');
         Route::put('/rapport-interventions.update/{id}', 'updateRapport');
         Route::delete('/rapport-interventions.delete/{id}', 'destroyRapport');
+    });
+
+    Route::controller(TresorerieController::class)->group(function () {
+        Route::get('/tresoreries.getAllData', 'indexTresorerie');
+        Route::get('/Tresoreries.getOptionsData', 'getOptionsTresorerie');
+        Route::post('/tresoreries.store', 'store');
+        Route::put('/tresoreries.update/{id}', 'update');
+        Route::delete('/tresoreries.delete/{id}', 'destroy');
+    });
+
+    Route::controller(TransactionTresorerieController::class)->group(function () {
+        Route::get('/transaction-tresoreries.getAllData', 'getTransactionData');
+        Route::post('/transaction-tresoreries.store', 'store');
+        Route::get('/transaction-tresoreries.update/{id}', 'update');
+        Route::get('/transaction-tresoreries.delete/{id}', 'destroy');
     });
 });

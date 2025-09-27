@@ -1696,6 +1696,327 @@
                 ]
             }
         },
+        "/api/transaction-tresoreries.getAllData": {
+            "get": {
+                "tags": [
+                    "TransactionTrésoreries"
+                ],
+                "summary": "Liste des Trasactions",
+                "operationId": "97885858ea2b4de1026553c9f136a3d2",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
+        "/api/transaction-tresoreries.store": {
+            "post": {
+                "tags": [
+                    "TransactionTrésoreries"
+                ],
+                "summary": "Créer une transaction de trésorerie",
+                "operationId": "b944dc16a8d315859c6a23613b536ba5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "transaction_date",
+                                    "account_id",
+                                    "amount",
+                                    "transaction_type"
+                                ],
+                                "properties": {
+                                    "motif": {
+                                        "type": "string",
+                                        "example": "Achat fournitures"
+                                    },
+                                    "transaction_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-09-27"
+                                    },
+                                    "account_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "amount": {
+                                        "type": "number",
+                                        "format": "decimal",
+                                        "example": 500
+                                    },
+                                    "transaction_type": {
+                                        "type": "string",
+                                        "example": "depot"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Transaction créée avec succès"
+                    },
+                    "400": {
+                        "description": "Erreur de validation"
+                    },
+                    "409": {
+                        "description": "Transaction déjà existante"
+                    }
+                }
+            }
+        },
+        "/api/transaction-tresoreries.update/{id}": {
+            "put": {
+                "tags": [
+                    "TransactionTrésoreries"
+                ],
+                "summary": "Mettre à jour une transaction de trésorerie",
+                "operationId": "9c76982ae0707a6f9f8fc84cec6f0e24",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la transaction",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "motif": {
+                                        "type": "string",
+                                        "example": "Achat fournitures"
+                                    },
+                                    "transaction_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-09-27"
+                                    },
+                                    "account_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "amount": {
+                                        "type": "number",
+                                        "format": "decimal",
+                                        "example": 500
+                                    },
+                                    "transaction_type": {
+                                        "type": "string",
+                                        "example": "DEPENSE"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Transaction mise à jour avec succès"
+                    },
+                    "400": {
+                        "description": "Erreur de validation"
+                    },
+                    "404": {
+                        "description": "Transaction non trouvée"
+                    }
+                }
+            }
+        },
+        "/api/transaction-tresoreries.delete/{id}": {
+            "delete": {
+                "tags": [
+                    "TransactionTrésoreries"
+                ],
+                "summary": "Supprimer une transaction de trésorerie",
+                "operationId": "47045cbfa7c03809f5e31d68cf0f4488",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la transaction",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Transaction supprimée avec succès"
+                    },
+                    "404": {
+                        "description": "Transaction non trouvée"
+                    }
+                }
+            }
+        },
+        "/api/tresoreries.getAllData": {
+            "get": {
+                "tags": [
+                    "Tresorerie"
+                ],
+                "summary": "Liste des Tresoreries",
+                "operationId": "81ad451168e4cc5bcebfd7443fbac2db",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
+        "/api/Tresoreries.getOptionsData": {
+            "get": {
+                "tags": [
+                    "Tresorerie"
+                ],
+                "summary": "Liste des Tresoreries",
+                "operationId": "39bc02b540073e4bff6c3bb9a62cd5e2",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
+        "/api/tresoreries.store": {
+            "post": {
+                "tags": [
+                    "Trésoreries"
+                ],
+                "summary": "Créer une trésorerie",
+                "operationId": "c02986498cbc099ee253338a0651171e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "designation",
+                                    "type"
+                                ],
+                                "properties": {
+                                    "designation": {
+                                        "type": "string",
+                                        "example": "Caisse principale"
+                                    },
+                                    "reference": {
+                                        "type": "string",
+                                        "example": "CAISSE-001"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "example": "caisse"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Trésorerie créée avec succès"
+                    },
+                    "400": {
+                        "description": "Erreur de validation"
+                    },
+                    "409": {
+                        "description": "Trésorerie déjà existante"
+                    }
+                }
+            }
+        },
+        "/api/tresoreries/{id}": {
+            "put": {
+                "tags": [
+                    "Trésoreries"
+                ],
+                "summary": "Mettre à jour une trésorerie",
+                "operationId": "0a261ab5b896e5d26a693e5c10abaf5c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la trésorerie",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "designation": {
+                                        "type": "string",
+                                        "example": "Caisse secondaire"
+                                    },
+                                    "reference": {
+                                        "type": "string",
+                                        "example": "CAISSE-002"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "example": "banque"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Trésorerie mise à jour avec succès"
+                    },
+                    "404": {
+                        "description": "Trésorerie non trouvée"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Trésoreries"
+                ],
+                "summary": "Supprimer une trésorerie",
+                "operationId": "0815db21d8c9b42c926e5934b54e1bfd",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la trésorerie",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Trésorerie supprimée avec succès"
+                    },
+                    "404": {
+                        "description": "Trésorerie non trouvée"
+                    }
+                }
+            }
+        },
         "/api/users.getData": {
             "get": {
                 "tags": [
@@ -2471,6 +2792,18 @@
         {
             "name": "Tickets",
             "description": "Tickets"
+        },
+        {
+            "name": "TransactionTrésoreries",
+            "description": "TransactionTrésoreries"
+        },
+        {
+            "name": "Tresorerie",
+            "description": "Tresorerie"
+        },
+        {
+            "name": "Trésoreries",
+            "description": "Trésoreries"
         }
     ]
 }
