@@ -178,6 +178,10 @@ class TresorerieController extends Controller
         $tresorerie = Tresorerie::findOrFail($id);
         $tresorerie->delete();
 
-        return response()->json(null, 204);
+        return response()->json([
+            'message' => "success",
+            'success' => true,
+            'status'  => 200,
+        ], 200);
     }
 }

@@ -15,10 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('motif')->nullable();
             $table->date('transaction_date');
-            $table->foreignId('account_id')->constrained('tresoreries');
+            $table->foreignId('account_id')
+                ->nullable()
+                ->constrained('tresoreries')
+                ->onDelete('set null');
             $table->decimal('amount', 8, 2);
             $table->string('transaction_type');
-            $table->foreignId('facturation_id')->nullable()->constrained('facturations');
+            $table->foreignId('facturation_id')->nullable()->constrained('facturations')->onDelete('set null');
             $table->float('solde');
             $table->boolean('status')->default(true);
             $table->string('reference')->nullable();
