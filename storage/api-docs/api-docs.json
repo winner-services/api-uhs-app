@@ -818,6 +818,107 @@
                 }
             }
         },
+        "/api/payements.getAllData": {
+            "get": {
+                "tags": [
+                    "Payements"
+                ],
+                "summary": "Liste des Payements",
+                "description": "Récupérer toutes les Payements avec leurs abonnés",
+                "operationId": "e8b837bf5416f65773264dbea8699390",
+                "responses": {
+                    "200": {
+                        "description": "Liste des Payements",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Facturation"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/payements.store": {
+            "post": {
+                "tags": [
+                    "Payements"
+                ],
+                "summary": "Créer un paiement",
+                "operationId": "ab0d5906d86756a3b8e1aed131bf97b3",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "loan_amount",
+                                    "paid_amount",
+                                    "transaction_date",
+                                    "account_id",
+                                    "facture_id"
+                                ],
+                                "properties": {
+                                    "loan_amount": {
+                                        "type": "number",
+                                        "format": "decimal",
+                                        "example": 1000
+                                    },
+                                    "paid_amount": {
+                                        "type": "number",
+                                        "format": "decimal",
+                                        "example": 500
+                                    },
+                                    "transaction_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-09-27"
+                                    },
+                                    "account_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "facture_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Paiement créé avec succès"
+                    },
+                    "400": {
+                        "description": "Erreur de validation"
+                    },
+                    "500": {
+                        "description": "Erreur serveur lors de la création"
+                    }
+                }
+            }
+        },
         "/api/permission.index": {
             "get": {
                 "tags": [
@@ -1939,13 +2040,13 @@
                 }
             }
         },
-        "/api/tresoreries/{id}": {
+        "/api/tresoreries.update/{id}": {
             "put": {
                 "tags": [
                     "Trésoreries"
                 ],
                 "summary": "Mettre à jour une trésorerie",
-                "operationId": "0a261ab5b896e5d26a693e5c10abaf5c",
+                "operationId": "1f56dac6baefeb9dd7b87f91330c2cc5",
                 "parameters": [
                     {
                         "name": "id",
@@ -1989,13 +2090,15 @@
                         "description": "Trésorerie non trouvée"
                     }
                 }
-            },
+            }
+        },
+        "/api/tresoreries.delete/{id}": {
             "delete": {
                 "tags": [
                     "Trésoreries"
                 ],
                 "summary": "Supprimer une trésorerie",
-                "operationId": "0815db21d8c9b42c926e5934b54e1bfd",
+                "operationId": "6efed89caced70497f7d8280d39d0ab8",
                 "parameters": [
                     {
                         "name": "id",
@@ -2575,6 +2678,10 @@
                         "type": "string",
                         "example": "Non payé"
                     },
+                    "reference": {
+                        "type": "string",
+                        "example": "FAC-6637"
+                    },
                     "date_emission": {
                         "type": "string",
                         "format": "date",
@@ -2772,6 +2879,10 @@
         {
             "name": "RapportInterventions",
             "description": "RapportInterventions"
+        },
+        {
+            "name": "Payements",
+            "description": "Payements"
         },
         {
             "name": "Permission",

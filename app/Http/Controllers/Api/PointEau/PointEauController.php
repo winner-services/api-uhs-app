@@ -106,6 +106,7 @@ class PointEauController extends Controller
                 'long'            => $request->input('long'),
                 'numero_compteur' => $request->input('numero_compteur'),
                 'status'          => $request->input('status'),
+                'matricule'       => fake()->unique()->numerify('BRN-#####')
             ]);
 
             DB::commit();

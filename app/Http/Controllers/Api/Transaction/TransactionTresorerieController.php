@@ -122,7 +122,7 @@ class TransactionTresorerieController extends Controller
                 'solde'            => ($request->input('transaction_type') === 'RECETTE')
                     ? $solde + $request->input('amount')
                     : ($request->input('transaction_type') === 'DEPENSE' ? $solde - $request->input('amount') : $solde),
-                'reference'        => fake()->randomNumber(5),
+                'reference'        => fake()->unique()->numerify('TRANS-#####'),
                 'addedBy'          => $user->id,
             ];
             $transaction['motif'] = $request->filled('motif') ? $request->motif : '-';

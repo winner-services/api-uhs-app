@@ -93,7 +93,7 @@ class TresorerieController extends Controller
                 'message' => 'Cette trésorerie existe déjà.'
             ], 409);
         }
-        
+
         $tresorerie = Tresorerie::create([
             'designation' => $validated['designation'],
             'reference' => $validated['reference'],
@@ -101,12 +101,16 @@ class TresorerieController extends Controller
             'addedBy' => $user->id
         ]);
 
-        return response()->json($tresorerie, 201);
+        return response()->json([
+            'message' => "success",
+            'success' => true,
+            'status'  => 201,
+        ], 201);
     }
 
     /**
      * @OA\Put(
-     *     path="/api/tresoreries/{id}",
+     *     path="/api/tresoreries.update/{id}",
      *     summary="Mettre à jour une trésorerie",
      *     tags={"Trésoreries"},
      *     @OA\Parameter(
@@ -146,12 +150,16 @@ class TresorerieController extends Controller
             'addedBy' => $user->id ?? $tresorerie->addedBy
         ]);
 
-        return response()->json($tresorerie, 200);
+        return response()->json([
+            'message' => "success",
+            'success' => true,
+            'status'  => 200,
+        ], 200);
     }
 
     /**
      * @OA\Delete(
-     *     path="/api/tresoreries/{id}",
+     *     path="/api/tresoreries.delete/{id}",
      *     summary="Supprimer une trésorerie",
      *     tags={"Trésoreries"},
      *     @OA\Parameter(

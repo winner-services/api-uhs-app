@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\About\AboutController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Facturation\FacturationController;
 use App\Http\Controllers\Api\Intervention\RapportInterventionController;
+use App\Http\Controllers\Api\Payement\PayementController;
 use App\Http\Controllers\Api\Permission\PermissionController;
 use App\Http\Controllers\Api\PointEau\PointEauAbonne\PointEauAbonneController;
 use App\Http\Controllers\Api\PointEau\PointEauController;
@@ -118,5 +119,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/transaction-tresoreries.store', 'store');
         Route::get('/transaction-tresoreries.update/{id}', 'update');
         Route::get('/transaction-tresoreries.delete/{id}', 'destroy');
+    });
+
+    Route::controller(PayementController::class)->group(function () {
+        Route::get('/payements.getAllData', 'getPayement');
+        Route::post('/payements.store', 'store');
     });
 });

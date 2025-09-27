@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  *     @OA\Property(property="montant", type="number", format="float", example=150.75),
  *     @OA\Property(property="dette", type="number", format="float", example=50.00),
  *     @OA\Property(property="status", type="string", example="Non payé"),
+ *     @OA\Property(property="reference", type="string", example="FAC-6637"),
  *     @OA\Property(property="date_emission", type="string", format="date", example="2025-09-01"),
  *     @OA\Property(property="date_paiement", type="string", format="date", nullable=true, example="2025-09-10"),
  *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-09-21T10:00:00Z"),
@@ -33,7 +34,8 @@ class Facturation extends Model
         'status',
         'date_emission',
         'date_paiement',
-        'addedBy'
+        'addedBy',
+        'reference'
     ];
 
     public function abonne()

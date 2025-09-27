@@ -10,7 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
 
 class FacturationController extends Controller
 {
@@ -170,6 +169,7 @@ class FacturationController extends Controller
                     'addedBy'       => $user->id,
                     'created_at'    => now(),
                     'updated_at'    => now(),
+                    'reference'     => fake()->unique()->numerify('FAC-#####')
                 ];
             }
 
