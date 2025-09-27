@@ -111,7 +111,7 @@ class PayementController extends Controller
         try {
             DB::beginTransaction();
             $user = Auth::user();
-            $dette = Facturation::where('facture_id', $request->facture_id)->first();
+            $dette = Facturation::where('id', $request->facture_id)->first();
 
             $montantFromRequet = $request->paid_amount;
             $lastTransaction = TrasactionTresorerie::where('account_id', $request->account_id)
