@@ -47,7 +47,7 @@ class FacturationController extends Controller
             ELSE 4
         END ASC
     ")
-            ->latest('created_at') // ensuite par date
+            // ->latest('created_at') // ensuite par date
             // ->orderBy($sort_field, $sort_direction)
             ->paginate($page);
 
