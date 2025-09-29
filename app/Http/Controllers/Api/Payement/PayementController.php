@@ -184,6 +184,7 @@ class PayementController extends Controller
                 'addedBy'          => $user->id,
                 'reference'        => fake()->unique()->numerify('TRANS-#####'),
                 'solde'            => $solde + $montantPaye,
+                'facturation_id'   => $request->facture_id
             ]);
 
             DB::commit();
