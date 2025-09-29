@@ -145,6 +145,34 @@ class FacturationController extends Controller
 
             $insertData = [];
 
+            // foreach ($abonnes as $abonne) {
+            //     if (in_array($abonne->id, $facturesExistantes)) {
+            //         continue; // facture déjà créée ce mois
+            //     }
+
+            //     $prixMensuel = $abonne->categorie->prix_mensuel ?? 0;
+            //     $facturePrecedente = $facturesPrecedentes->get($abonne->id);
+
+            //     if ($facturePrecedente && $facturePrecedente->status !== 'payé') {
+            //         $dette = $facturePrecedente->dette + $facturePrecedente->montant;
+            //     } else {
+            //         $dette = $prixMensuel;
+            //     }
+
+            //     $insertData[] = [
+            //         'abonne_id'     => $abonne->id,
+            //         'mois'          => $mois,
+            //         'montant'       => $prixMensuel,
+            //         'dette'         => $dette,
+            //         'status'        => 'impayé',
+            //         'date_emission' => $date->toDateString(),
+            //         'addedBy'       => $user->id,
+            //         'created_at'    => now(),
+            //         'updated_at'    => now(),
+            //         'reference'     => fake()->unique()->numerify('FAC-#####')
+            //     ];
+            // }
+
             foreach ($abonnes as $abonne) {
                 if (in_array($abonne->id, $facturesExistantes)) {
                     continue; // facture déjà créée ce mois
@@ -153,10 +181,19 @@ class FacturationController extends Controller
                 $prixMensuel = $abonne->categorie->prix_mensuel ?? 0;
                 $facturePrecedente = $facturesPrecedentes->get($abonne->id);
 
-                if ($facturePrecedente && $facturePrecedente->status !== 'payé') {
-                    $dette = $facturePrecedente->dette + $prixMensuel;
+                if ($facturePrecedente) {
+                    // ✅ Cas où il existe déjà une facture précédente
+                    if ($facturePrecedente->status !== 'payé') {
+                        $dette  = $facturePrecedente->dette + $facturePrecedente->montant;
+                        $status = 'insoldée'; // 🔴 Nouvel état quand il y a une dette
+                    } else {
+                        $dette  = 0;
+                        $status = 'impayé';
+                    }
                 } else {
-                    $dette = $prixMensuel;
+                    // ✅ Première facturation → dette = 0
+                    $dette  = 0;
+                    $status = 'impayé';
                 }
 
                 $insertData[] = [
@@ -164,7 +201,7 @@ class FacturationController extends Controller
                     'mois'          => $mois,
                     'montant'       => $prixMensuel,
                     'dette'         => $dette,
-                    'status'        => 'impayé',
+                    'status'        => $status, // 💡 on insère selon le cas
                     'date_emission' => $date->toDateString(),
                     'addedBy'       => $user->id,
                     'created_at'    => now(),
@@ -172,7 +209,6 @@ class FacturationController extends Controller
                     'reference'     => fake()->unique()->numerify('FAC-#####')
                 ];
             }
-
             // 5️⃣ Insertion en une seule requête
             if (!empty($insertData)) {
                 Facturation::insert($insertData);

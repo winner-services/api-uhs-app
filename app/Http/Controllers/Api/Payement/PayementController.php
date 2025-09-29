@@ -77,119 +77,111 @@ class PayementController extends Controller
      * )
      */
     public function store(Request $request)
-    {
-        $rules = [
-            'loan_amount'      => ['required', 'numeric'],
-            'paid_amount'      => ['required', 'numeric'],
-            'transaction_date' => ['required', 'date'],
-            'account_id'       => ['required', 'exists:tresoreries,id'],
-            'facture_id'       => ['required', 'exists:facturations,id'],
-        ];
+{
+    $rules = [
+        'loan_amount'      => ['required', 'numeric'],
+        'paid_amount'      => ['required', 'numeric'],
+        'transaction_date' => ['required', 'date'],
+        'account_id'       => ['required', 'exists:tresoreries,id'],
+        'facture_id'       => ['required', 'exists:facturations,id'],
+    ];
 
-        $messages = [
-            'loan_amount.required'      => 'Le montant du prêt est obligatoire.',
-            'loan_amount.numeric'       => 'Le montant du prêt doit être un nombre.',
-            'paid_amount.required'      => 'Le montant payé est obligatoire.',
-            'paid_amount.numeric'       => 'Le montant payé doit être un nombre.',
-            'transaction_date.required' => 'La date de la transaction est obligatoire.',
-            'transaction_date.date'     => 'La date de la transaction doit être valide.',
-            'account_id.required'       => 'Le compte associé est obligatoire.',
-            'account_id.exists'         => 'Le compte sélectionné n’existe pas.',
-            'facture_id.required'       => 'La facture associée est obligatoire.',
-            'facture_id.exists'         => 'La facture sélectionnée n’existe pas.',
-        ];
+    $messages = [
+        'loan_amount.required'      => 'Le montant du prêt est obligatoire.',
+        'loan_amount.numeric'       => 'Le montant du prêt doit être un nombre.',
+        'paid_amount.required'      => 'Le montant payé est obligatoire.',
+        'paid_amount.numeric'       => 'Le montant payé doit être un nombre.',
+        'transaction_date.required' => 'La date de la transaction est obligatoire.',
+        'transaction_date.date'     => 'La date de la transaction doit être valide.',
+        'account_id.required'       => 'Le compte associé est obligatoire.',
+        'account_id.exists'         => 'Le compte sélectionné n’existe pas.',
+        'facture_id.required'       => 'La facture associée est obligatoire.',
+        'facture_id.exists'         => 'La facture sélectionnée n’existe pas.',
+    ];
 
-        $validator = Validator::make($request->all(), $rules, $messages);
+    $validator = Validator::make($request->all(), $rules, $messages);
 
-        if ($validator->fails()) {
+    if ($validator->fails()) {
+        return response()->json([
+            'message' => 'Les données envoyées ne sont pas valides.',
+            'errors'  => $validator->errors(),
+        ], 422);
+    }
+
+    DB::beginTransaction();
+    try {
+        $user    = Auth::user();
+        $facture = Facturation::findOrFail($request->facture_id);
+
+        $montantPaye  = $request->paid_amount;
+        $lastTransaction = TrasactionTresorerie::where('account_id', $request->account_id)
+            ->latest('id')
+            ->first();
+
+        $solde = $lastTransaction ? $lastTransaction->solde : 0;
+
+        // Vérification cohérence montant payé
+        if ($montantPaye <= 0) {
             return response()->json([
-                'message' => 'Les données envoyées ne sont pas valides.',
-                'errors'  => $validator->errors()
+                'message' => 'Le montant payé doit être supérieur à 0.',
+                'status'  => 422,
             ], 422);
         }
 
-        try {
-            DB::beginTransaction();
-            $user = Auth::user();
-            $dette = Facturation::where('id', $request->facture_id)->first();
-
-            $montantFromRequet = $request->paid_amount;
-            $lastTransaction = TrasactionTresorerie::where('account_id', $request->account_id)
-                ->latest('id')
-                ->first();
-            $solde = $lastTransaction ? $lastTransaction->solde : 0;
-            $montantRestant = $dette->dette;
-
-            if ($request->paid_amount >= $request->loan_amount) {
-                $updateDette = Facturation::find($request->facture_id);
-                $updateDette->dette -= $montantFromRequet;
-                $updateDette->status = 'payé';
-                $updateDette->save();
-                $payement = Payement::create([
-                    'loan_amount'      => 0,
-                    'paid_amount'      => $request->input('paid_amount'),
-                    'transaction_date' => $request->input('transaction_date'),
-                    'account_id'       => $request->input('account_id'),
-                    'facture_id'       => $request->input('facture_id'),
-                    'addedBy'          => $user->id,
-                    'reference'        => fake()->unique()->numerify('PAY-#####'),
-                ]);
-
-                TrasactionTresorerie::create([
-                    'motif' => 'payement de la facture',
-                    'transaction_type' => 'RECETTE',
-                    'amount' => $montantFromRequet,
-                    'account_id' => $request->account_id,
-                    'transaction_date' => $request->transaction_date,
-                    'addedBy' => $user->id,
-                    'reference' => fake()->unique()->numerify('TRANS-#####'),
-                    'solde' => $solde + $montantFromRequet
-                ]);
-            } elseif ($montantFromRequet > 0) {
-                $updateDette = Facturation::find($request->facture_id);
-                $updateDette->dette -= $montantFromRequet;
-                $updateDette->status = 'payé avance';
-                $updateDette->save();
-
-                $payement = Payement::create([
-                    'loan_amount'      => $updateDette->dette - $montantFromRequet,
-                    'paid_amount'      => $request->input('paid_amount'),
-                    'transaction_date' => $request->input('transaction_date'),
-                    'account_id'       => $request->input('account_id'),
-                    'facture_id'       => $request->input('facture_id'),
-                    'addedBy'          => $user->id,
-                    'reference'        => fake()->unique()->numerify('PAY-#####'),
-                ]);
-
-                TrasactionTresorerie::create([
-                    'motif' => 'payement avance de la facture',
-                    'transaction_type' => 'RECETTE',
-                    'amount' => $montantFromRequet,
-                    'account_id' => $request->account_id,
-                    'transaction_date' => $request->transaction_date,
-                    'addedBy' => $user->id,
-                    'reference' => fake()->unique()->numerify('TRANS-#####'),
-                    'solde' => $solde + $montantFromRequet
-                ]);
-            }
-
-
-
-
-            DB::commit();
-
+        if ($montantPaye > $request->loan_amount) {
             return response()->json([
-                'message' => "Paiement ajouté avec succès",
-                'success' => true,
-                'status'  => 201,
-                'data'    => $payement
-            ], 201);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'message' => 'Erreur lors de la création du paiement.',
-                'error'   => $e->getMessage()
-            ], 500);
+                'message' => 'Le montant payé ne doit pas être supérieur au montant du prêt.',
+                'status'  => 422,
+            ], 422);
         }
+
+        // Mise à jour de la dette
+        $facture->dette -= $montantPaye;
+        if ($facture->dette <= 0) {
+            $facture->dette  = 0;
+            $facture->status = 'payé';
+        }
+        $facture->save();
+
+        // Création du paiement
+        $payement = Payement::create([
+            'loan_amount'      => max(0, $request->loan_amount - $montantPaye),
+            'paid_amount'      => $montantPaye,
+            'transaction_date' => $request->transaction_date,
+            'account_id'       => $request->account_id,
+            'facture_id'       => $request->facture_id,
+            'addedBy'          => $user->id,
+            'reference'        => fake()->unique()->numerify('PAY-#####'),
+        ]);
+
+        // Enregistrement dans la trésorerie
+        TrasactionTresorerie::create([
+            'motif'            => 'Paiement de la facture',
+            'transaction_type' => 'RECETTE',
+            'amount'           => $montantPaye,
+            'account_id'       => $request->account_id,
+            'transaction_date' => $request->transaction_date,
+            'addedBy'          => $user->id,
+            'reference'        => fake()->unique()->numerify('TRANS-#####'),
+            'solde'            => $solde + $montantPaye,
+        ]);
+
+        DB::commit();
+
+        return response()->json([
+            'message' => 'Paiement ajouté avec succès.',
+            'success' => true,
+            'status'  => 201,
+            'data'    => $payement,
+        ], 201);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json([
+            'message' => 'Erreur lors de la création du paiement.',
+            'error'   => $e->getMessage(),
+        ], 500);
     }
+}
+
 }
