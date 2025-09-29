@@ -89,12 +89,12 @@ class TicketController extends Controller
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"point_id","description","status","priorite","technicien","date_ouverture"},
+     *             required={"point_id","description","status","priorite","technicien_id","date_ouverture"},
      *             @OA\Property(property="point_id", type="integer", example=1),
      *             @OA\Property(property="description", type="string", example="Fuite détectée dans le compteur."),
      *             @OA\Property(property="status", type="string", example="Ouvert"),
      *             @OA\Property(property="priorite", type="string", example="Haute"),
-     *             @OA\Property(property="technicien", type="string", example="Jean Mukendi"),
+     *             @OA\Property(property="technicien_id", type="integer", example=1),
      *             @OA\Property(property="date_ouverture", type="string", format="date", example="2025-09-21"),
      *             @OA\Property(property="date_cloture", type="string", format="date", example="2025-09-25")
      *         )
@@ -108,11 +108,11 @@ class TicketController extends Controller
     {
         $rules = [
             'point_id'      => ['required', 'integer', 'exists:point_eaus,id'],
-            'description'   => ['required', 'string'],
-            'status'        => ['required', 'string'],
-            'priorite'      => ['required', 'string'],
-            'technicien'    => ['required', 'string'],
-            'date_ouverture' => ['required', 'date'],
+            'description'   => ['nullable', 'string'],
+            'status'        => ['nullable', 'string'],
+            'priorite'      => ['nullable', 'string'],
+            'technicien_id'    => ['required'],
+            'date_ouverture' => ['nullable', 'date'],
             'date_cloture'  => ['nullable', 'date'],
         ];
 
@@ -133,7 +133,7 @@ class TicketController extends Controller
                 'description' => $request->description,
                 'statut' => $request->status,
                 'priorite' => $request->priorite,
-                'technicien' => $request->technicien,
+                'technicien_id' => $request->technicien_id,
                 'date_ouverture' => $request->date_ouverture,
                 'date_cloture' => $request->date_cloture,
                 'addedBy' => $user->id
@@ -169,7 +169,7 @@ class TicketController extends Controller
      *             @OA\Property(property="description", type="string", example="Réparation effectuée."),
      *             @OA\Property(property="status", type="string", example="Clôturé"),
      *             @OA\Property(property="priorite", type="string", example="Moyenne"),
-     *             @OA\Property(property="technicien", type="string", example="Pierre Kaseba"),
+     *             @OA\Property(property="technicien_id", type="integer", example=1),
      *             @OA\Property(property="date_ouverture", type="string", format="date", example="2025-09-21"),
      *             @OA\Property(property="date_cloture", type="string", format="date", example="2025-09-23")
      *         )
@@ -191,7 +191,7 @@ class TicketController extends Controller
             'description'   => ['sometimes', 'string'],
             'status'        => ['sometimes', 'string'],
             'priorite'      => ['sometimes', 'string'],
-            'technicien'    => ['sometimes', 'string'],
+            'technicien_id'    => ['sometimes'],
             'date_ouverture' => ['sometimes', 'date'],
             'date_cloture'  => ['nullable', 'date'],
         ];
@@ -210,7 +210,7 @@ class TicketController extends Controller
             'description' => $request->description,
             'statut' => $request->status,
             'priorite' => $request->priorite,
-            'technicien' => $request->technicien,
+            'technicien' => $request->technicien_id,
             'date_ouverture' => $request->date_ouverture,
             'date_cloture' => $request->date_cloture,
             'addedBy' => $user->id ?? $ticket->addedBy

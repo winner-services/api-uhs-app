@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Model;
  *     @OA\Property(property="description", type="string", example="Fuite détectée sur le compteur."),
  *     @OA\Property(property="statut", type="string", example="Ouvert"),
  *     @OA\Property(property="priorite", type="string", example="Haute"),
- *     @OA\Property(property="technicien", type="string", example="Jean Mukendi"),
+ *     @OA\Property(property="technicien_id", type="integer", example=1),
  *     @OA\Property(property="date_ouverture", type="string", format="date", example="2025-09-21"),
  *     @OA\Property(property="date_cloture", type="string", format="date", nullable=true, example="2025-09-25"),
  *     @OA\Property(property="created_at", type="string", format="date-time", example="2025-09-21T10:00:00Z"),
@@ -28,7 +28,7 @@ class Ticket extends Model
 {
     protected $fillable = [
         'point_id', 'description', 'statut',
-        'priorite', 'technicien', 'date_ouverture', 'date_cloture','addedBy'
+        'priorite', 'technicien_id', 'date_ouverture', 'date_cloture','addedBy'
     ];
 
     public function point()

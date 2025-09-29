@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('tickets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('point_id')->constrained('point_eaus')->onDelete('cascade');;
-            $table->text('description');
-            $table->string('statut');
-            $table->string('priorite');
-            $table->string('technicien');
-            $table->date('date_ouverture');
+            $table->text('description')->nullable();
+            $table->string('statut')->nullable();
+            $table->string('priorite')->nullable();
+            $table->foreignId('technicien_id')->constrained('users');
+            $table->date('date_ouverture')->nullable();
             $table->date('date_cloture')->nullable();
             $table->foreignId('addedBy')->constrained('users');
             $table->timestamps();

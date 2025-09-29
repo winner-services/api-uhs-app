@@ -1630,7 +1630,7 @@
                                     "description",
                                     "status",
                                     "priorite",
-                                    "technicien",
+                                    "technicien_id",
                                     "date_ouverture"
                                 ],
                                 "properties": {
@@ -1650,9 +1650,9 @@
                                         "type": "string",
                                         "example": "Haute"
                                     },
-                                    "technicien": {
-                                        "type": "string",
-                                        "example": "Jean Mukendi"
+                                    "technicien_id": {
+                                        "type": "integer",
+                                        "example": 1
                                     },
                                     "date_ouverture": {
                                         "type": "string",
@@ -1725,9 +1725,9 @@
                                         "type": "string",
                                         "example": "Moyenne"
                                     },
-                                    "technicien": {
-                                        "type": "string",
-                                        "example": "Pierre Kaseba"
+                                    "technicien_id": {
+                                        "type": "integer",
+                                        "example": 1
                                     },
                                     "date_ouverture": {
                                         "type": "string",
@@ -2774,9 +2774,9 @@
                         "type": "string",
                         "example": "Haute"
                     },
-                    "technicien": {
-                        "type": "string",
-                        "example": "Jean Mukendi"
+                    "technicien_id": {
+                        "type": "integer",
+                        "example": 1
                     },
                     "date_ouverture": {
                         "type": "string",
