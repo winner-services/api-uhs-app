@@ -34,7 +34,10 @@ class TicketController extends Controller
         $q = request("q", "");
         $sort_direction = request('sort_direction', 'desc');
         $sort_field = request('sort_field', 'id');
-        $data = Ticket::with('point', 'user')
+        $data = Ticket::join('point_eaus', 'tickets.point_id', '=', 'point_eaus.id')
+            ->join('users', 'tickets.addedBy', '=', 'users.id')
+            ->join('users', 'tickets.technicien_id', '=', 'users.id')
+            ->select('tickets.*', 'point_eaus.matricule', 'users.name as addedBy', 'users.name as technicien')
             ->latest()
             // ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
