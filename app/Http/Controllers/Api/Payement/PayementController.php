@@ -144,6 +144,7 @@ class PayementController extends Controller
                 $facture->dette   = 0;
                 $facture->montant = 0;
                 $facture->status  = 'payé';
+                $facture->date_paiement  = $request->transaction_date;
             }
             // 4️⃣ Cas montant payé < loan_amount
             else {
@@ -153,10 +154,12 @@ class PayementController extends Controller
                     $facture->dette   = 0;
                     $facture->montant = max(0, $montant - $reste);
                     $facture->status  = 'acompte';
+                    $facture->date_paiement  = $request->transaction_date;
                 } else {
                     // On réduit uniquement la dette
                     $facture->dette  = $dette - $montantPaye;
                     $facture->status = 'acompte';
+                    $facture->date_paiement  = $request->transaction_date;
                 }
             }
 
