@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('technicien_id')->constrained('users');
             $table->date('date_ouverture')->nullable();
             $table->date('date_cloture')->nullable();
+            $table->string('reference');
             $table->foreignId('addedBy')->constrained('users');
             $table->timestamps();
         });
