@@ -152,11 +152,11 @@ class PayementController extends Controller
                     $reste = $montantPaye - $dette;
                     $facture->dette   = 0;
                     $facture->montant = max(0, $montant - $reste);
-                    $facture->status  = 'facture avancée';
+                    $facture->status  = 'avance sur payement';
                 } else {
                     // On réduit uniquement la dette
                     $facture->dette  = $dette - $montantPaye;
-                    $facture->status = 'facture avancée';
+                    $facture->status = 'avance sur payement';
                 }
             }
 

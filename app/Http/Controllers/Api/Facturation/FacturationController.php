@@ -40,9 +40,10 @@ class FacturationController extends Controller
         $data = Facturation::with('abonne', 'user')
             ->orderByRaw("
         CASE 
-            WHEN status = 'impayé' THEN 1
+            WHEN status = 'impayée' THEN 1
+            WHEN status = 'avance sur payement' THEN 2
             WHEN status = 'insoldée' THEN 2
-            WHEN status = 'payé' THEN 3
+            WHEN status = 'payée' THEN 3
             ELSE 4
         END ASC
     ")
