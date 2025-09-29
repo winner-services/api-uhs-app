@@ -2770,6 +2770,10 @@
                         "type": "string",
                         "example": "Ouvert"
                     },
+                    "reference": {
+                        "type": "string",
+                        "example": "TCK-202509"
+                    },
                     "priorite": {
                         "type": "string",
                         "example": "Haute"
