@@ -41,7 +41,7 @@ class PayementController extends Controller
             ->join('facturations', 'payements.facture_id', '=', 'facturations.id')
             ->join('users', 'payements.addedBy', '=', 'users.id')
             ->join('abonnes', 'facturations.abonne_id', '=', 'abonnes.id')
-            ->select('payements.*', 'abonnes.nom as abonne', 'users.name as addedBy', 'tresoreries.dedignation as tresorerie')
+            ->select('payements.*', 'abonnes.nom as abonne', 'users.name as addedBy', 'tresoreries.designation as tresorerie')
             ->latest()
             // ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
