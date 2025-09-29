@@ -32,23 +32,19 @@ class FacturationController extends Controller
      */
     public function index()
     {
-
         $page = request("paginate", 10);
-        $q = request("q", "");
-        $sort_direction = request('sort_direction', 'desc');
-        // $sort_field = request('sort_field', 'id');
+
         $data = Facturation::with('abonne', 'user')
             ->orderByRaw("
-        CASE 
-            WHEN status = 'impayé' THEN 1
-            WHEN status = 'acompte' THEN 2
-            WHEN status = 'insoldée' THEN 2
-            WHEN status = 'payée' THEN 3
-            ELSE 4
-        END ASC
-    ")
-            ->latest('created_at') // ensuite par date
-            // ->orderBy($sort_field, $sort_direction)
+            CASE 
+                WHEN status = 'impayé'  THEN 1
+                WHEN status = 'acompte' THEN 2
+                WHEN status = 'insoldée' THEN 2
+                WHEN status = 'payé'    THEN 3
+                ELSE 4
+            END
+        ")
+            ->orderBy('created_at', 'desc')
             ->paginate($page);
 
         $result = [
