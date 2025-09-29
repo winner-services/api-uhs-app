@@ -136,7 +136,8 @@ class TicketController extends Controller
                 'technicien_id' => $request->technicien_id,
                 'date_ouverture' => $request->date_ouverture,
                 'date_cloture' => $request->date_cloture,
-                'addedBy' => $user->id
+                'addedBy' => $user->id,
+                'reference' => fake()->unique()->numerify('PAN-#####')
             ]);
 
             DB::commit();
