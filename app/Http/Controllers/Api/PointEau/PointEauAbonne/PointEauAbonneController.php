@@ -28,7 +28,7 @@ class PointEauAbonneController extends Controller
         $data = PointEauAbonne::join('abonnes', 'point_eau_abonnes.abonne_id', '=', 'abonnes.id')
             ->join('users', 'point_eau_abonnes.addedBy', '=', 'users.id')
             ->join('point_eaus','point_eau_abonnes.point_eau_id','=','point_eaus.id')
-            ->select('point_eau_abonnes.*','point_eaus.numero_compteur', 'abonnes.nom as abonne', 'users.name as addedBy')
+            ->select('point_eau_abonnes.*','point_eaus.numero_compteur','point_eaus.matricule', 'abonnes.nom as abonne', 'users.name as addedBy')
             ->latest()
             // ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
