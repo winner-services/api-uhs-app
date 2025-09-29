@@ -36,18 +36,27 @@ class FacturationController extends Controller
         $page = request("paginate", 10);
         $q = request("q", "");
         $sort_direction = request('sort_direction', 'desc');
-        $sort_field = request('sort_field', 'id');
+        // $sort_field = request('sort_field', 'id');
         $data = Facturation::with('abonne', 'user')
-            ->latest()
-            // ->searh(trim($q))
-            ->orderBy($sort_field, $sort_direction)
+            ->orderByRaw("
+        CASE 
+            WHEN status = 'impayé' THEN 1
+            WHEN status = 'insoldée' THEN 2
+            WHEN status = 'payé' THEN 3
+            ELSE 4
+        END ASC
+    ")
+            ->latest('created_at') // ensuite par date
+            // ->orderBy($sort_field, $sort_direction)
             ->paginate($page);
+
         $result = [
             'message' => "OK",
             'success' => true,
-            'data' => $data,
-            'status' => 200
+            'data'    => $data,
+            'status'  => 200
         ];
+
         return response()->json($result);
     }
 
@@ -185,7 +194,9 @@ class FacturationController extends Controller
                     // ✅ Cas où il existe déjà une facture précédente
                     if ($facturePrecedente->status !== 'payé') {
                         $dette  = $facturePrecedente->dette + $facturePrecedente->montant;
-                        $status = 'insoldée'; // 🔴 Nouvel état quand il y a une dette
+                        $status = 'impayé'; // 🔴 Nouvel état quand il y a une dette
+                        $facturePrecedente->status = 'insoldée';
+                        $facturePrecedente->save();
                     } else {
                         $dette  = 0;
                         $status = 'impayé';

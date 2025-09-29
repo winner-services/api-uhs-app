@@ -164,7 +164,8 @@ class PayementController extends Controller
 
             // Enregistrement du paiement
             $payement = Payement::create([
-                'loan_amount'      => max(0, $loanAmount - $montantPaye),
+                // 'loan_amount'      => max(0, $loanAmount - $montantPaye),
+                'loan_amount'      => $loanAmount,
                 'paid_amount'      => $montantPaye,
                 'transaction_date' => $request->transaction_date,
                 'account_id'       => $request->account_id,
