@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('role_permission_actions', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('role_id');
-            $table->unsignedBigInteger('permission_id');
+            $table->unsignedBigInteger('role_id')->nullable();
+            $table->unsignedBigInteger('permission_id')->nullable();
             $table->boolean('voir')->default(false);
             $table->boolean('ajouter')->default(false);
             $table->boolean('modifier')->default(false);

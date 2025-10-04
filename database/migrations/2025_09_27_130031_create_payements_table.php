@@ -16,9 +16,9 @@ return new class extends Migration
             $table->decimal('loan_amount', 8, 2);
             $table->decimal('paid_amount', 8, 2);
             $table->date('transaction_date');
-            $table->foreignId('account_id')->constrained('tresoreries');
-            $table->foreignId('facture_id')->constrained('facturations');
-            $table->foreignId('addedBy')->constrained('users');
+            $table->foreignId('account_id')->nullable()->constrained('tresoreries')->nullOnDelete();
+            $table->foreignId('facture_id')->nullable()->constrained('facturations')->nullOnDelete();
+            $table->foreignId('addedBy')->nullable()->constrained('users')->nullOnDelete();
             $table->boolean('status')->default(true);
             $table->string('reference')->nullable();
             $table->timestamps();

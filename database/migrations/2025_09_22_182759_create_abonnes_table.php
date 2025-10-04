@@ -14,10 +14,13 @@ return new class extends Migration
         Schema::create('abonnes', function (Blueprint $table) {
             $table->id();
             $table->string('nom');
-            $table->foreignId('categorie_id')->constrained('abonnement_categories');
+            $table->foreignId('categorie_id')
+                ->nullable()
+                ->constrained('abonnement_categories')
+                ->nullOnDelete();
             $table->string('telephone')->nullable();
             $table->string('adresse')->nullable();
-            $table->foreignId('addedBy')->constrained('users');
+            $table->foreignId('addedBy')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

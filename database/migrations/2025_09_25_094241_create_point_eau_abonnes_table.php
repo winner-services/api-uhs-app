@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('point_eau_abonnes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('abonne_id')->constrained('abonnes');
-            $table->foreignId('point_eau_id')->constrained('point_eaus');
+            $table->foreignId('abonne_id')->nullable()->constrained('abonnes')->nullOnDelete();
+            $table->foreignId('point_eau_id')->nullable()->constrained('point_eaus')->nullOnDelete();
             $table->date('date_operation');
-            $table->foreignId('addedBy')->constrained('users');
+            $table->foreignId('addedBy')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

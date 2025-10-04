@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('rapport_interventions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('ticket_id')->constrained('tickets')->onDelete('cascade');
+            $table->foreignId('ticket_id')->nullable()->constrained('tickets')->nullOnDelete();
             $table->string('description');
             $table->decimal('cout_reparation', 8, 2)->nullable();
             $table->date('date_rapport');
-            $table->foreignId('addedBy')->constrained('users');
+            $table->foreignId('addedBy')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

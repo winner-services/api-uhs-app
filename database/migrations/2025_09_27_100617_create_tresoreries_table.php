@@ -16,7 +16,7 @@ return new class extends Migration
             $table->text('designation');
             $table->text('reference')->nullable();
             $table->text('type');
-            $table->foreignId('addedBy')->constrained('users');
+            $table->foreignId('addedBy')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }
