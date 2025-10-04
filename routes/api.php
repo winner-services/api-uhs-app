@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\Payement\PayementController;
 use App\Http\Controllers\Api\Permission\PermissionController;
 use App\Http\Controllers\Api\PointEau\PointEauAbonne\PointEauAbonneController;
 use App\Http\Controllers\Api\PointEau\PointEauController;
+use App\Http\Controllers\Api\Rapport\RapportController;
 use App\Http\Controllers\Api\Role\RoleController;
 use App\Http\Controllers\Api\Ticket\TicketController;
 use App\Http\Controllers\Api\Transaction\TransactionTresorerieController;
@@ -125,4 +126,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/payements.getAllData', 'getPayement');
         Route::post('/payements.store', 'store');
     });
+});
+
+Route::controller(RapportController::class)->group(function () {
+    Route::post('/depenses.store', 'storeDepense');
+    Route::put('/depenses.update/{id}', 'updateDepense');
+    Route::delete('/depenses.delete/{id}', 'deleteDepense');
 });

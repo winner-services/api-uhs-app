@@ -11,16 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tickets', function (Blueprint $table) {
+        Schema::create('rapports', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('point_id')->constrained('point_eaus')->onDelete('set null');;
+            $table->date('date');
             $table->text('description')->nullable();
-            $table->string('statut')->nullable();
-            $table->string('priorite')->nullable();
-            $table->foreignId('technicien_id')->constrained('users');
-            $table->date('date_ouverture')->nullable();
-            $table->date('date_cloture')->nullable();
-            $table->string('reference');
+            $table->string('status')->default('En cours');
+            $table->foreignId('ticket_id')->constrained()->onDelete('set null');
             $table->foreignId('addedBy')->constrained('users');
             $table->timestamps();
         });
@@ -31,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tickets');
+        Schema::dropIfExists('rapports');
     }
 };

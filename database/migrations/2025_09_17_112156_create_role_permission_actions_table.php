@@ -20,8 +20,8 @@ return new class extends Migration
             $table->boolean('modifier')->default(false);
             $table->boolean('supprimer')->default(false);
             $table->timestamps();
-            $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
-            $table->foreign('permission_id')->references('id')->on('permissions')->onDelete('cascade');
+            $table->foreign('role_id')->references('id')->on('roles')->onDelete('set null');
+            $table->foreign('permission_id')->references('id')->on('permissions')->onDelete('set null');
         });
     }
 
