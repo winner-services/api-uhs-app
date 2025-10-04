@@ -1243,6 +1243,207 @@
                 }
             }
         },
+        "/api/depenses.store": {
+            "post": {
+                "tags": [
+                    "Depenses"
+                ],
+                "summary": "Créer une dépense avec ses détails",
+                "description": "Crée une nouvelle dépense (main) et plusieurs détails associés dans une seule transaction.",
+                "operationId": "storeDepense",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "main": {
+                                        "properties": {
+                                            "date": {
+                                                "type": "string",
+                                                "example": "2025-10-03"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "lorem ipsum"
+                                            },
+                                            "status": {
+                                                "type": "string",
+                                                "example": "Cloturer"
+                                            },
+                                            "ticket_id": {
+                                                "type": "integer",
+                                                "example": 2
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "details": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "motif": {
+                                                    "type": "string",
+                                                    "example": "test"
+                                                },
+                                                "amount": {
+                                                    "type": "number",
+                                                    "example": 30.5
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Dépense créée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Dépense créée avec succès"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne"
+                    }
+                }
+            }
+        },
+        "/api/depenses.update/{id}": {
+            "put": {
+                "tags": [
+                    "Depenses"
+                ],
+                "summary": "Mettre à jour une dépense et ses détails",
+                "description": "Met à jour les informations principales et tous les détails associés d'une dépense existante.",
+                "operationId": "updateDepense",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la dépense à mettre à jour",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "main": {
+                                        "properties": {
+                                            "date": {
+                                                "type": "string",
+                                                "example": "2025-10-04"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "Nouvelle dépense modifiée"
+                                            },
+                                            "status": {
+                                                "type": "string",
+                                                "example": "Cloturer"
+                                            },
+                                            "ticket_id": {
+                                                "type": "integer",
+                                                "example": 2
+                                            }
+                                        },
+                                        "type": "object"
+                                    },
+                                    "details": {
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "motif": {
+                                                    "type": "string",
+                                                    "example": "Transport"
+                                                },
+                                                "amount": {
+                                                    "type": "number",
+                                                    "example": 100
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Dépense mise à jour avec succès"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne"
+                    }
+                }
+            }
+        },
+        "/api/depenses.delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Depenses"
+                ],
+                "summary": "Supprimer une dépense",
+                "description": "Supprime une dépense et tous ses détails associés.",
+                "operationId": "deleteDepense",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la dépense à supprimer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Dépense supprimée avec succès"
+                    },
+                    "404": {
+                        "description": "Dépense non trouvée"
+                    },
+                    "500": {
+                        "description": "Erreur serveur interne"
+                    }
+                }
+            }
+        },
         "/api/role.store": {
             "post": {
                 "tags": [
@@ -2899,6 +3100,10 @@
         {
             "name": "Points d’eau",
             "description": "Points d’eau"
+        },
+        {
+            "name": "Depenses",
+            "description": "Depenses"
         },
         {
             "name": "Role",
