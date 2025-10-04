@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('detail_rapports', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('rapport_id')->constrained('rapports')->onDelete('set null');
+            $table->foreignId('rapport_id')->constrained('rapports');
             $table->string('motif');
             $table->decimal('amount', 10, 2);
             $table->timestamps();
