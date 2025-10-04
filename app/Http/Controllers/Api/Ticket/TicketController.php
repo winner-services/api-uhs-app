@@ -41,6 +41,8 @@ class TicketController extends Controller
                 'tickets.*',
                 'point_eaus.matricule as point_eau',
                 'point_eaus.numero_compteur',
+                'point_eaus.lat',
+                'point_eaus.long',
                 'u1.name as addedBy',
                 'u2.name as technicien'
             )
