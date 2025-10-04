@@ -16,7 +16,7 @@ return new class extends Migration
             $table->date('date');
             $table->text('description')->nullable();
             $table->string('status')->default('En cours');
-            $table->foreignId('ticket_id')->constrained()->onDelete('set null');
+            $table->foreignId('ticket_id')->constrained('tickets')->onDelete('set null');
             $table->foreignId('addedBy')->constrained('users');
             $table->timestamps();
         });
