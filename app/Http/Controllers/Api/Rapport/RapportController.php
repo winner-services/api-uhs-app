@@ -13,12 +13,73 @@ use Illuminate\Support\Facades\Validator;
 class RapportController extends Controller
 {
     /**
+     * @OA\Get(
+     *     path="/api/depenses.index",
+     *     summary="Afficher toutes les dépenses avec leurs détails associés",
+     *     tags={"Dépenses"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des dépenses récupérée avec succès",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="message", type="string", example="Liste des dépenses récupérée avec succès"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="date", type="string", example="2025-10-03"),
+     *                     @OA\Property(property="description", type="string", example="Achat matériel"),
+     *                     @OA\Property(property="status", type="string", example="Cloturer"),
+     *                     @OA\Property(property="ticket_id", type="integer", example=2),
+     *                     @OA\Property(property="addedBy", type="integer", example=1),
+     *                     @OA\Property(
+     *                         property="details",
+     *                         type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=10),
+     *                             @OA\Property(property="motif", type="string", example="Papeterie"),
+     *                             @OA\Property(property="amount", type="number", example=150.75)
+     *                         )
+     *                     )
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=500, description="Erreur interne du serveur")
+     * )
+     */
+    public function indexDepense()
+    {
+        try {
+            $depenses = Rapport::with(['details', 'ticket'])
+                ->latest()
+                ->get();
+
+            return response()->json([
+                'status' => 200,
+                'message' => 'Liste des dépenses récupérée avec succès',
+                'data' => $depenses
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Erreur lors de la récupération des dépenses',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * @OA\Post(
      *     path="/api/depenses.store",
      *     summary="Créer une dépense avec ses détails",
      *     description="Crée une nouvelle dépense (main) et plusieurs détails associés dans une seule transaction.",
      *     operationId="storeDepense",
-     *     tags={"Depenses"},
+     *     tags={"Dépenses"},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
@@ -79,8 +140,6 @@ class RapportController extends Controller
                 foreach ($request->input('details') as $detail) {
                     $depense->details()->create($detail);
                 }
-
-                // return $depense->load('details', 'user');
             });
 
             return response()->json([
@@ -99,38 +158,39 @@ class RapportController extends Controller
     /**
      * @OA\Put(
      *     path="/api/depenses.update/{id}",
-     *     summary="Mettre à jour une dépense et ses détails",
-     *     description="Met à jour les informations principales et tous les détails associés d'une dépense existante.",
-     *     operationId="updateDepense",
-     *     tags={"Depenses"},
+     *     summary="Mettre à jour une dépense existante et ses détails sans les supprimer",
+     *     tags={"Dépenses"},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
-     *         description="ID de la dépense à mettre à jour",
-     *         @OA\Schema(type="integer", example=1)
+     *         description="ID de la dépense à modifier",
+     *         @OA\Schema(type="integer")
      *     ),
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
      *             type="object",
      *             @OA\Property(property="main", type="object",
-     *                 @OA\Property(property="date", type="string", example="2025-10-04"),
-     *                 @OA\Property(property="description", type="string", example="Nouvelle dépense modifiée"),
+     *                 @OA\Property(property="date", type="string", example="2025-10-03"),
+     *                 @OA\Property(property="description", type="string", example="Achat matériel"),
      *                 @OA\Property(property="status", type="string", example="Cloturer"),
      *                 @OA\Property(property="ticket_id", type="integer", example=2)
      *             ),
      *             @OA\Property(property="details", type="array",
      *                 @OA\Items(
-     *                     @OA\Property(property="motif", type="string", example="Transport"),
-     *                     @OA\Property(property="amount", type="number", example=100.00)
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="motif", type="string", example="Papeterie"),
+     *                     @OA\Property(property="amount", type="number", example=120.5)
      *                 )
      *             )
      *         )
      *     ),
      *     @OA\Response(response=200, description="Dépense mise à jour avec succès"),
-     *     @OA\Response(response=422, description="Erreur de validation"),
-     *     @OA\Response(response=500, description="Erreur serveur interne")
+     *     @OA\Response(response=404, description="Dépense non trouvée"),
+     *     @OA\Response(response=422, description="Données invalides"),
+     *     @OA\Response(response=500, description="Erreur interne du serveur")
      * )
      */
     public function updateDepense(Request $request, $id)
@@ -153,22 +213,37 @@ class RapportController extends Controller
         }
 
         try {
-            $depense = DB::transaction(function () use ($request, $id) {
-                $depense = Rapport::findOrFail($id);
-                $depense->update($request->input('main'));
+            $depense = Rapport::with('details')->find($id);
 
-                $depense->details()->delete();
+            if (!$depense) {
+                return response()->json([
+                    'message' => 'Dépense non trouvée',
+                    'status' => 404
+                ], 404);
+            }
 
-                foreach ($request->input('details') as $detail) {
-                    $depense->details()->create($detail);
+            DB::transaction(function () use ($depense, $request) {
+                // 🧩 Met à jour les infos principales
+                $mainData = $request->input('main');
+                $depense->update($mainData);
+
+                // 🧩 Met à jour les détails un par un
+                foreach ($request->input('details') as $detailData) {
+                    if (isset($detailData['id'])) {
+                        // Si le détail existe -> on le met à jour
+                        $detail = $depense->details()->where('id', $detailData['id'])->first();
+                        if ($detail) {
+                            $detail->update($detailData);
+                        }
+                    } else {
+                        // Si pas d'ID -> on le crée
+                        $depense->details()->create($detailData);
+                    }
                 }
-
-                return $depense->load('details');
             });
 
             return response()->json([
                 'message' => 'Dépense mise à jour avec succès',
-                'data' => $depense,
                 'success' => true,
                 'status' => 200
             ], 200);
@@ -183,32 +258,51 @@ class RapportController extends Controller
     /**
      * @OA\Delete(
      *     path="/api/depenses.delete/{id}",
-     *     summary="Supprimer une dépense",
-     *     description="Supprime une dépense et tous ses détails associés.",
-     *     operationId="deleteDepense",
-     *     tags={"Depenses"},
+     *     summary="Supprimer une dépense et tous ses détails associés",
+     *     tags={"Dépenses"},
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         description="ID de la dépense à supprimer",
-     *         @OA\Schema(type="integer", example=1)
+     *         @OA\Schema(type="integer")
      *     ),
-     *     @OA\Response(response=200, description="Dépense supprimée avec succès"),
-     *     @OA\Response(response=404, description="Dépense non trouvée"),
-     *     @OA\Response(response=500, description="Erreur serveur interne")
+     *     @OA\Response(
+     *         response=200,
+     *         description="Dépense supprimée avec succès"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Dépense non trouvée"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erreur interne du serveur"
+     *     )
      * )
      */
     public function deleteDepense($id)
     {
         try {
-            DB::transaction(function () use ($id) {
-                $depense = Rapport::findOrFail($id);
+            $depense = Rapport::with('details')->find($id);
+
+            if (!$depense) {
+                return response()->json([
+                    'message' => 'Dépense non trouvée',
+                    'status' => 404
+                ], 404);
+            }
+
+            DB::transaction(function () use ($depense) {
+                // 🔹 Supprimer les détails associés
+                $depense->details()->delete();
+
+                // 🔹 Supprimer la dépense principale
                 $depense->delete();
             });
 
             return response()->json([
-                'message' => 'Dépense supprimée avec succès',
+                'message' => 'Dépense et ses détails supprimés avec succès',
                 'success' => true,
                 'status' => 200
             ], 200);

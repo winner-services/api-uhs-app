@@ -130,5 +130,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/depenses.store', 'storeDepense');
         Route::put('/depenses.update/{id}', 'updateDepense');
         Route::delete('/depenses.delete/{id}', 'deleteDepense');
+        Route::get('/depenses.index', 'indexDepense');
     });
 });
