@@ -80,7 +80,7 @@ class RapportController extends Controller
                     $depense->details()->create($detail);
                 }
 
-                return $depense->load('details', 'user');
+                // return $depense->load('details', 'user');
             });
 
             return response()->json([
