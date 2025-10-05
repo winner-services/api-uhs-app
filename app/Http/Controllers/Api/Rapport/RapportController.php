@@ -55,7 +55,7 @@ class RapportController extends Controller
     public function indexDepense()
     {
         try {
-            $depenses = Rapport::with(['details', 'ticket'])
+            $depenses = Rapport::with(['details', 'ticket','user'])
                 ->latest()
                 ->get();
 
