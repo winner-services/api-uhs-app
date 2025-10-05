@@ -1243,10 +1243,96 @@
                 }
             }
         },
+        "/api/depenses.index": {
+            "get": {
+                "tags": [
+                    "Dépenses"
+                ],
+                "summary": "Afficher toutes les dépenses avec leurs détails associés",
+                "operationId": "f1a4a7f8d797dc3328b25104255af782",
+                "responses": {
+                    "200": {
+                        "description": "Liste des dépenses récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Liste des dépenses récupérée avec succès"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "date": {
+                                                        "type": "string",
+                                                        "example": "2025-10-03"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Achat matériel"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "Cloturer"
+                                                    },
+                                                    "ticket_id": {
+                                                        "type": "integer",
+                                                        "example": 2
+                                                    },
+                                                    "addedBy": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "details": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 10
+                                                                },
+                                                                "motif": {
+                                                                    "type": "string",
+                                                                    "example": "Papeterie"
+                                                                },
+                                                                "amount": {
+                                                                    "type": "number",
+                                                                    "example": 150.75
+                                                                }
+                                                            },
+                                                            "type": "object"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur"
+                    }
+                }
+            }
+        },
         "/api/depenses.store": {
             "post": {
                 "tags": [
-                    "Depenses"
+                    "Dépenses"
                 ],
                 "summary": "Créer une dépense avec ses détails",
                 "description": "Crée une nouvelle dépense (main) et plusieurs détails associés dans une seule transaction.",
@@ -1332,20 +1418,18 @@
         "/api/depenses.update/{id}": {
             "put": {
                 "tags": [
-                    "Depenses"
+                    "Dépenses"
                 ],
-                "summary": "Mettre à jour une dépense et ses détails",
-                "description": "Met à jour les informations principales et tous les détails associés d'une dépense existante.",
-                "operationId": "updateDepense",
+                "summary": "Mettre à jour une dépense existante et ses détails sans les supprimer",
+                "operationId": "fd93f7c874f6517a59b4b3fcc0c80c4d",
                 "parameters": [
                     {
                         "name": "id",
                         "in": "path",
-                        "description": "ID de la dépense à mettre à jour",
+                        "description": "ID de la dépense à modifier",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "type": "integer"
                         }
                     }
                 ],
@@ -1359,11 +1443,11 @@
                                         "properties": {
                                             "date": {
                                                 "type": "string",
-                                                "example": "2025-10-04"
+                                                "example": "2025-10-03"
                                             },
                                             "description": {
                                                 "type": "string",
-                                                "example": "Nouvelle dépense modifiée"
+                                                "example": "Achat matériel"
                                             },
                                             "status": {
                                                 "type": "string",
@@ -1380,13 +1464,17 @@
                                         "type": "array",
                                         "items": {
                                             "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
                                                 "motif": {
                                                     "type": "string",
-                                                    "example": "Transport"
+                                                    "example": "Papeterie"
                                                 },
                                                 "amount": {
                                                     "type": "number",
-                                                    "example": 100
+                                                    "example": 120.5
                                                 }
                                             },
                                             "type": "object"
@@ -1402,11 +1490,14 @@
                     "200": {
                         "description": "Dépense mise à jour avec succès"
                     },
+                    "404": {
+                        "description": "Dépense non trouvée"
+                    },
                     "422": {
-                        "description": "Erreur de validation"
+                        "description": "Données invalides"
                     },
                     "500": {
-                        "description": "Erreur serveur interne"
+                        "description": "Erreur interne du serveur"
                     }
                 }
             }
@@ -1414,11 +1505,10 @@
         "/api/depenses.delete/{id}": {
             "delete": {
                 "tags": [
-                    "Depenses"
+                    "Dépenses"
                 ],
-                "summary": "Supprimer une dépense",
-                "description": "Supprime une dépense et tous ses détails associés.",
-                "operationId": "deleteDepense",
+                "summary": "Supprimer une dépense et tous ses détails associés",
+                "operationId": "fea48c7c0135db91901c559a9c7783bf",
                 "parameters": [
                     {
                         "name": "id",
@@ -1426,8 +1516,7 @@
                         "description": "ID de la dépense à supprimer",
                         "required": true,
                         "schema": {
-                            "type": "integer",
-                            "example": 1
+                            "type": "integer"
                         }
                     }
                 ],
@@ -1439,7 +1528,7 @@
                         "description": "Dépense non trouvée"
                     },
                     "500": {
-                        "description": "Erreur serveur interne"
+                        "description": "Erreur interne du serveur"
                     }
                 }
             }
@@ -3102,8 +3191,8 @@
             "description": "Points d’eau"
         },
         {
-            "name": "Depenses",
-            "description": "Depenses"
+            "name": "Dépenses",
+            "description": "Dépenses"
         },
         {
             "name": "Role",
