@@ -126,10 +126,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/payements.getAllData', 'getPayement');
         Route::post('/payements.store', 'store');
     });
-});
-
-Route::controller(RapportController::class)->group(function () {
-    Route::post('/depenses.store', 'storeDepense');
-    Route::put('/depenses.update/{id}', 'updateDepense');
-    Route::delete('/depenses.delete/{id}', 'deleteDepense');
+    Route::controller(RapportController::class)->group(function () {
+        Route::post('/depenses.store', 'storeDepense');
+        Route::put('/depenses.update/{id}', 'updateDepense');
+        Route::delete('/depenses.delete/{id}', 'deleteDepense');
+    });
 });
