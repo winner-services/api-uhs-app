@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Rapport;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -69,13 +70,17 @@ class RapportController extends Controller
 
         try {
             $depense = DB::transaction(function () use ($request) {
-                $depense = Rapport::create($request->input('main'));
+                $user = Auth::user();
+                $mainData = $request->input('main');
+                $mainData['addedBy'] = $user->id;
+
+                $depense = Rapport::create($mainData);
 
                 foreach ($request->input('details') as $detail) {
                     $depense->details()->create($detail);
                 }
 
-                return $depense->load('details');
+                return $depense->load('details', 'auteur');
             });
 
             return response()->json([
