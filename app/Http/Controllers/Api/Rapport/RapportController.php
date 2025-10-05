@@ -85,7 +85,6 @@ class RapportController extends Controller
 
             return response()->json([
                 'message' => 'Dépense créée avec succès',
-                'data' => $depense,
                 'success' => true,
                 'status' => 201
             ], 201);
