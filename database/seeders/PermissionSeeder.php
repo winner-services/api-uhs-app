@@ -15,11 +15,23 @@ class PermissionSeeder extends Seeder
     {
         $permissions = [
             'abonnement',
-            'categorie-abonnement',
-            'client',
+            'categorie_abonnement',
+            'abonne',
+            'raccordement',
+            'borne',
+            'facturation',
+            'paiement',
+            'finance',
+            'tresorerie',
+            'transaction_tresorerie',
+            'ticket',
+            'mantenance',
+            'paramettre',
+            'technicien_dashboard',
+            'technicien_ticket'
         ];
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission]);
         }
     }
 }
