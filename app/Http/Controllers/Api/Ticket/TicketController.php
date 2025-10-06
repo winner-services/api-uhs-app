@@ -30,11 +30,22 @@ class TicketController extends Controller
      */
     public function index()
     {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Utilisateur non authentifié',
+                'success' => false,
+                'status' => 401
+            ], 401);
+        }
+
         $page = request("paginate", 10);
         $q = request("q", "");
         $sort_direction = request('sort_direction', 'desc');
         $sort_field = request('sort_field', 'id');
-        $data = Ticket::join('point_eaus', 'tickets.point_id', '=', 'point_eaus.id')
+
+        $query = Ticket::join('point_eaus', 'tickets.point_id', '=', 'point_eaus.id')
             ->join('users as u1', 'tickets.addedBy', '=', 'u1.id')
             ->join('users as u2', 'tickets.technicien_id', '=', 'u2.id')
             ->select(
@@ -45,19 +56,68 @@ class TicketController extends Controller
                 'point_eaus.long',
                 'u1.name as addedBy',
                 'u2.name as technicien'
-            )
-            ->latest()
-            // ->searh(trim($q))
-            ->orderBy($sort_field, $sort_direction)
+            );
+
+        // --- Filtrage selon le rôle ---
+        if ($user->hasRole('technicien')) {
+            $query->where('tickets.technicien_id', $user->id);
+        } elseif ($user->hasRole('admin')) {
+            // Admin → voit tous les tickets, pas de filtre
+        } else {
+            // Autres rôles → ne voit aucun ticket
+            $query->whereRaw('0 = 1');
+        }
+
+        // --- Recherche ---
+        if (!empty(trim($q))) {
+            $query->where(function ($subQuery) use ($q) {
+                $subQuery->where('point_eaus.matricule', 'like', "%$q%")
+                    ->orWhere('tickets.titre', 'like', "%$q%")
+                    ->orWhere('u2.name', 'like', "%$q%");
+            });
+        }
+
+        $data = $query->orderBy($sort_field, $sort_direction)
             ->paginate($page);
-        $result = [
+
+        return response()->json([
             'message' => "OK",
             'success' => true,
             'data' => $data,
-            'status' => 200
-        ];
-        return response()->json($result);
+            'status' => 200,
+        ]);
     }
+
+    // public function index()
+    // {
+    //     $page = request("paginate", 10);
+    //     $q = request("q", "");
+    //     $sort_direction = request('sort_direction', 'desc');
+    //     $sort_field = request('sort_field', 'id');
+    //     $data = Ticket::join('point_eaus', 'tickets.point_id', '=', 'point_eaus.id')
+    //         ->join('users as u1', 'tickets.addedBy', '=', 'u1.id')
+    //         ->join('users as u2', 'tickets.technicien_id', '=', 'u2.id')
+    //         ->select(
+    //             'tickets.*',
+    //             'point_eaus.matricule as point_eau',
+    //             'point_eaus.numero_compteur',
+    //             'point_eaus.lat',
+    //             'point_eaus.long',
+    //             'u1.name as addedBy',
+    //             'u2.name as technicien'
+    //         )
+    //         ->latest()
+    //         // ->searh(trim($q))
+    //         ->orderBy($sort_field, $sort_direction)
+    //         ->paginate($page);
+    //     $result = [
+    //         'message' => "OK",
+    //         'success' => true,
+    //         'data' => $data,
+    //         'status' => 200
+    //     ];
+    //     return response()->json($result);
+    // }
 
     /**
      * @OA\Get(
