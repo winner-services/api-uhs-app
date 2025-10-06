@@ -57,12 +57,12 @@ class TicketController extends Controller
                 'u1.name as addedBy',
                 'u2.name as technicien'
             );
-            dd($user->id);
-
+            
         // --- Filtrage selon le rôle ---
         if ($user->hasRole('technicien')) {
             $query->where('tickets.technicien_id', '=', $user->id);
         } elseif ($user->hasRole('admin')) {
+            dd($user->id);
             // Admin → voit tous les tickets, pas de filtre
         } else {
             // Autres rôles → ne voit aucun ticket
