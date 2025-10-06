@@ -60,7 +60,7 @@ class TicketController extends Controller
 
         // --- Filtrage selon le rôle ---
         if ($user->hasRole('technicien')) {
-            $query->where('tickets.technicien_id', $user->id);
+            $query->where('tickets.technicien_id', 9);
         } elseif ($user->hasRole('admin')) {
             // Admin → voit tous les tickets, pas de filtre
         } else {
