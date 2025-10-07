@@ -31,8 +31,9 @@ class TransactionTresorerieController extends Controller
             ]);
         }
         $idCompte = request("account_id", null);
+            dd($idCompte);
+
         if ($idCompte === 'null') {
-            dd($caisse->id);
             $idCompte = $caisse->id;
         }
 
