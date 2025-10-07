@@ -128,7 +128,7 @@ class UserController extends Controller
             'name'       => ['required', 'string', 'max:255', 'unique:users,name'],
             'email'      => ['nullable', 'string', 'email', 'max:255', 'unique:users,email'],
             'phone'      => ['required', 'string', 'max:20', 'unique:users,phone'],
-            'password'   => ['required', 'string', 'min:4'],
+            'password'   => ['required', 'string'],
             'role_id'    => ['required', 'integer', 'exists:roles,id'],
         ];
 

@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Abonnement\AbonnementCategoryController;
 use App\Http\Controllers\Api\Abonnement\AbonnementController;
 use App\Http\Controllers\Api\About\AboutController;
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\DashBoard\DashBoardController;
 use App\Http\Controllers\Api\Facturation\FacturationController;
 use App\Http\Controllers\Api\Intervention\RapportInterventionController;
 use App\Http\Controllers\Api\Payement\PayementController;
@@ -131,5 +132,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/depenses.update/{id}', 'updateDepense');
         Route::delete('/depenses.delete/{id}', 'deleteDepense');
         Route::get('/depenses.index', 'indexDepense');
+    });
+
+    Route::controller(DashBoardController::class)->group(function () {
+        Route::get('/dashboard.mobile', 'indexMobile');
     });
 });
