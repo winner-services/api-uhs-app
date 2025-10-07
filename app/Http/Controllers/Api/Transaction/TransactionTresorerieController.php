@@ -43,7 +43,7 @@ class TransactionTresorerieController extends Controller
             ->join('tresoreries', 'trasaction_tresoreries.account_id', '=', 'tresoreries.id')
             ->select('trasaction_tresoreries.*', 'users.name as addedBy', 'tresoreries.designation as account_name')
             ->where('trasaction_tresoreries.status', true)
-            ->where('account_id', $idCompte)
+            ->where('account_id', 2)
             ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
             ->paginate($page);
