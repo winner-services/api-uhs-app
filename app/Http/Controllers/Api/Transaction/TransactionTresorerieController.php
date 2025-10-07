@@ -20,10 +20,9 @@ class TransactionTresorerieController extends Controller
      * @OA\Response(response=200, description="Liste récupérée avec succès"),
      * )
      */
-    public function getTransactionData(Request $request)
+    public function getTransactionData()
     {
         $caisse = Tresorerie::where('designation', 'Caisse')->first();
-        dd($caisse->id);
         if (is_null($caisse)) {
             return response()->json([
                 'message' => "Compte 'CAISSE' introuvable",
@@ -33,6 +32,7 @@ class TransactionTresorerieController extends Controller
         }
         $idCompte = request("account_id", null);
         if ($idCompte === 'null') {
+            dd($caisse->id);
             $idCompte = $caisse->id;
         }
 
