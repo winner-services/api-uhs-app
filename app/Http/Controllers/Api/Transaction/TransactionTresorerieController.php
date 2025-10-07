@@ -23,6 +23,7 @@ class TransactionTresorerieController extends Controller
     public function getTransactionData(Request $request)
     {
         $caisse = Tresorerie::where('designation', 'Caisse')->first();
+        dd($caisse->id);
         if (is_null($caisse)) {
             return response()->json([
                 'message' => "Compte 'CAISSE' introuvable",
