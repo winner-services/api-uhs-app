@@ -125,6 +125,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(PayementController::class)->group(function () {
         Route::get('/payements.getAllData', 'getPayement');
+        Route::get('/payementsWeb.getAllData', 'getPayementWeb');
         Route::post('/payements.store', 'store');
     });
     Route::controller(RapportController::class)->group(function () {
@@ -132,7 +133,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/depenses.update/{id}', 'updateDepense');
         Route::delete('/depenses.delete/{id}', 'deleteDepense');
         Route::get('/depenses.index', 'indexDepense');
-        Route::get('/payementsWeb.getAllData', 'getPayementWeb');
     });
 
     Route::controller(DashBoardController::class)->group(function () {

@@ -857,6 +857,45 @@
                 ]
             }
         },
+        "/api/payementsWeb.getAllData": {
+            "get": {
+                "tags": [
+                    "Payements"
+                ],
+                "summary": "Liste des Payements",
+                "description": "Récupérer toutes les Payements avec leurs abonnés",
+                "operationId": "b210c1b3cfe3b2dbc3202041df1f63d3",
+                "responses": {
+                    "200": {
+                        "description": "Liste des Payements",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Facturation"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/payements.store": {
             "post": {
                 "tags": [
