@@ -34,7 +34,6 @@ class TransactionTresorerieController extends Controller
 
         if ($idCompte === null || $idCompte === 'null') {
             $idCompte = $caisse->id;
-            dd($idCompte);
         }
 
         $page = request("paginate", 10);
