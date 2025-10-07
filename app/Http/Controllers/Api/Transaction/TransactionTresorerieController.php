@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Transaction;
 
 use App\Http\Controllers\Controller;
 use App\Models\TrasactionTresorerie;
+use App\Models\Tresorerie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +22,7 @@ class TransactionTresorerieController extends Controller
      */
     public function getTransactionData(Request $request)
     {
-        $caisse = TrasactionTresorerie::where('designation', 'CAISSE')->first();
+        $caisse = Tresorerie::where('designation', 'Caisse')->first();
         if (is_null($caisse)) {
             return response()->json([
                 'message' => "Compte 'CAISSE' introuvable",
