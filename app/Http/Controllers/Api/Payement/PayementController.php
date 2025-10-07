@@ -33,6 +33,16 @@ class PayementController extends Controller
 
     public function getPayement()
     {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Utilisateur non authentifié',
+                'success' => false,
+                'status' => 401
+            ], 401);
+        }
+
         $page = request("paginate", 10);
         $q = request("q", "");
         $sort_direction = request('sort_direction', 'desc');
@@ -45,6 +55,7 @@ class PayementController extends Controller
             ->latest()
             // ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
+            ->where('payements.addedBy', $user->id)
             ->paginate($page);
         $result = [
             'message' => "OK",
