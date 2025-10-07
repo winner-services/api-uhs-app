@@ -13,12 +13,14 @@ class DashBoardController extends Controller
         $total_factures = Facturation::count();
         $total_factures_paye = Facturation::where('status', 'payé')->count();
         $total_factures_acompte = Facturation::where('status', 'acompte')->count();
+        $total_factures_insolde = Facturation::where('status', 'insoldée')->count();
         return response()->json([
             'success' => true,
             'status' => 200,
             'total_factures' => $total_factures,
             'total_factures_paye' => $total_factures_paye,
-            'total_factures_acompte' => $total_factures_acompte
+            'total_factures_acompte' => $total_factures_acompte,
+            'total_factures_insolde' => $total_factures_insolde
         ]);
     }
 }
