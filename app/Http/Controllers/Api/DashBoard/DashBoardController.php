@@ -11,12 +11,14 @@ class DashBoardController extends Controller
     public function indexMobile()
     {
         $total_factures = Facturation::count();
-        $total_factures_paye = Facturation::where('')->get();
-        $total_factures_acompte = Facturation::where('')->get();
+        $total_factures_paye = Facturation::where('status', 'payé')->count();
+        $total_factures_acompte = Facturation::where('status', 'acompte')->count();
         return response()->json([
             'success' => true,
             'status' => 200,
-            'total_factures' => $total_factures
+            'total_factures' => $total_factures,
+            'total_factures_paye' => $total_factures_paye,
+            'total_factures_acompte' => $total_factures_acompte
         ]);
     }
 }
