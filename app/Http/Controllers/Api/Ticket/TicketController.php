@@ -91,38 +91,6 @@ class TicketController extends Controller
             'status' => 200,
         ]);
     }
-
-    // public function index()
-    // {
-    //     $page = request("paginate", 10);
-    //     $q = request("q", "");
-    //     $sort_direction = request('sort_direction', 'desc');
-    //     $sort_field = request('sort_field', 'id');
-    //     $data = Ticket::join('point_eaus', 'tickets.point_id', '=', 'point_eaus.id')
-    //         ->join('users as u1', 'tickets.addedBy', '=', 'u1.id')
-    //         ->join('users as u2', 'tickets.technicien_id', '=', 'u2.id')
-    //         ->select(
-    //             'tickets.*',
-    //             'point_eaus.matricule as point_eau',
-    //             'point_eaus.numero_compteur',
-    //             'point_eaus.lat',
-    //             'point_eaus.long',
-    //             'u1.name as addedBy',
-    //             'u2.name as technicien'
-    //         )
-    //         ->latest()
-    //         // ->searh(trim($q))
-    //         ->orderBy($sort_field, $sort_direction)
-    //         ->paginate($page);
-    //     $result = [
-    //         'message' => "OK",
-    //         'success' => true,
-    //         'data' => $data,
-    //         'status' => 200
-    //     ];
-    //     return response()->json($result);
-    // }
-
     /**
      * @OA\Get(
      *     path="/api/tickets.getOptionsData",
@@ -264,12 +232,13 @@ class TicketController extends Controller
         }
         $user = Auth::user();
         $rules = [
+            'point_id'      => ['required', 'integer', 'exists:point_eaus,id'],
             'description'   => ['sometimes', 'string'],
             'status'        => ['sometimes', 'string'],
             'priorite'      => ['sometimes', 'string'],
             'technicien_id'    => ['sometimes'],
-            'date_ouverture' => ['sometimes', 'date'],
-            'date_cloture'  => ['nullable', 'date'],
+            'date_ouverture' => ['nullable'],
+            'date_cloture'  => ['nullable'],
         ];
 
         $validator = Validator::make($request->all(), $rules);
