@@ -60,7 +60,7 @@ class RapportController extends Controller
             $sort_direction = request('sort_direction', 'desc');
             $sort_field = request('sort_field', 'id');
 
-            $data = Rapport::with(['details', 'ticket', 'user'])
+            $data = Rapport::with(['details', 'ticket', 'user','ticket.point'])
                 ->when(trim($q) !== '', function ($query) use ($q) {
                     // Exemple de recherche sur la description ou le ticket
                     $query->where('description', 'LIKE', "%{$q}%")
