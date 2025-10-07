@@ -55,23 +55,63 @@ class RapportController extends Controller
     public function indexDepense()
     {
         try {
-            $depenses = Rapport::with(['details', 'ticket','user'])
-                ->latest()
-                ->get();
+            $page = request('paginate', 10);
+            $q = request('q', '');
+            $sort_direction = request('sort_direction', 'desc');
+            $sort_field = request('sort_field', 'id');
 
-            return response()->json([
-                'status' => 200,
+            $data = Rapport::with(['details', 'ticket', 'user'])
+                ->when(trim($q) !== '', function ($query) use ($q) {
+                    // Exemple de recherche sur la description ou le ticket
+                    $query->where('description', 'LIKE', "%{$q}%")
+                        ->orWhereHas('ticket', function ($q2) use ($q) {
+                            $q2->where('titre', 'LIKE', "%{$q}%");
+                        })
+                        ->orWhereHas('user', function ($q3) use ($q) {
+                            $q3->where('name', 'LIKE', "%{$q}%");
+                        });
+                })
+                ->orderBy($sort_field, $sort_direction)
+                ->paginate($page);
+
+            $result = [
                 'message' => 'Liste des dépenses récupérée avec succès',
-                'data' => $depenses
-            ], 200);
+                'success' => true,
+                'status' => 200,
+                'data' => $data,
+            ];
+
+            return response()->json($result);
         } catch (Exception $e) {
             return response()->json([
-                'status' => 500,
                 'message' => 'Erreur lors de la récupération des dépenses',
-                'error' => $e->getMessage()
+                'success' => false,
+                'status' => 500,
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
+
+    // public function indexDepense()
+    // {
+    //     try {
+    //         $depenses = Rapport::with(['details', 'ticket','user'])
+    //             ->latest()
+    //             ->get();
+
+    //         return response()->json([
+    //             'status' => 200,
+    //             'message' => 'Liste des dépenses récupérée avec succès',
+    //             'data' => $depenses
+    //         ], 200);
+    //     } catch (Exception $e) {
+    //         return response()->json([
+    //             'status' => 500,
+    //             'message' => 'Erreur lors de la récupération des dépenses',
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
 
     /**
      * @OA\Post(

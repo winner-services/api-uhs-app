@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Api\PointEau\PointEauAbonne;
 
 use App\Http\Controllers\Controller;
 use App\Models\PointEauAbonne;
-use App\Models\Rapport;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,68 +19,28 @@ class PointEauAbonneController extends Controller
      * @OA\Response(response=200, description="Liste récupérée avec succès"),
      * )
      */
-    public function indexDepense()
+    public function indexPointAbonne()
     {
-        try {
-            $page = request('paginate', 10);
-            $q = request('q', '');
-            $sort_direction = request('sort_direction', 'desc');
-            $sort_field = request('sort_field', 'id');
-
-            $data = Rapport::with(['details', 'ticket', 'user'])
-                ->when(trim($q) !== '', function ($query) use ($q) {
-                    // Exemple de recherche sur la description ou le ticket
-                    $query->where('description', 'LIKE', "%{$q}%")
-                        ->orWhereHas('ticket', function ($q2) use ($q) {
-                            $q2->where('titre', 'LIKE', "%{$q}%");
-                        })
-                        ->orWhereHas('user', function ($q3) use ($q) {
-                            $q3->where('name', 'LIKE', "%{$q}%");
-                        });
-                })
-                ->orderBy($sort_field, $sort_direction)
-                ->paginate($page);
-
-            $result = [
-                'message' => 'Liste des dépenses récupérée avec succès',
-                'success' => true,
-                'status' => 200,
-                'data' => $data,
-            ];
-
-            return response()->json($result);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Erreur lors de la récupération des dépenses',
-                'success' => false,
-                'status' => 500,
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        $page = request("paginate", 10);
+        $q = request("q", "");
+        $sort_direction = request('sort_direction', 'desc');
+        $sort_field = request('sort_field', 'id');
+        $data = PointEauAbonne::join('abonnes', 'point_eau_abonnes.abonne_id', '=', 'abonnes.id')
+            ->join('users', 'point_eau_abonnes.addedBy', '=', 'users.id')
+            ->join('point_eaus','point_eau_abonnes.point_eau_id','=','point_eaus.id')
+            ->select('point_eau_abonnes.*','point_eaus.numero_compteur','point_eaus.matricule', 'abonnes.nom as abonne', 'users.name as addedBy')
+            ->latest()
+            // ->searh(trim($q))
+            ->orderBy($sort_field, $sort_direction)
+            ->paginate($page);
+        $result = [
+            'message' => "OK",
+            'success' => true,
+            'data' => $data,
+            'status' => 200
+        ];
+        return response()->json($result);
     }
-
-    // public function indexPointAbonne()
-    // {
-    //     $page = request("paginate", 10);
-    //     $q = request("q", "");
-    //     $sort_direction = request('sort_direction', 'desc');
-    //     $sort_field = request('sort_field', 'id');
-    //     $data = PointEauAbonne::join('abonnes', 'point_eau_abonnes.abonne_id', '=', 'abonnes.id')
-    //         ->join('users', 'point_eau_abonnes.addedBy', '=', 'users.id')
-    //         ->join('point_eaus','point_eau_abonnes.point_eau_id','=','point_eaus.id')
-    //         ->select('point_eau_abonnes.*','point_eaus.numero_compteur','point_eaus.matricule', 'abonnes.nom as abonne', 'users.name as addedBy')
-    //         ->latest()
-    //         // ->searh(trim($q))
-    //         ->orderBy($sort_field, $sort_direction)
-    //         ->paginate($page);
-    //     $result = [
-    //         'message' => "OK",
-    //         'success' => true,
-    //         'data' => $data,
-    //         'status' => 200
-    //     ];
-    //     return response()->json($result);
-    // }
 
     /**
      * @OA\Post(
