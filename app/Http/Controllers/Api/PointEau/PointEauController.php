@@ -79,10 +79,10 @@ class PointEauController extends Controller
     public function store(Request $request)
     {
         $rules = [
-            'lat'             => ['nullable', 'string'],
-            'long'            => ['nullable', 'string', 'max:255'],
-            'numero_compteur' => ['nullable', 'string', 'max:255', 'unique:point_eaus,numero_compteur'],
-            'status'          => ['nullable', 'string'],
+            'lat'             => ['nullable'],
+            'long'            => ['nullable'],
+            'numero_compteur' => ['nullable'],
+            'status'          => ['nullable'],
         ];
 
         $messages = [
@@ -155,10 +155,10 @@ class PointEauController extends Controller
         }
 
         $rules = [
-            'lat'             => ['nullable', 'string'],
-            'long'            => ['nullable', 'string'],
-            'numero_compteur' => ['nullable', 'string'],
-            'status'          => ['nullable', 'string'],
+            'lat'             => ['nullable'],
+            'long'            => ['nullable'],
+            'numero_compteur' => ['nullable'],
+            'status'          => ['nullable'],
         ];
 
         $validator = Validator::make($request->all(), $rules);
