@@ -14,7 +14,7 @@ class DashBoardController extends Controller
         return response()->json([
             'success' => true,
             'status' => 200,
-            'total_factures' => $total_factures
+            'data' => $total_factures
         ]);
     }
 }
