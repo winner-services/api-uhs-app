@@ -255,7 +255,7 @@ class TicketController extends Controller
             'description' => $request->description,
             'statut' => $request->status,
             'priorite' => $request->priorite,
-            'technicien' => $request->technicien_id,
+            'technicien_id' => $request->technicien_id,
             'date_ouverture' => $request->date_ouverture,
             'date_cloture' => $request->date_cloture,
             'addedBy' => $user->id ?? $ticket->addedBy
