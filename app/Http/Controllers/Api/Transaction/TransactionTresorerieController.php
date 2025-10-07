@@ -31,10 +31,10 @@ class TransactionTresorerieController extends Controller
             ]);
         }
         $idCompte = request("account_id", null);
-            dd($idCompte);
 
-        if ($idCompte === 'null') {
+        if ($idCompte === null || $idCompte === 'null') {
             $idCompte = $caisse->id;
+            dd($idCompte);
         }
 
         $page = request("paginate", 10);
