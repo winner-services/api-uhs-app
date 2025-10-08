@@ -47,15 +47,29 @@ class PointEauController extends Controller
      */
     public function getOptionsPointData()
     {
-        $data = PointEau::latest()->get();
-        $result = [
+        $data = PointEau::doesntHave('abonnements')
+            ->latest()
+            ->get();
+
+        return response()->json([
             'message' => "OK",
             'success' => true,
             'data' => $data,
             'status' => 200
-        ];
-        return response()->json($result);
+        ]);
     }
+
+    // public function getOptionsPointData()
+    // {
+    //     $data = PointEau::latest()->get();
+    //     $result = [
+    //         'message' => "OK",
+    //         'success' => true,
+    //         'data' => $data,
+    //         'status' => 200
+    //     ];
+    //     return response()->json($result);
+    // }
 
     /**
      * @OA\Post(
