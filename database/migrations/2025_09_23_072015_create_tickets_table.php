@@ -15,8 +15,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('point_id')->nullable()->constrained('point_eaus')->nullOnDelete();
             $table->text('description')->nullable();
-            $table->string('statut')->nullable();
-            $table->string('priorite')->nullable();
+            // $table->string('statut')->nullable();
+            $table->enum('statut', ['OUVERT', 'EN_COURS', 'CLOTURE'])->default('OUVERT');
+            $table->enum('priorite', ['URGENTE', 'NORMALE'])->default('URGENTE');
+            // $table->string('priorite')->nullable();
             $table->foreignId('technicien_id')->nullable()->constrained('users')->nullOnDelete();
             $table->date('date_ouverture')->nullable();
             $table->date('date_cloture')->nullable();

@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class TicketController extends Controller
 {
@@ -148,8 +149,8 @@ class TicketController extends Controller
         $rules = [
             'point_id'      => ['required', 'integer', 'exists:point_eaus,id'],
             'description'   => ['nullable', 'string'],
-            'status'        => ['nullable', 'string'],
-            'priorite'      => ['nullable', 'string'],
+            'status'   => ['required', Rule::in(['OUVERT', 'EN_COURS', 'CLOTURE'])],
+            'priorite' => ['required', Rule::in(['URGENTE', 'NORMALE'])],
             'technicien_id'    => ['required'],
             'date_ouverture' => ['nullable', 'date'],
             'date_cloture'  => ['nullable', 'date'],
@@ -230,8 +231,8 @@ class TicketController extends Controller
         $rules = [
             'point_id'      => ['required', 'integer', 'exists:point_eaus,id'],
             'description'   => ['sometimes', 'string'],
-            'status'        => ['sometimes', 'string'],
-            'priorite'      => ['sometimes', 'string'],
+            'status'   => ['required', Rule::in(['OUVERT', 'EN_COURS', 'CLOTURE'])],
+            'priorite' => ['required', Rule::in(['URGENTE', 'NORMALE'])],
             'technicien_id'    => ['sometimes'],
             'date_ouverture' => ['nullable'],
             'date_cloture'  => ['nullable'],

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->date('date');
             $table->text('description')->nullable();
             $table->string('status')->default('En cours');
+            $table->decimal('total_price',8,2);
             $table->foreignId('ticket_id')->nullable()->constrained('tickets')->nullOnDelete();
             $table->foreignId('addedBy')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

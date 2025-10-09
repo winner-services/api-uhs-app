@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Rapport extends Model
 {
-    protected $fillable = ['date', 'description', 'status', 'ticket_id', 'addedBy'];
+    protected $fillable = ['date', 'description', 'total_price', 'status', 'ticket_id', 'addedBy'];
 
     public function details()
     {
