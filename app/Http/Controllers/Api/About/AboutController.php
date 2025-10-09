@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\About;
 use App\Http\Controllers\Controller;
 use App\Models\About;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class AboutController extends Controller
@@ -25,7 +26,7 @@ class AboutController extends Controller
     public function getData()
     {
         $about = About::first();
-            return response()->json([
+        return response()->json([
             'message' => 'succes',
             'status' => 200,
             'data' => $about
@@ -66,20 +67,63 @@ class AboutController extends Controller
     {
         $data = $request->all();
 
-        if ($request->hasFile('logo')) {
-            $path = $request->file('logo')->store('logo', 'public');
-            $data['logo'] = $path;
-        }
+        return DB::transaction(function () use ($request, $data) {
 
-        $about = About::create($data);
+            // 🔹 Gestion du fichier logo
+            if ($request->hasFile('logo')) {
+                $path = $request->file('logo')->store('logo', 'public');
+                $data['logo'] = $path;
+            }
 
-        return response()->json($about, 201);
-         return response()->json([
-            'message' => 'succes',
-            'status' => 201,
-            'success' => true
-        ]);
+            // 🔹 Récupère l'enregistrement existant (si la table About doit en avoir qu’un)
+            $about = About::first();
+
+            if ($about) {
+                // 🔹 Supprime l’ancien logo si un nouveau est fourni
+                if ($request->hasFile('logo') && $about->logo) {
+                    Storage::disk('public')->delete($about->logo);
+                }
+
+                // 🔹 Mise à jour
+                $about->update($data);
+
+                $message = 'Données mises à jour avec succès.';
+                $status = 200;
+            } else {
+                // 🔹 Création
+                $about = About::create($data);
+
+                $message = 'Données créées avec succès.';
+                $status = 201;
+            }
+
+            // 🔹 Réponse unifiée
+            return response()->json([
+                'message' => $message,
+                'status'  => $status,
+                'success' => true,
+                'data'    => $about
+            ], $status);
+        });
     }
+    // public function store(Request $request)
+    // {
+    //     $data = $request->all();
+
+    //     if ($request->hasFile('logo')) {
+    //         $path = $request->file('logo')->store('logo', 'public');
+    //         $data['logo'] = $path;
+    //     }
+
+    //     $about = About::create($data);
+
+    //     return response()->json($about, 201);
+    //      return response()->json([
+    //         'message' => 'succes',
+    //         'status' => 201,
+    //         'success' => true
+    //     ]);
+    // }
 
     /**
      * @OA\Post(
