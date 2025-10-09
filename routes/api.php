@@ -142,5 +142,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(AutrePayementController::class)->group(function () {
         Route::get('/versements.getAllData', 'getVersement');
+        Route::post('/versements.store', 'storeVersement');
+        Route::put('/versements.update/{id}', 'updateVersement');
     });
 });

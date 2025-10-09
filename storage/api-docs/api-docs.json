@@ -857,6 +857,195 @@
                 ]
             }
         },
+        "/api/versements.store": {
+            "post": {
+                "tags": [
+                    "Versements"
+                ],
+                "summary": "Créer un nouveau versement",
+                "description": "Crée un nouveau versement avec les informations fournies. Le taux est de 30% par défaut.",
+                "operationId": "storeVersement",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "transaction_date",
+                                    "amount",
+                                    "paid_amount"
+                                ],
+                                "properties": {
+                                    "transaction_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-10-09"
+                                    },
+                                    "amount": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 1000
+                                    },
+                                    "paid_amount": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 700
+                                    },
+                                    "taux": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 30
+                                    },
+                                    "account_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "agent_id": {
+                                        "type": "integer",
+                                        "example": 3
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Versement créé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Versement créé avec succès."
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 201
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Versement"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                }
+            }
+        },
+        "/api/versements.update/{id}": {
+            "put": {
+                "tags": [
+                    "Versements"
+                ],
+                "summary": "Mettre à jour un versement existant",
+                "description": "Met à jour un versement existant avec les informations fournies.",
+                "operationId": "updateVersement",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du versement à mettre à jour",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "transaction_date",
+                                    "amount",
+                                    "paid_amount"
+                                ],
+                                "properties": {
+                                    "transaction_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-10-09"
+                                    },
+                                    "amount": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 1000
+                                    },
+                                    "paid_amount": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 700
+                                    },
+                                    "taux": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 30
+                                    },
+                                    "account_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "agent_id": {
+                                        "type": "integer",
+                                        "example": 3
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Versement mis à jour avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Versement mis à jour avec succès."
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "example": 200
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Versement"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Versement non trouvé"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                }
+            }
+        },
         "/api/payements.getAllData": {
             "get": {
                 "tags": [
@@ -3217,6 +3406,63 @@
                     "updated_at": {
                         "type": "string",
                         "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "Versement": {
+                "title": "Versement",
+                "description": "Schéma du modèle Versement",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "transaction_date": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2025-10-09"
+                    },
+                    "amount": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 1000
+                    },
+                    "paid_amount": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 700
+                    },
+                    "taux": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 30
+                    },
+                    "reference": {
+                        "type": "string",
+                        "example": "VF-20251009-0001"
+                    },
+                    "account_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "agent_id": {
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "addedBy": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-10-09T10:00:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-10-09T11:00:00Z"
                     }
                 },
                 "type": "object"

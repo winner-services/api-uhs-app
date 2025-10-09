@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Api\Payement;
 
 use App\Http\Controllers\Controller;
+use App\Models\TrasactionTresorerie;
 use App\Models\Versement;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class AutrePayementController extends Controller
 {
@@ -46,5 +49,216 @@ class AutrePayementController extends Controller
             'status' => 200
         ];
         return response()->json($result);
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/versements.store",
+     *     tags={"Versements"},
+     *     summary="Créer un nouveau versement",
+     *     description="Crée un nouveau versement avec les informations fournies. Le taux est de 30% par défaut.",
+     *     operationId="storeVersement",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"transaction_date", "amount", "paid_amount"},
+     *             @OA\Property(property="transaction_date", type="string", format="date", example="2025-10-09"),
+     *             @OA\Property(property="amount", type="number", format="float", example=1000.00),
+     *             @OA\Property(property="paid_amount", type="number", format="float", example=700.00),
+     *             @OA\Property(property="taux", type="number", format="float", example=30.00),
+     *             @OA\Property(property="account_id", type="integer", example=1),
+     *             @OA\Property(property="agent_id", type="integer", example=3),
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Versement créé avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Versement créé avec succès."),
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="status", type="integer", example=201),
+     *             @OA\Property(property="data", ref="#/components/schemas/Versement")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Erreur de validation"
+     *     )
+     * )
+     */
+
+    public function storeVersement(Request $request)
+    {
+        $validated = $request->validate([
+            'transaction_date' => ['required', 'date'],
+            'amount'           => ['required', 'numeric', 'min:0'],
+            'paid_amount'      => ['required', 'numeric', 'min:0'],
+            'taux'             => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'account_id'       => ['nullable', 'exists:tresoreries,id'],
+            'agent_id'         => ['nullable', 'exists:users,id']
+        ]);
+
+        return DB::transaction(function () use ($validated) {
+            $totalAmount = round($validated['amount'] - $validated['paid_amount'], 2);
+
+            $lastTransaction = TrasactionTresorerie::where('account_id', $validated['account_id'])
+                ->latest('id')
+                ->first();
+            $solde = $lastTransaction ? $lastTransaction->solde : 0;
+
+            $versement = Versement::create([
+                'transaction_date' => $validated['transaction_date'],
+                'amount'           => $validated['amount'],
+                'paid_amount'      => $validated['paid_amount'],
+                'taux'             => $validated['taux'] ?? 30.00,
+                'reference'        => fake()->unique()->numerify('VERS-#####'),
+                'account_id'       => $validated['account_id'] ?? null,
+                'agent_id'         => $validated['agent_id'] ?? null,
+                'addedBy'          => Auth::user()->id
+            ]);
+
+            TrasactionTresorerie::create([
+                'motif'            => 'Paiement de la facture du Bornier',
+                'transaction_type' => 'RECETTE',
+                'amount'           => $totalAmount,
+                'account_id'       => $validated['account_id'],
+                'transaction_date' => $validated['transaction_date'],
+                'addedBy'          => Auth::user()->id,
+                'reference'        => fake()->unique()->numerify('TRANS-#####'),
+                'solde'            => $solde + $totalAmount
+            ]);
+
+            return response()->json([
+                'message' => 'Versement créé avec succès.',
+                'status'  => 201,
+                'success' => true,
+                'data'    => $versement
+            ], 201);
+        });
+    }
+
+    /**
+     * @OA\Put(
+     *     path="/api/versements.update/{id}",
+     *     tags={"Versements"},
+     *     summary="Mettre à jour un versement existant",
+     *     description="Met à jour un versement existant avec les informations fournies.",
+     *     operationId="updateVersement",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID du versement à mettre à jour",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"transaction_date", "amount", "paid_amount"},
+     *             @OA\Property(property="transaction_date", type="string", format="date", example="2025-10-09"),
+     *             @OA\Property(property="amount", type="number", format="float", example=1000.00),
+     *             @OA\Property(property="paid_amount", type="number", format="float", example=700.00),
+     *             @OA\Property(property="taux", type="number", format="float", example=30.00),
+     *             @OA\Property(property="account_id", type="integer", example=1),
+     *             @OA\Property(property="agent_id", type="integer", example=3)
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Versement mis à jour avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Versement mis à jour avec succès."),
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="status", type="integer", example=200),
+     *             @OA\Property(property="data", ref="#/components/schemas/Versement")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Versement non trouvé"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Erreur de validation"
+     *     )
+     * )
+     */
+    public function updateVersement(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'transaction_date' => ['required', 'date'],
+            'amount'           => ['required', 'numeric', 'min:0'],
+            'paid_amount'      => ['required', 'numeric', 'min:0'],
+            'taux'             => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'account_id'       => ['nullable', 'exists:tresoreries,id'],
+            'agent_id'         => ['nullable', 'exists:users,id']
+        ]);
+
+        $versement = Versement::find($id);
+
+        if (!$versement) {
+            return response()->json([
+                'message' => 'Versement non trouvé.',
+                'status'  => 404,
+                'success' => false
+            ], 404);
+        }
+
+        return DB::transaction(function () use ($versement, $validated) {
+            // Calcul du nouveau total
+            $totalAmount = round($validated['amount'] - $validated['paid_amount'], 2);
+
+            // Récupération du dernier solde du compte
+            $lastTransaction = TrasactionTresorerie::where('account_id', $validated['account_id'])
+                ->latest('id')
+                ->first();
+            $solde = $lastTransaction ? $lastTransaction->solde : 0;
+
+            // Mise à jour du versement
+            $versement->update([
+                'transaction_date' => $validated['transaction_date'],
+                'amount'           => $validated['amount'],
+                'paid_amount'      => $validated['paid_amount'],
+                'taux'             => $validated['taux'] ?? 30.00,
+                'account_id'       => $validated['account_id'] ?? $versement->account_id,
+                'agent_id'         => $validated['agent_id'] ?? $versement->agent_id,
+                'updatedBy'        => Auth::user()->id
+            ]);
+
+            // Mise à jour de la transaction correspondante (si elle existe)
+            $transaction = TrasactionTresorerie::where('reference', 'like', '%TRANS-%')
+                ->where('account_id', $versement->account_id)
+                ->where('transaction_type', 'RECETTE')
+                ->whereDate('transaction_date', $versement->transaction_date)
+                ->first();
+
+            if ($transaction) {
+                $transaction->update([
+                    'amount'           => $totalAmount,
+                    'transaction_date' => $validated['transaction_date'],
+                    'solde'            => $solde + $totalAmount,
+                    'updatedBy'        => Auth::user()->id
+                ]);
+            } else {
+                // Si aucune transaction liée n'existe, on en crée une nouvelle
+                TrasactionTresorerie::create([
+                    'motif'            => 'Mise à jour du versement du Bornier',
+                    'transaction_type' => 'RECETTE',
+                    'amount'           => $totalAmount,
+                    'account_id'       => $validated['account_id'],
+                    'transaction_date' => $validated['transaction_date'],
+                    'addedBy'          => Auth::user()->id,
+                    'reference'        => fake()->unique()->numerify('TRANS-#####'),
+                    'solde'            => $solde + $totalAmount
+                ]);
+            }
+
+            return response()->json([
+                'message' => 'Versement mis à jour avec succès.',
+                'status'  => 200,
+                'success' => true,
+                'data'    => $versement
+            ], 200);
+        });
     }
 }
