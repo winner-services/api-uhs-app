@@ -17,6 +17,8 @@ return new class extends Migration
             $table->decimal('amount', 8, 2);
             $table->decimal('paid_amount', 8, 2);
             $table->decimal('taux', 5, 2)->default(30.00);
+            $table->string('reference')->nullable();
+            $table->foreignId('account_id')->nullable()->constrained('tresoreries')->nullOnDelete();
             $table->foreignId('agent_id')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('addedBy')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

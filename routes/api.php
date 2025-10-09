@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\DashBoard\DashBoardController;
 use App\Http\Controllers\Api\Facturation\FacturationController;
 use App\Http\Controllers\Api\Intervention\RapportInterventionController;
+use App\Http\Controllers\Api\Payement\AutrePayementController;
 use App\Http\Controllers\Api\Payement\PayementController;
 use App\Http\Controllers\Api\Permission\PermissionController;
 use App\Http\Controllers\Api\PointEau\PointEauAbonne\PointEauAbonneController;
@@ -137,5 +138,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(DashBoardController::class)->group(function () {
         Route::get('/dashboard.mobile', 'indexMobile');
+    });
+
+    Route::controller(AutrePayementController::class)->group(function () {
+        Route::get('/versements.getAllData', 'getVersement');
     });
 });
