@@ -818,6 +818,45 @@
                 }
             }
         },
+        "/api/versements.getAllData": {
+            "get": {
+                "tags": [
+                    "Versements"
+                ],
+                "summary": "Liste des versements",
+                "description": "Récupérer toutes les Payements avec leurs abonnés",
+                "operationId": "bef88b93b2f6f84d13d8c56bfc4f6eb6",
+                "responses": {
+                    "200": {
+                        "description": "Liste des Payements",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Facturation"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/payements.getAllData": {
             "get": {
                 "tags": [
@@ -3212,6 +3251,10 @@
         {
             "name": "RapportInterventions",
             "description": "RapportInterventions"
+        },
+        {
+            "name": "Versements",
+            "description": "Versements"
         },
         {
             "name": "Payements",
