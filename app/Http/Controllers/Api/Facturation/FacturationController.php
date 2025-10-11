@@ -124,98 +124,86 @@ class FacturationController extends Controller
         $date = Carbon::parse($request->date_emission);
         $mois = $date->format('m-Y');
         $moisPrecedent = $date->copy()->subMonth()->format('m-Y');
-
         $user = Auth::user();
 
         DB::beginTransaction();
         try {
-            // 1️⃣ Récupérer tous les abonne_ids reliés à un point d’eau
+            // 1️⃣ Récupérer tous les abonnements actifs (liaisons point_eau_abonnes)
+            $abonnements = PointEauAbonne::with(['abonne.categorie'])->get();
 
-            $abonnement = PointEauAbonne::join('abonnes', 'point_eau_abonnes.abonne_id', '=', 'abonnes.id')
-                ->select('point_eau_abonnes.*')->get();
+            // 2️⃣ Extraire les IDs des liaisons
+            $id_raccordement = $abonnements->pluck('id');
 
-            $abonneIds = $abonnement->pluck('abonne_id');
-            $id_racordement = $abonnement->pluck('id');
-            // dd($abonnement->pluck('id'));
-
-            // 2️⃣ Charger les abonnés + leur catégorie en une seule requête
-
-            // $abonnes = Abonne::with('categorie')
-            //     ->whereIn('id', $abonneIds)
-            //     ->get();
-            $abonnes = PointEauAbonne::with(['abonne.categorie'])
-                ->whereIn('id', $id_racordement)
-                ->get();
-            // dd($abonnes);
-
-            // 3️⃣ Charger les factures déjà générées pour éviter doublons
-            $facturesExistantes = Facturation::whereIn('point_eau_abonnes_id', $id_racordement)
+            // 3️⃣ Factures déjà existantes ce mois
+            $facturesExistantes = Facturation::whereIn('point_eau_abonnes_id', $id_raccordement)
                 ->where('mois', $mois)
                 ->pluck('point_eau_abonnes_id')
                 ->toArray();
 
-            // 4️⃣ Charger les factures du mois précédent en une seule fois
-            $facturesPrecedentes = Facturation::whereIn('point_eau_abonnes_id', $id_racordement)
+            // 4️⃣ Factures du mois précédent
+            $facturesPrecedentes = Facturation::whereIn('point_eau_abonnes_id', $id_raccordement)
                 ->where('mois', $moisPrecedent)
                 ->get()
-                ->keyBy('point_eau_abonnes_id'); // clé = abonne_id
+                ->keyBy('point_eau_abonnes_id');
 
             $insertData = [];
 
-            foreach ($abonnes as $abonne) {
-                if (in_array($abonne->id, $facturesExistantes)) {
-                    continue; // facture déjà créée ce mois
+            foreach ($abonnements as $raccordement) {
+
+                if (in_array($raccordement->id, $facturesExistantes)) {
+                    continue; // déjà facturé ce mois
                 }
 
-                $prixMensuel = $abonne->categorie->prix_mensuel ?? 0;
-                $facturePrecedente = $facturesPrecedentes->get($abonne->id);
+                // ✅ accéder via $raccordement->abonne->categorie
+                $prixMensuel = $raccordement->abonne->categorie->prix_mensuel ?? 0;
+
+                $facturePrecedente = $facturesPrecedentes->get($raccordement->id);
 
                 if ($facturePrecedente) {
-                    // ✅ Cas où il existe déjà une facture précédente
                     if ($facturePrecedente->status !== 'payé') {
-                        $dette  = $facturePrecedente->dette + $facturePrecedente->montant;
-                        $status = 'impayé'; // 🔴 Nouvel état quand il y a une dette
-                        $facturePrecedente->status = 'insoldée';
-                        $facturePrecedente->save();
+                        $dette = $facturePrecedente->dette + $facturePrecedente->montant;
+                        $status = 'impayé';
+                        $facturePrecedente->update(['status' => 'insoldée']);
                     } else {
-                        $dette  = 0;
+                        $dette = 0;
                         $status = 'impayé';
                     }
                 } else {
-                    // ✅ Première facturation → dette = 0
-                    $dette  = 0;
+                    $dette = 0;
                     $status = 'impayé';
                 }
 
                 $insertData[] = [
-                    'point_eau_abonnes_id'     => $abonne->id,
-                    'mois'          => $mois,
-                    'montant'       => $prixMensuel,
-                    'dette'         => $dette,
-                    'status'        => $status, // 💡 on insère selon le cas
-                    'date_emission' => $date->toDateString(),
-                    'addedBy'       => $user->id,
-                    'created_at'    => now(),
-                    'updated_at'    => now(),
-                    'reference'     => fake()->unique()->numerify('FAC-#####')
+                    'point_eau_abonnes_id' => $raccordement->id,
+                    'mois'                 => $mois,
+                    'montant'              => $prixMensuel,
+                    'dette'                => $dette,
+                    'status'               => $status,
+                    'date_emission'        => $date->toDateString(),
+                    'addedBy'              => $user->id,
+                    'created_at'           => now(),
+                    'updated_at'           => now(),
+                    'reference'            => fake()->unique()->numerify('FAC-#####')
                 ];
             }
-            // 5️⃣ Insertion en une seule requête
+
             if (!empty($insertData)) {
                 Facturation::insert($insertData);
             }
 
             DB::commit();
+
             return response()->json([
                 'success' => true,
                 'message' => 'Factures générées avec succès',
-                'count'   => count($insertData) // combien insérées
+                'count'   => count($insertData)
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
+                'line'    => $e->getLine()
             ], 500);
         }
     }
