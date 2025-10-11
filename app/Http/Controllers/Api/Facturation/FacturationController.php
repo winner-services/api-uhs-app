@@ -33,7 +33,7 @@ class FacturationController extends Controller
     {
         $page = request("paginate", 10);
 
-        $data = Facturation::with('pointEauAbonne.abonne as abonne', 'user')
+        $data = Facturation::with('pointEauAbonne.abonne', 'user')
             ->orderByRaw("
             CASE 
                 WHEN status = 'impayé'  THEN 1
