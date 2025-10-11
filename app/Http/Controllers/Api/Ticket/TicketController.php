@@ -149,7 +149,7 @@ class TicketController extends Controller
         $rules = [
             'point_id'      => ['required', 'integer', 'exists:point_eaus,id'],
             'description'   => ['nullable', 'string'],
-            'status'   => ['required', Rule::in(['OUVERT', 'EN_COURS', 'CLOTURE'])],
+            'statut'   => ['required', Rule::in(['OUVERT', 'EN_COURS', 'CLOTURE'])],
             'priorite' => ['required', Rule::in(['URGENTE', 'NORMALE'])],
             'technicien_id'    => ['required'],
             'date_ouverture' => ['nullable', 'date'],
@@ -171,7 +171,7 @@ class TicketController extends Controller
             $ticket = Ticket::create([
                 'point_id' => $request->point_id,
                 'description' => $request->description,
-                'statut' => $request->status,
+                'statut' => $request->statut,
                 'priorite' => $request->priorite,
                 'technicien_id' => $request->technicien_id,
                 'date_ouverture' => $request->date_ouverture,
