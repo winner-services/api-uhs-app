@@ -130,8 +130,12 @@ class FacturationController extends Controller
         DB::beginTransaction();
         try {
             // 1️⃣ Récupérer tous les abonne_ids reliés à un point d’eau
+
+            $abonnement = PointEauAbonne::join('abonnes','point_eau_abonnes.abonne_id','=','abonnes.id')
+            ->select('point_eau_abonnes.*')->get();
+            dd($abonnement->abonne_id);
+
             $abonneIds = PointEauAbonne::pluck('abonne_id');
-            dd($abonneIds);
 
             // 2️⃣ Charger les abonnés + leur catégorie en une seule requête
             $abonnes = Abonne::with('categorie')
@@ -151,34 +155,6 @@ class FacturationController extends Controller
                 ->keyBy('abonne_id'); // clé = abonne_id
 
             $insertData = [];
-
-            // foreach ($abonnes as $abonne) {
-            //     if (in_array($abonne->id, $facturesExistantes)) {
-            //         continue; // facture déjà créée ce mois
-            //     }
-
-            //     $prixMensuel = $abonne->categorie->prix_mensuel ?? 0;
-            //     $facturePrecedente = $facturesPrecedentes->get($abonne->id);
-
-            //     if ($facturePrecedente && $facturePrecedente->status !== 'payé') {
-            //         $dette = $facturePrecedente->dette + $facturePrecedente->montant;
-            //     } else {
-            //         $dette = $prixMensuel;
-            //     }
-
-            //     $insertData[] = [
-            //         'abonne_id'     => $abonne->id,
-            //         'mois'          => $mois,
-            //         'montant'       => $prixMensuel,
-            //         'dette'         => $dette,
-            //         'status'        => 'impayé',
-            //         'date_emission' => $date->toDateString(),
-            //         'addedBy'       => $user->id,
-            //         'created_at'    => now(),
-            //         'updated_at'    => now(),
-            //         'reference'     => fake()->unique()->numerify('FAC-#####')
-            //     ];
-            // }
 
             foreach ($abonnes as $abonne) {
                 if (in_array($abonne->id, $facturesExistantes)) {

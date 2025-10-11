@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('facturations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('abonne_id')->nullable()->constrained('abonnes')->nullOnDelete();
+            $table->foreignId('point_eau_abonnes_id')->nullable()->constrained('point_eau_abonnes')->nullOnDelete();
             $table->string('mois'); // 09-2025
             $table->decimal('montant', 8, 2);
             $table->decimal('dette', 8, 2)->default(0);

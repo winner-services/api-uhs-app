@@ -27,7 +27,7 @@ use Illuminate\Database\Eloquent\Model;
 class Facturation extends Model
 {
     protected $fillable = [
-        'abonne_id',
+        'point_eau_abonnes_id',
         'mois',
         'montant',
         'dette',
@@ -38,10 +38,10 @@ class Facturation extends Model
         'reference'
     ];
 
-    public function abonne()
-    {
-        return $this->belongsTo(Abonne::class, 'abonne_id');
-    }
+    // public function abonne()
+    // {
+    //     return $this->belongsTo(Abonne::class, 'abonne_id');
+    // }
 
     public function user()
     {
