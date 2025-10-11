@@ -131,6 +131,7 @@ class FacturationController extends Controller
         try {
             // 1️⃣ Récupérer tous les abonne_ids reliés à un point d’eau
             $abonneIds = PointEauAbonne::distinct()->pluck('abonne_id');
+            dd($abonneIds);
 
             // 2️⃣ Charger les abonnés + leur catégorie en une seule requête
             $abonnes = Abonne::with('categorie')
