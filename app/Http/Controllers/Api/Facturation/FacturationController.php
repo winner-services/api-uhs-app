@@ -185,6 +185,8 @@ class FacturationController extends Controller
                     'updated_at'           => now(),
                     'reference'            => fake()->unique()->numerify('FAC-#####')
                 ];
+
+                dd($insertData);
             }
 
             if (!empty($insertData)) {
