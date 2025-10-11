@@ -135,10 +135,14 @@ class FacturationController extends Controller
             ->select('point_eau_abonnes.*')->get();
 
             $abonneIds = $abonnement->pluck('abonne_id');
-            dd($abonneIds);
+            dd($abonnement->pluck('id'));
              
             // 2️⃣ Charger les abonnés + leur catégorie en une seule requête
-            $abonnes = Abonne::with('categorie')
+
+            // $abonnes = Abonne::with('categorie')
+            //     ->whereIn('id', $abonneIds)
+            //     ->get();
+                $abonnes = PointEauAbonne::with(['abonne.categorie'])
                 ->whereIn('id', $abonneIds)
                 ->get();
 

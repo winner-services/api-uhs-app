@@ -29,4 +29,8 @@ class Abonne extends Model
             ->orWhere('abonnement_categories.designation', 'like', $term);
         });
     }
+    public function pointsEau()
+    {
+        return $this->belongsToMany(PointEau::class, 'point_eau_abonnes', 'abonne_id', 'point_eau_id');
+    }
 }
