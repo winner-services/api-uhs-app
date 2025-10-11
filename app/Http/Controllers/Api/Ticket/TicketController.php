@@ -51,6 +51,7 @@ class TicketController extends Controller
             ->join('users as u2', 'tickets.technicien_id', '=', 'u2.id')
             ->select(
                 'tickets.*',
+                'tickets.statut as status',
                 'point_eaus.matricule as point_eau',
                 'point_eaus.numero_compteur',
                 'point_eaus.lat',
