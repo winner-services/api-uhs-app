@@ -131,20 +131,24 @@ class FacturationController extends Controller
         try {
             // 1️⃣ Récupérer tous les abonne_ids reliés à un point d’eau
 
-            $abonnement = PointEauAbonne::join('abonnes','point_eau_abonnes.abonne_id','=','abonnes.id')
-            ->select('point_eau_abonnes.*')->get();
+            $abonnement = PointEauAbonne::join('abonnes', 'point_eau_abonnes.abonne_id', '=', 'abonnes.id')
+                ->select('point_eau_abonnes.*')->get();
 
             $abonneIds = $abonnement->pluck('abonne_id');
-            dd($abonnement->pluck('id'));
-             
+            $id_racordement = $abonnement->pluck('id');
+            // dd($abonnement->pluck('id'));
+
             // 2️⃣ Charger les abonnés + leur catégorie en une seule requête
 
             // $abonnes = Abonne::with('categorie')
             //     ->whereIn('id', $abonneIds)
             //     ->get();
-                $abonnes = PointEauAbonne::with(['abonne.categorie'])
-                ->whereIn('id', $abonneIds)
+            $abonnes = PointEauAbonne::with(['abonne.categorie'])
+                ->whereIn('id', $id_racordement)
                 ->get();
+
+                dd($abonnes);
+
 
             // 3️⃣ Charger les factures déjà générées pour éviter doublons
             $facturesExistantes = Facturation::whereIn('abonne_id', $abonneIds)
