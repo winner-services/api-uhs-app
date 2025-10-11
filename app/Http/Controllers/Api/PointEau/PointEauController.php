@@ -47,9 +47,10 @@ class PointEauController extends Controller
      */
     public function getOptionsPointData()
     {
-        $data = PointEau::doesntHave('abonnements')
-            ->latest()
-            ->get();
+        // $data = PointEau::doesntHave('abonnements')
+        //     ->latest()
+        //     ->get();
+        $data = PointEau::latest()->get();
 
         return response()->json([
             'message' => "OK",
