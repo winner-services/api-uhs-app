@@ -127,38 +127,63 @@ class FacturationController extends Controller
         $user = Auth::user();
 
         DB::beginTransaction();
+
         try {
-            // 1️⃣ Récupérer tous les abonnements actifs (liaisons point_eau_abonnes)
-            $abonnements = PointEauAbonne::with(['abonne.categorie'])->get();
+            /**
+             * 1️⃣ Récupérer tous les abonnements actifs (point_eau_abonnes)
+             *    + abonné + catégorie
+             */
+            $abonnements = PointEauAbonne::with(['abonne.categorie'])
+                ->whereHas('abonne') // sécurité : exclure les abonnements sans abonné
+                ->get();
 
-            // 2️⃣ Extraire les IDs des liaisons
-            $id_raccordement = $abonnements->pluck('id');
+            if ($abonnements->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Aucun abonnement trouvé pour la facturation.'
+                ], 404);
+            }
 
-            // 3️⃣ Factures déjà existantes ce mois
-            $facturesExistantes = Facturation::whereIn('point_eau_abonnes_id', $id_raccordement)
+            /**
+             * 2️⃣ Extraire les IDs de raccordement
+             */
+            $idRaccordements = $abonnements->pluck('id');
+
+            /**
+             * 3️⃣ Identifier les factures déjà existantes pour ce mois
+             */
+            $facturesExistantes = Facturation::whereIn('point_eau_abonnes_id', $idRaccordements)
                 ->where('mois', $mois)
                 ->pluck('point_eau_abonnes_id')
                 ->toArray();
 
-            // 4️⃣ Factures du mois précédent
-            $facturesPrecedentes = Facturation::whereIn('point_eau_abonnes_id', $id_raccordement)
+            /**
+             * 4️⃣ Récupérer les factures du mois précédent
+             */
+            $facturesPrecedentes = Facturation::whereIn('point_eau_abonnes_id', $idRaccordements)
                 ->where('mois', $moisPrecedent)
                 ->get()
                 ->keyBy('point_eau_abonnes_id');
 
+            /**
+             * 5️⃣ Préparer les données à insérer
+             */
             $insertData = [];
 
             foreach ($abonnements as $raccordement) {
 
+                // 🔹 Si déjà facturé ce mois → on saute
                 if (in_array($raccordement->id, $facturesExistantes)) {
-                    continue; // déjà facturé ce mois
+                    continue;
                 }
 
-                // ✅ accéder via $raccordement->abonne->categorie
+                // 🔹 Prix mensuel depuis la catégorie
                 $prixMensuel = $raccordement->abonne->categorie->prix_mensuel ?? 0;
 
+                // 🔹 Récupérer la facture du mois précédent
                 $facturePrecedente = $facturesPrecedentes->get($raccordement->id);
 
+                // 🔹 Calcul de la dette
                 if ($facturePrecedente) {
                     if ($facturePrecedente->status !== 'payé') {
                         $dette = $facturePrecedente->dette + $facturePrecedente->montant;
@@ -173,6 +198,7 @@ class FacturationController extends Controller
                     $status = 'impayé';
                 }
 
+                // 🔹 Préparer la ligne à insérer
                 $insertData[] = [
                     'point_eau_abonnes_id' => $raccordement->id,
                     'mois'                 => $mois,
@@ -183,12 +209,13 @@ class FacturationController extends Controller
                     'addedBy'              => $user->id,
                     'created_at'           => now(),
                     'updated_at'           => now(),
-                    'reference'            => fake()->unique()->numerify('FAC-#####')
+                    'reference'            => strtoupper('FAC-' . uniqid()),
                 ];
-
-                dd($insertData);
             }
 
+            /**
+             * 6️⃣ Insertion en masse
+             */
             if (!empty($insertData)) {
                 Facturation::insert($insertData);
             }
@@ -197,15 +224,15 @@ class FacturationController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Factures générées avec succès',
-                'count'   => count($insertData)
+                'message' => 'Factures générées avec succès.',
+                'count'   => count($insertData),
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
-                'line'    => $e->getLine()
+                'line'    => $e->getLine(),
             ], 500);
         }
     }
