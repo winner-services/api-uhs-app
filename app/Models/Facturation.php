@@ -38,10 +38,10 @@ class Facturation extends Model
         'reference'
     ];
 
-    // public function abonne()
-    // {
-    //     return $this->belongsTo(Abonne::class, 'abonne_id');
-    // }
+    public function pointEauAbonne()
+    {
+        return $this->belongsTo(PointEauAbonne::class, 'point_eau_abonnes_id');
+    }
 
     public function user()
     {
