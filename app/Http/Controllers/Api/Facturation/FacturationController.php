@@ -140,15 +140,13 @@ class FacturationController extends Controller
 
             // 2️⃣ Charger les abonnés + leur catégorie en une seule requête
 
-            // $abonnes = Abonne::with('categorie')
-            //     ->whereIn('id', $abonneIds)
-            //     ->get();
-            $abonnes = PointEauAbonne::with(['abonne.categorie'])
-                ->whereIn('id', $id_racordement)
+            $abonnes = Abonne::with('categorie')
+                ->whereIn('id', $abonneIds)
                 ->get();
-
+            // $abonnes = PointEauAbonne::with(['abonne.categorie'])
+            //     ->whereIn('id', $id_racordement)
+            //     ->get();
                 dd($abonnes);
-
 
             // 3️⃣ Charger les factures déjà générées pour éviter doublons
             $facturesExistantes = Facturation::whereIn('abonne_id', $abonneIds)
