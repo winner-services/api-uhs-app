@@ -140,25 +140,25 @@ class FacturationController extends Controller
 
             // 2️⃣ Charger les abonnés + leur catégorie en une seule requête
 
-            $abonnes = Abonne::with('categorie')
-                ->whereIn('id', $abonneIds)
-                ->get();
-            // $abonnes = PointEauAbonne::with(['abonne.categorie'])
-            //     ->whereIn('id', $id_racordement)
+            // $abonnes = Abonne::with('categorie')
+            //     ->whereIn('id', $abonneIds)
             //     ->get();
-                dd($abonnes);
+            $abonnes = PointEauAbonne::with(['abonne.categorie'])
+                ->whereIn('id', $id_racordement)
+                ->get();
+            // dd($abonnes);
 
             // 3️⃣ Charger les factures déjà générées pour éviter doublons
-            $facturesExistantes = Facturation::whereIn('abonne_id', $abonneIds)
+            $facturesExistantes = Facturation::whereIn('point_eau_abonnes_id', $id_racordement)
                 ->where('mois', $mois)
-                ->pluck('abonne_id')
+                ->pluck('point_eau_abonnes_id')
                 ->toArray();
 
             // 4️⃣ Charger les factures du mois précédent en une seule fois
-            $facturesPrecedentes = Facturation::whereIn('abonne_id', $abonneIds)
+            $facturesPrecedentes = Facturation::whereIn('point_eau_abonnes_id', $id_racordement)
                 ->where('mois', $moisPrecedent)
                 ->get()
-                ->keyBy('abonne_id'); // clé = abonne_id
+                ->keyBy('point_eau_abonnes_id'); // clé = abonne_id
 
             $insertData = [];
 
@@ -188,7 +188,7 @@ class FacturationController extends Controller
                 }
 
                 $insertData[] = [
-                    'abonne_id'     => $abonne->id,
+                    'point_eau_abonnes_id'     => $abonne->id,
                     'mois'          => $mois,
                     'montant'       => $prixMensuel,
                     'dette'         => $dette,
