@@ -130,7 +130,7 @@ class FacturationController extends Controller
         DB::beginTransaction();
         try {
             // 1️⃣ Récupérer tous les abonne_ids reliés à un point d’eau
-            $abonneIds = PointEauAbonne::distinct()->pluck('abonne_id');
+            $abonneIds = PointEauAbonne::pluck('abonne_id');
             dd($abonneIds);
 
             // 2️⃣ Charger les abonnés + leur catégorie en une seule requête
