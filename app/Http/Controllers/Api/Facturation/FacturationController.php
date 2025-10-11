@@ -133,7 +133,8 @@ class FacturationController extends Controller
 
             $abonnement = PointEauAbonne::join('abonnes','point_eau_abonnes.abonne_id','=','abonnes.id')
             ->select('point_eau_abonnes.*')->get();
-            dd($abonnement->abonne_id);
+            dd($abonnement->pluck('abonne_id'));
+
 
             $abonneIds = PointEauAbonne::pluck('abonne_id');
 
