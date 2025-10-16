@@ -45,7 +45,13 @@ class UserController extends Controller
             'success' => true,
             'status' => 200,
             'message' => 'Liste des utilisateurs récupérée avec succès',
-            'data' => UserResource::collection($users)
+            'data' => UserResource::collection($users),
+            'pagination' => [
+                'current_page' => $users->currentPage(),
+                'per_page' => $users->perPage(),
+                'total' => $users->total(),
+                'last_page' => $users->lastPage(),
+            ]
         ]);
     }
 
