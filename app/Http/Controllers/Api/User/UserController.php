@@ -41,28 +41,8 @@ class UserController extends Controller
             ->search($request->get('search', ''))
             ->paginate(10);
 
-        return response()->json([
-            'success' => true,
-            'status' => 200,
-            'message' => 'Liste des utilisateurs récupérée avec succès',
-            'data' => UserResource::collection($users),
-            'pagination' => [
-                'current_page' => $users->currentPage(),
-                'per_page' => $users->perPage(),
-                'total' => $users->total(),
-                'last_page' => $users->lastPage(),
-            ]
-        ]);
+        return UserResource::collection($users);
     }
-
-    // public function index(Request $request)
-    // {
-    //     $users = User::query()
-    //         ->search($request->get('search', ''))
-    //         ->paginate(10);
-
-    //     return UserResource::collection($users);
-    // }
 
     /**
      * @OA\Get(
