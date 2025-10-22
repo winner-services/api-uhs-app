@@ -50,12 +50,7 @@ class DashBoardController extends Controller
         $abonnesTotaux = Abonne::count();
         $montantPaye = TrasactionTresorerie::query()
             ->where('transaction_type', 'RECETTE')
-            // ->where(function ($q) {
-            //     $q->where('motif', 'LIKE', '%Ref: TRANS%')
-            //         ->orWhere('motif', 'LIKE', '%Ref:TRANS%')
-            //         ->orWhere('motif', 'LIKE', '%ref: trans%')
-            //         ->orWhere('motif', 'LIKE', '%ref:trans%');
-            // })
+            // ->where('motif', 'LIKE', '%Ref: TRANS%')
             ->sum('amount');
         $montantImpayes = Facturation::where('status', 'insoldée')->sum('montant');
         $montantFacture = $montantPaye + $montantImpayes;
