@@ -48,7 +48,7 @@ class DashBoardController extends Controller
     public function indexWeb()
     {
         $abonnesTotaux = Abonne::count();
-        $montantPaye = $total = TrasactionTresorerie::query()
+        $montantPaye = TrasactionTresorerie::query()
             ->where('transaction_type', 'RECETTE')
             ->where('motif', 'LIKE', '%Ref: TRANS%')
             ->sum('amount');
