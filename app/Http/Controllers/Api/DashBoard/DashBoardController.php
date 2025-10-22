@@ -48,10 +48,10 @@ class DashBoardController extends Controller
     public function indexWeb()
     {
         $abonnesTotaux = Abonne::count();
-        $montantPaye = TrasactionTresorerie::query()
-            ->where('transaction_type', 'RECETTE')
-            // ->where('motif', 'LIKE', '%Ref: TRANS%')
-            ->sum('amount');
+        $montantPaye = TrasactionTresorerie::where('transaction_type', 'RECETTE')
+            ->selectRaw("SUM(CAST(REPLACE(amount, ',', '.') AS DECIMAL(15,2))) as total")
+            ->value('total');
+
         $montantImpayes = Facturation::where('status', 'insoldée')->sum('montant');
         $montantFacture = $montantPaye + $montantImpayes;
         $ticketsOuverts = Ticket::count();
@@ -70,6 +70,7 @@ class DashBoardController extends Controller
             'ticketsOuverts' => $ticketsOuverts,
             'ticketsResolus' => $ticketsResolus,
             'ticketsAttente' => $ticketsAttente,
+            'interventionCloture' => $interventionCloture,
             'randomBornes' => $randomBornes
         ]);
     }
