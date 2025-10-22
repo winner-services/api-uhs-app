@@ -566,6 +566,56 @@
                 ]
             }
         },
+        "/api/dashBoardAdmin.getData": {
+            "get": {
+                "tags": [
+                    "DashBoard"
+                ],
+                "summary": "Récupère tous les rapports d'intervention",
+                "description": "Retourne la liste des rapports d'intervention",
+                "operationId": "indexWeb",
+                "responses": {
+                    "200": {
+                        "description": "Succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/RapportIntervention"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/dashBoardTechnicien.getData": {
+            "get": {
+                "tags": [
+                    "DashBoard"
+                ],
+                "summary": "Récupère tous les rapports d'intervention",
+                "description": "Retourne la liste des rapports d'intervention",
+                "operationId": "indexTechnicien",
+                "responses": {
+                    "200": {
+                        "description": "Succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/RapportIntervention"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/facturations.getAllData": {
             "get": {
                 "tags": [
@@ -3489,6 +3539,10 @@
         {
             "name": "Auth",
             "description": "Auth"
+        },
+        {
+            "name": "DashBoard",
+            "description": "DashBoard"
         },
         {
             "name": "Facturations",

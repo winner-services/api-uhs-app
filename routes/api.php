@@ -138,6 +138,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(DashBoardController::class)->group(function () {
         Route::get('/dashboard.mobile', 'indexMobile');
+        Route::get('/dashBoardAdmin.getData', 'indexWeb');
+        Route::get('/dashBoardTechnicien.getData', 'indexTechnicien');
     });
 
     Route::controller(AutrePayementController::class)->group(function () {
