@@ -1869,7 +1869,7 @@
                 "tags": [
                     "Rapports"
                 ],
-                "summary": "Liste des points d’eau",
+                "summary": "Liste des points d’eau abonnes",
                 "operationId": "390e12aad52fdf9ac831dd24c522938b",
                 "parameters": [
                     {
@@ -1907,7 +1907,7 @@
                 "tags": [
                     "Rapports"
                 ],
-                "summary": "Liste des points d’eau",
+                "summary": "Liste des facturations",
                 "operationId": "ed613f50fbda2c8fb82aeac113ea001c",
                 "parameters": [
                     {
@@ -1945,8 +1945,46 @@
                 "tags": [
                     "Rapports"
                 ],
-                "summary": "Liste des points d’eau",
+                "summary": "Liste des versements",
                 "operationId": "d9609c4f8cf2de7333b8f8fe75d77062",
+                "parameters": [
+                    {
+                        "name": "date_start",
+                        "in": "query",
+                        "description": "Date de début au format YYYY-MM-DD (inclus). Par défaut : début du mois courant.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-10-01"
+                        }
+                    },
+                    {
+                        "name": "date_end",
+                        "in": "query",
+                        "description": "Date de fin au format YYYY-MM-DD (inclus). Par défaut : date du jour.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-10-25"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
+        "/api/rapport.tickets": {
+            "get": {
+                "tags": [
+                    "Rapports"
+                ],
+                "summary": "Liste des tickets",
+                "operationId": "8a2df635c52dc0529f6f78d8b0500e7d",
                 "parameters": [
                     {
                         "name": "date_start",

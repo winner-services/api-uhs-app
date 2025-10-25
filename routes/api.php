@@ -154,5 +154,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/rapport.point-eau-abonne', 'rapportPointEauAbonne');
         Route::get('/rapport.facturations', 'rapportFacturations');
         Route::get('/rapport.versements', 'versements');
+        Route::get('/rapport.tickets', 'rapportTickets');
     });
 });
