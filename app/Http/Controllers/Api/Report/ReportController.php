@@ -19,11 +19,27 @@ class ReportController extends Controller
      * )
      */
     public function rapportBorne()
-    {
+    {$tz = config('app.timezone', 'Africa/Lubumbashi');
         $date_start = request('date_start', date('Y-m-01'));
         $date_end = request('date_end', date('Y-m-d'));
-        $data = PointEau::where('status', 'Actif')
-            ->whereBetween('created_at', [$date_start, $date_end])->get();
+        $data = PointEau::query()
+        ->where('status', 'Actif')
+        ->whereBetween('created_at', [$date_start, $date_end])
+        ->latest()
+        ->get()
+        // Pour l'affichage on reconvertit chaque created_at dans le fuseau local puis format Y-m-d
+        ->map(function ($item) use ($tz) {
+            $arr = $item->toArray();
+
+            // Si created_at est Carbon instance
+            if ($item->created_at instanceof \Carbon\Carbon) {
+                $arr['created_at'] = $item->created_at->setTimezone($tz)->toDateString();
+            } else {
+                $arr['created_at'] = Carbon::parse($arr['created_at'])->setTimezone($tz)->toDateString();
+            } return $arr;
+        });
+        // $data = PointEau::where('status', 'Actif')
+        //     ->whereBetween('created_at', [$date_start, $date_end])->get();
         return response()->json([
             'message' => 'success',
             'success' => true,
