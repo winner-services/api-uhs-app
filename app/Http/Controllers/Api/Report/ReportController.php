@@ -74,14 +74,30 @@ class ReportController extends Controller
     /**
      * @OA\Get(
      * path="/api/rapport.facturations",
-     * summary="Liste",
+     * summary="Liste des points d’eau",
      * tags={"Rapports"},
+     *     @OA\Parameter(
+     *         name="date_start",
+     *         in="query",
+     *         required=false,
+     *         description="Date de début au format YYYY-MM-DD (inclus). Par défaut : début du mois courant.",
+     *         @OA\Schema(type="string", format="date", example="2025-10-01")
+     *     ),
+     *     @OA\Parameter(
+     *         name="date_end",
+     *         in="query",
+     *         required=false,
+     *         description="Date de fin au format YYYY-MM-DD (inclus). Par défaut : date du jour.",
+     *         @OA\Schema(type="string", format="date", example="2025-10-25")
+     *     ),
      * @OA\Response(response=200, description="Liste récupérée avec succès"),
      * )
      */
 
     public function rapportFacturations()
     {
+        $date_start = request('date_start', date('Y-m-01'));
+        $date_end = request('date_end', date('Y-m-d'));
         $data = Facturation::with('pointEauAbonne.abonne', 'user')
             ->orderByRaw("
             CASE 
@@ -93,7 +109,7 @@ class ReportController extends Controller
             END
         ")
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->whereBetween('date_emission', [$date_start, $date_end])->get();
 
         $result = [
             'message' => "OK",
