@@ -150,7 +150,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::controller(ReportController::class)->group(function () {
-        Route::post('/rapport.borne', 'rapportBorne');
+        Route::get('/rapport.borne', 'rapportBorne');
         Route::get('/rapport.point-eau-abonne', 'rapportPointEauAbonne');
         Route::get('/rapport.facturations', 'rapportFacturations');
     });
