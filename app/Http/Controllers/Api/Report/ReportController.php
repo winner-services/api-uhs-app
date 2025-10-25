@@ -44,7 +44,6 @@ class ReportController extends Controller
         $date_start = $request->get('date_start', Carbon::now()->startOfMonth()->toDateString());
         $date_end   = $request->get('date_end', Carbon::now()->toDateString());
 
-        // Assurer format datetime complet
         $date_start = Carbon::parse($date_start)->startOfDay();
         $date_end   = Carbon::parse($date_end)->endOfDay();
 
@@ -52,7 +51,11 @@ class ReportController extends Controller
             ->where('status', 'Actif')
             ->whereBetween('created_at', [$date_start, $date_end])
             ->latest()
-            ->get();
+            ->get()
+            ->map(function ($item) {
+                $item->created_at = Carbon::parse($item->created_at)->format('Y-m-d');
+                return $item;
+            });
 
         return response()->json([
             'success' => true,
@@ -61,6 +64,7 @@ class ReportController extends Controller
             'data'    => $data,
         ], 200);
     }
+
 
     /**
      * @OA\Get(
