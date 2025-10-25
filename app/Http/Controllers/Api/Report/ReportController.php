@@ -56,6 +56,9 @@ class ReportController extends Controller
                 $item->created_at = Carbon::parse($item->created_at)->format('Y-m-d');
                 return $item;
             });
+        // vérifier le type de created_at du premier élément
+        dd($data->first()->created_at, get_class($data->first()->created_at ?? 'null'));
+
 
         return response()->json([
             'success' => true,
