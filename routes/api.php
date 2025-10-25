@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\Permission\PermissionController;
 use App\Http\Controllers\Api\PointEau\PointEauAbonne\PointEauAbonneController;
 use App\Http\Controllers\Api\PointEau\PointEauController;
 use App\Http\Controllers\Api\Rapport\RapportController;
+use App\Http\Controllers\Api\Report\ReportController;
 use App\Http\Controllers\Api\Role\RoleController;
 use App\Http\Controllers\Api\Ticket\TicketController;
 use App\Http\Controllers\Api\Transaction\TransactionTresorerieController;
@@ -146,5 +147,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/versements.getAllData', 'getVersement');
         Route::post('/versements.store', 'storeVersement');
         Route::put('/versements.update/{id}', 'updateVersement');
+    });
+
+    Route::controller(ReportController::class)->group(function () {
+        Route::get('/rapport.borne', 'rapportBorne');
     });
 });
