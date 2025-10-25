@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Facturation;
 use App\Models\PointEau;
 use App\Models\PointEauAbonne;
+use App\Models\Versement;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller
@@ -103,14 +104,57 @@ class ReportController extends Controller
             CASE 
                 WHEN status = 'impayé'  THEN 1
                 WHEN status = 'acompte' THEN 2
-                WHEN status = 'insoldée' THEN 2
-                WHEN status = 'payé'    THEN 3
-                ELSE 4
+                WHEN status = 'insoldée' THEN 3
+                WHEN status = 'payé'    THEN 4
+                ELSE 5
             END
         ")
             ->orderBy('created_at', 'desc')
             ->whereBetween('date_emission', [$date_start, $date_end])->get();
 
+        $result = [
+            'message' => "OK",
+            'success' => true,
+            'status'  => 200,
+            'data'    => $data
+        ];
+
+        return response()->json($result);
+    }
+
+    /**
+     * @OA\Get(
+     * path="/api/rapport.versements",
+     * summary="Liste des points d’eau",
+     * tags={"Rapports"},
+     *     @OA\Parameter(
+     *         name="date_start",
+     *         in="query",
+     *         required=false,
+     *         description="Date de début au format YYYY-MM-DD (inclus). Par défaut : début du mois courant.",
+     *         @OA\Schema(type="string", format="date", example="2025-10-01")
+     *     ),
+     *     @OA\Parameter(
+     *         name="date_end",
+     *         in="query",
+     *         required=false,
+     *         description="Date de fin au format YYYY-MM-DD (inclus). Par défaut : date du jour.",
+     *         @OA\Schema(type="string", format="date", example="2025-10-25")
+     *     ),
+     * @OA\Response(response=200, description="Liste récupérée avec succès"),
+     * )
+     */
+
+    public function versements()
+    {
+        $date_start = request('date_start', date('Y-m-01'));
+        $date_end = request('date_end', date('Y-m-d'));
+        $data = Versement::join('tresoreries', 'versements.account_id', '=', 'tresoreries.id')
+            ->join('users as u1', 'versements.addedBy', '=', 'u1.id')
+            ->join('users as u2', 'versements.agent_id', '=', 'u2.id')
+            ->select('versements.*', 'u2.name as agent', 'u1.name as addedBy', 'tresoreries.designation as tresorerie')
+            ->latest()
+            ->whereBetween('transaction_date', [$date_start, $date_end])->get();
         $result = [
             'message' => "OK",
             'success' => true,

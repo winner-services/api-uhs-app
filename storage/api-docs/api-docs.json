@@ -1907,8 +1907,70 @@
                 "tags": [
                     "Rapports"
                 ],
-                "summary": "Liste",
+                "summary": "Liste des points d’eau",
                 "operationId": "ed613f50fbda2c8fb82aeac113ea001c",
+                "parameters": [
+                    {
+                        "name": "date_start",
+                        "in": "query",
+                        "description": "Date de début au format YYYY-MM-DD (inclus). Par défaut : début du mois courant.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-10-01"
+                        }
+                    },
+                    {
+                        "name": "date_end",
+                        "in": "query",
+                        "description": "Date de fin au format YYYY-MM-DD (inclus). Par défaut : date du jour.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-10-25"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
+        "/api/rapport.versements": {
+            "get": {
+                "tags": [
+                    "Rapports"
+                ],
+                "summary": "Liste des points d’eau",
+                "operationId": "d9609c4f8cf2de7333b8f8fe75d77062",
+                "parameters": [
+                    {
+                        "name": "date_start",
+                        "in": "query",
+                        "description": "Date de début au format YYYY-MM-DD (inclus). Par défaut : début du mois courant.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-10-01"
+                        }
+                    },
+                    {
+                        "name": "date_end",
+                        "in": "query",
+                        "description": "Date de fin au format YYYY-MM-DD (inclus). Par défaut : date du jour.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-10-25"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Liste récupérée avec succès"
