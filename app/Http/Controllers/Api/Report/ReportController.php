@@ -192,6 +192,7 @@ class ReportController extends Controller
     {
         $date_start = request('date_start', date('Y-m-01'));
         $date_end = request('date_end', date('Y-m-d'));
+        dd($date_start,$date_end);
         $data = Ticket::join('point_eaus', 'tickets.point_id', '=', 'point_eaus.id')
             ->join('users as u1', 'tickets.addedBy', '=', 'u1.id')
             ->join('users as u2', 'tickets.technicien_id', '=', 'u2.id')
