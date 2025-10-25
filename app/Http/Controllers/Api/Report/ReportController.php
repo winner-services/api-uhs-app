@@ -12,11 +12,30 @@ use Illuminate\Support\Carbon;
 class ReportController extends Controller
 {
     /**
-     * @OA\Get(
+     * @OA\Post(
      * path="/api/rapport.borne",
-     * summary="Liste des points d’eau",
+     * summary="get",
+     * description="get",
+     * security={{ "bearerAuth":{ }}},
+     * operationId="rapportBorne",
      * tags={"Rapports"},
-     * @OA\Response(response=200, description="Liste récupérée avec succès"),
+     * @OA\RequestBody(
+     *    required=true,
+     *    description="Get",
+     *    @OA\JsonContent(
+     *       required={"date_start","date_end"},
+     *       @OA\Property(property="date_start", type="string", format="text",example="2025-03-03"),
+     *       @OA\Property(property="date_end", type="string", format="text",example="2025-03-03")
+     *    ),
+     * ),
+     * @OA\Response(
+     *    response=201,
+     *    description="success",
+     *     ),
+     * @OA\Response(
+     *    response=401,
+     *    description="existe",
+     *     )
      * )
      */
 
