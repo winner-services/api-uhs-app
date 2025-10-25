@@ -1850,6 +1850,72 @@
                 }
             }
         },
+        "/api/rapport.borne": {
+            "get": {
+                "tags": [
+                    "Rapports"
+                ],
+                "summary": "Liste des points d’eau",
+                "operationId": "944a3cacbb806e37d7375e77adadfa64",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
+        "/api/rapport.point-eau-abonne": {
+            "get": {
+                "tags": [
+                    "Rapports"
+                ],
+                "summary": "Liste des points d’eau",
+                "operationId": "390e12aad52fdf9ac831dd24c522938b",
+                "parameters": [
+                    {
+                        "name": "date_start",
+                        "in": "query",
+                        "description": "Date de début au format YYYY-MM-DD (inclus). Par défaut : début du mois courant.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-10-01"
+                        }
+                    },
+                    {
+                        "name": "date_end",
+                        "in": "query",
+                        "description": "Date de fin au format YYYY-MM-DD (inclus). Par défaut : date du jour.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-10-25"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
+        "/api/rapport.facturations": {
+            "get": {
+                "tags": [
+                    "Rapports"
+                ],
+                "summary": "Liste",
+                "operationId": "ed613f50fbda2c8fb82aeac113ea001c",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
         "/api/role.store": {
             "post": {
                 "tags": [
@@ -3575,6 +3641,10 @@
         {
             "name": "Dépenses",
             "description": "Dépenses"
+        },
+        {
+            "name": "Rapports",
+            "description": "Rapports"
         },
         {
             "name": "Role",
