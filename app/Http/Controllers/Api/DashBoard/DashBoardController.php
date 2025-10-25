@@ -8,9 +8,7 @@ use App\Models\Facturation;
 use App\Models\PointEau;
 use App\Models\Ticket;
 use App\Models\TrasactionTresorerie;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use PDO;
 
 class DashBoardController extends Controller
 {
@@ -30,35 +28,50 @@ class DashBoardController extends Controller
         ]);
     }
 
+
     /**
      * @OA\Get(
-     *      path="/api/dashBoardAdmin.getData",
-     *      operationId="indexWeb",
-     *      tags={"DashBoard"},
-     *      summary="Récupère tous les rapports d'intervention",
-     *      description="Retourne la liste des rapports d'intervention",
-     *      @OA\Response(
-     *          response=200,
-     *          description="Succès",
-     *          @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/RapportIntervention"))
-     *      )
+     * path="/api/dashBoardAdmin.getData",
+     * summary="dashBoardAdmin",
+     * tags={"DashBoard"},
+     *     @OA\Parameter(
+     *         name="date_start",
+     *         in="query",
+     *         required=false,
+     *         description="Date de début au format YYYY-MM-DD (inclus). Par défaut : début du mois courant.",
+     *         @OA\Schema(type="string", format="date", example="2025-10-01")
+     *     ),
+     *     @OA\Parameter(
+     *         name="date_end",
+     *         in="query",
+     *         required=false,
+     *         description="Date de fin au format YYYY-MM-DD (inclus). Par défaut : date du jour.",
+     *         @OA\Schema(type="string", format="date", example="2025-10-25")
+     *     ),
+     * @OA\Response(response=200, description="Liste récupérée avec succès"),
      * )
      */
 
     public function indexWeb()
     {
+        $date_start = request('date_start', date('Y-m-01'));
+        $date_end = request('date_end', date('Y-m-d'));
+
         $abonnesTotaux = Abonne::count();
         $montantPaye = TrasactionTresorerie::query()
             ->where('transaction_type', 'RECETTE')
             ->where('motif', 'LIKE', '%Paiement de la facture%')
+            ->whereBetween('transaction_date', [$date_start, $date_end])
             ->sum('amount');
-        $montantImpayes = Facturation::where('status', 'insoldée')->sum('montant');
+        $montantImpayes = Facturation::where('status', 'insoldée')
+            ->whereBetween('date_emission', [$date_start, $date_end])
+            ->sum('montant');
         $montantFacture = $montantPaye + $montantImpayes;
-        $ticketsOuverts = Ticket::count();
-        $ticketsResolus = Ticket::where('statut', 'CLOTURE')->count();
-        $ticketsAttente = Ticket::where('statut', 'En attente')->count();
+        $ticketsOuverts = Ticket::whereBetween('date_ouverture', [$date_start, $date_end])->count();
+        $ticketsResolus = Ticket::where('statut', 'CLOTURE')->whereBetween('date_cloture', [$date_start, $date_end])->count();
+        $ticketsAttente = Ticket::where('statut', 'En attente')->whereBetween('date_ouverture', [$date_start, $date_end])->count();
+        $interventionCloture = Ticket::where('statut', 'CLOTURE')->whereBetween('date_cloture', [$date_start, $date_end])->count();
         $randomBornes = PointEau::all();
-        $interventionCloture = Ticket::where('statut', 'CLOTURE')->count();
 
         return response()->json([
             'success' => true,

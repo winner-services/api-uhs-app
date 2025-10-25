@@ -571,22 +571,35 @@
                 "tags": [
                     "DashBoard"
                 ],
-                "summary": "Récupère tous les rapports d'intervention",
-                "description": "Retourne la liste des rapports d'intervention",
-                "operationId": "indexWeb",
+                "summary": "dashBoardAdmin",
+                "operationId": "b71388d3ac22c131a0408e536ab25621",
+                "parameters": [
+                    {
+                        "name": "date_start",
+                        "in": "query",
+                        "description": "Date de début au format YYYY-MM-DD (inclus). Par défaut : début du mois courant.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-10-01"
+                        }
+                    },
+                    {
+                        "name": "date_end",
+                        "in": "query",
+                        "description": "Date de fin au format YYYY-MM-DD (inclus). Par défaut : date du jour.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-10-25"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "Succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/RapportIntervention"
-                                    }
-                                }
-                            }
-                        }
+                        "description": "Liste récupérée avec succès"
                     }
                 }
             }
