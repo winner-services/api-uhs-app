@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Report;
 
 use App\Http\Controllers\Controller;
+use App\Models\Facturation;
 use App\Models\PointEau;
 use App\Models\PointEauAbonne;
 use Illuminate\Http\Request;
@@ -49,5 +50,39 @@ class ReportController extends Controller
             'status' => 200,
             'data' => $data
         ]);
+    }
+
+    /**
+     * @OA\Get(
+     * path="/api/rapport.facturations",
+     * summary="Liste",
+     * tags={"Rapports"},
+     * @OA\Response(response=200, description="Liste récupérée avec succès"),
+     * )
+     */
+
+    public function rapportFacturations()
+    {
+        $data = Facturation::with('pointEauAbonne.abonne', 'user')
+            ->orderByRaw("
+            CASE 
+                WHEN status = 'impayé'  THEN 1
+                WHEN status = 'acompte' THEN 2
+                WHEN status = 'insoldée' THEN 2
+                WHEN status = 'payé'    THEN 3
+                ELSE 4
+            END
+        ")
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $result = [
+            'message' => "OK",
+            'success' => true,
+            'status'  => 200,
+            'data'    => $data
+        ];
+
+        return response()->json($result);
     }
 }
