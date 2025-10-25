@@ -204,7 +204,7 @@ class ReportController extends Controller
                 'point_eaus.long',
                 'u1.name as addedBy',
                 'u2.name as technicien'
-            )->whereBetween('transaction_date', [$date_start, $date_end])->get();
+            )->whereBetween('date_ouverture', [$date_start, $date_end])->get();
         $result = [
             'message' => "OK",
             'success' => true,
