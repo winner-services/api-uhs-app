@@ -7,6 +7,7 @@ use App\Models\Facturation;
 use App\Models\PointEau;
 use App\Models\PointEauAbonne;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 
 class ReportController extends Controller
 {
@@ -18,16 +19,30 @@ class ReportController extends Controller
      * @OA\Response(response=200, description="Liste récupérée avec succès"),
      * )
      */
-    public function rapportBorne()
+
+    public function rapportBorne(Request $request)
     {
-        $data = PointEau::where('status', 'Actif')->latest()->get();
+        $date_start = $request->get('date_start', Carbon::now()->startOfMonth()->toDateString());
+        $date_end   = $request->get('date_end', Carbon::now()->toDateString());
+
+        // Assurer format datetime complet
+        $date_start = Carbon::parse($date_start)->startOfDay();
+        $date_end   = Carbon::parse($date_end)->endOfDay();
+
+        $data = PointEau::query()
+            ->where('status', 'Actif')
+            ->whereBetween('created_at', [$date_start, $date_end])
+            ->latest()
+            ->get();
+
         return response()->json([
-            'message' => 'success',
             'success' => true,
-            'status' => 200,
-            'data' => $data
-        ]);
+            'status'  => 200,
+            'message' => 'Liste des bornes actives filtrées par période',
+            'data'    => $data,
+        ], 200);
     }
+
     /**
      * @OA\Get(
      * path="/api/rapport.point-eau-abonne",
