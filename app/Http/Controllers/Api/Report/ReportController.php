@@ -38,27 +38,37 @@ class ReportController extends Controller
      *     )
      * )
      */
-
     public function rapportBorne(Request $request)
     {
-        $date_start = $request->get('date_start', Carbon::now()->startOfMonth()->toDateString());
-        $date_end   = $request->get('date_end', Carbon::now()->toDateString());
+        // Définit le fuseau désiré pour l'affichage (ou utilise app.timezone)
+        $tz = config('app.timezone', 'Africa/Lubumbashi');
 
-        $date_start = Carbon::parse($date_start)->startOfDay();
-        $date_end   = Carbon::parse($date_end)->endOfDay();
+        // On interprète les dates entrantes comme étant en timezone locale ($tz)
+        $date_start_local = $request->get('date_start', Carbon::now($tz)->startOfMonth()->toDateString());
+        $date_end_local   = $request->get('date_end', Carbon::now($tz)->toDateString());
+
+        // Convertir les bornes locales en UTC pour interroger la DB (assumant que la DB stocke en UTC)
+        $date_start_utc = Carbon::parse($date_start_local, $tz)->startOfDay()->setTimezone('UTC');
+        $date_end_utc   = Carbon::parse($date_end_local, $tz)->endOfDay()->setTimezone('UTC');
 
         $data = PointEau::query()
             ->where('status', 'Actif')
-            ->whereBetween('created_at', [$date_start, $date_end])
+            ->whereBetween('created_at', [$date_start_utc, $date_end_utc])
             ->latest()
             ->get()
-            ->map(function ($item) {
-                $item->created_at = Carbon::parse($item->created_at)->format('Y-m-d');
-                return $item;
-            });
-        // vérifier le type de created_at du premier élément
-        dd($data->first()->created_at, get_class($data->first()->created_at ?? 'null'));
+            // Pour l'affichage on reconvertit chaque created_at dans le fuseau local puis format Y-m-d
+            ->map(function ($item) use ($tz) {
+                $arr = $item->toArray();
 
+                // Si created_at est Carbon instance
+                if ($item->created_at instanceof \Carbon\Carbon) {
+                    $arr['created_at'] = $item->created_at->setTimezone($tz)->toDateString();
+                } else {
+                    $arr['created_at'] = Carbon::parse($arr['created_at'])->setTimezone($tz)->toDateString();
+                }
+
+                return $arr;
+            });
 
         return response()->json([
             'success' => true,
@@ -67,6 +77,32 @@ class ReportController extends Controller
             'data'    => $data,
         ], 200);
     }
+
+    // public function rapportBorne(Request $request)
+    // {
+    //     $date_start = $request->get('date_start', Carbon::now()->startOfMonth()->toDateString());
+    //     $date_end   = $request->get('date_end', Carbon::now()->toDateString());
+
+    //     $date_start = Carbon::parse($date_start)->startOfDay();
+    //     $date_end   = Carbon::parse($date_end)->endOfDay();
+
+    //     $data = PointEau::query()
+    //         ->where('status', 'Actif')
+    //         ->whereBetween('created_at', [$date_start, $date_end])
+    //         ->latest()
+    //         ->get()
+    //         ->map(function ($item) {
+    //             $item->created_at = Carbon::parse($item->created_at)->format('Y-m-d');
+    //             return $item;
+    //         });
+
+    //     return response()->json([
+    //         'success' => true,
+    //         'status'  => 200,
+    //         'message' => 'Liste des bornes actives filtrées par période',
+    //         'data'    => $data,
+    //     ], 200);
+    // }
 
 
     /**
