@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Report;
 
 use App\Http\Controllers\Controller;
+use App\Models\About;
 use App\Models\Facturation;
 use App\Models\PointEau;
 use App\Models\PointEauAbonne;
@@ -24,13 +25,15 @@ class ReportController extends Controller
     {
         $date_start = request('date_start', date('Y-m-01'));
         $date_end = request('date_end', date('Y-m-d'));
+        $about = About::first();
         $data = PointEau::where('status', 'Actif')
             ->latest()->get();
         return response()->json([
             'message' => 'success',
             'success' => true,
             'status' => 200,
-            'data' => $data
+            'data' => $data,
+            'company_info' => $about
         ]);
     }
     /**
@@ -57,6 +60,7 @@ class ReportController extends Controller
      */
     public function rapportPointEauAbonne()
     {
+        $about = About::first();
         $date_start = request('date_start', date('Y-m-01'));
         $date_end = request('date_end', date('Y-m-d'));
         $data = PointEauAbonne::join('abonnes', 'point_eau_abonnes.abonne_id', '=', 'abonnes.id')
@@ -69,7 +73,8 @@ class ReportController extends Controller
             'message' => 'success',
             'success' => true,
             'status' => 200,
-            'data' => $data
+            'data' => $data,
+            'company_info' => $about
         ]);
     }
 
@@ -98,6 +103,7 @@ class ReportController extends Controller
 
     public function rapportFacturations()
     {
+        $about = About::first();
         $date_start = request('date_start', date('Y-m-01'));
         $date_end = request('date_end', date('Y-m-d'));
         $data = Facturation::with('pointEauAbonne.abonne', 'user')
@@ -117,7 +123,8 @@ class ReportController extends Controller
             'message' => "OK",
             'success' => true,
             'status'  => 200,
-            'data'    => $data
+            'data'    => $data,
+            'company_info' => $about
         ];
 
         return response()->json($result);
@@ -148,6 +155,7 @@ class ReportController extends Controller
 
     public function versements()
     {
+        $about = About::first();
         $date_start = request('date_start', date('Y-m-01'));
         $date_end = request('date_end', date('Y-m-d'));
         $data = Versement::join('tresoreries', 'versements.account_id', '=', 'tresoreries.id')
@@ -160,7 +168,8 @@ class ReportController extends Controller
             'message' => "OK",
             'success' => true,
             'status'  => 200,
-            'data'    => $data
+            'data'    => $data,
+            'company_info' => $about
         ];
 
         return response()->json($result);
@@ -190,6 +199,7 @@ class ReportController extends Controller
      */
     public function rapportTickets()
     {
+        $about = About::first();
         $date_start = request('date_start', date('Y-m-01'));
         $date_end = request('date_end', date('Y-m-d'));
         $data = Ticket::join('point_eaus', 'tickets.point_id', '=', 'point_eaus.id')
@@ -209,7 +219,8 @@ class ReportController extends Controller
             'message' => "OK",
             'success' => true,
             'status'  => 200,
-            'data'    => $data
+            'data'    => $data,
+            'company_info' => $about
         ];
 
         return response()->json($result);
