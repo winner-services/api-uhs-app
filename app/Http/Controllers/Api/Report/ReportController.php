@@ -107,6 +107,20 @@ class ReportController extends Controller
     public function rapportPointEauAbonne()
     {
         $about = About::first();
+
+        if ($about && $about->logo) {
+            $path = storage_path('app/public/' . $about->logo);
+
+            if (file_exists($path)) {
+                $mime = mime_content_type($path);
+                $data = base64_encode(file_get_contents($path));
+                $about->logo = "data:$mime;base64,$data";
+            } else {
+                // Si fichier manquant, on peut utiliser une image par défaut
+                $about->logo = asset('images/default-logo.png');
+            }
+        }
+
         $date_start = request('date_start', date('Y-m-01'));
         $date_end = request('date_end', date('Y-m-d'));
         $data = PointEauAbonne::join('abonnes', 'point_eau_abonnes.abonne_id', '=', 'abonnes.id')
@@ -150,6 +164,21 @@ class ReportController extends Controller
     public function rapportFacturations()
     {
         $about = About::first();
+
+        if ($about && $about->logo) {
+            $path = storage_path('app/public/' . $about->logo);
+
+            if (file_exists($path)) {
+                $mime = mime_content_type($path);
+                $data = base64_encode(file_get_contents($path));
+                $about->logo = "data:$mime;base64,$data";
+            } else {
+                // Si fichier manquant, on peut utiliser une image par défaut
+                $about->logo = asset('images/default-logo.png');
+            }
+        }
+
+
         $date_start = request('date_start', date('Y-m-01'));
         $date_end = request('date_end', date('Y-m-d'));
         $data = Facturation::with('pointEauAbonne.abonne', 'user')
@@ -202,6 +231,20 @@ class ReportController extends Controller
     public function versements()
     {
         $about = About::first();
+
+        if ($about && $about->logo) {
+            $path = storage_path('app/public/' . $about->logo);
+
+            if (file_exists($path)) {
+                $mime = mime_content_type($path);
+                $data = base64_encode(file_get_contents($path));
+                $about->logo = "data:$mime;base64,$data";
+            } else {
+                // Si fichier manquant, on peut utiliser une image par défaut
+                $about->logo = asset('images/default-logo.png');
+            }
+        }
+
         $date_start = request('date_start', date('Y-m-01'));
         $date_end = request('date_end', date('Y-m-d'));
         $data = Versement::join('tresoreries', 'versements.account_id', '=', 'tresoreries.id')
@@ -246,6 +289,20 @@ class ReportController extends Controller
     public function rapportTickets()
     {
         $about = About::first();
+
+        if ($about && $about->logo) {
+            $path = storage_path('app/public/' . $about->logo);
+
+            if (file_exists($path)) {
+                $mime = mime_content_type($path);
+                $data = base64_encode(file_get_contents($path));
+                $about->logo = "data:$mime;base64,$data";
+            } else {
+                // Si fichier manquant, on peut utiliser une image par défaut
+                $about->logo = asset('images/default-logo.png');
+            }
+        }
+
         $date_start = request('date_start', date('Y-m-01'));
         $date_end = request('date_end', date('Y-m-d'));
         $data = Ticket::join('point_eaus', 'tickets.point_id', '=', 'point_eaus.id')
