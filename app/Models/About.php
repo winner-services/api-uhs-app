@@ -38,19 +38,19 @@ class About extends Model
         'logo'
     ];
 
-    public function getLogoAttribute($value)
-    {
-        if (!$value) {
-            return null;
-        }
+    // public function getLogoAttribute($value)
+    // {
+    //     if (!$value) {
+    //         return null;
+    //     }
 
-        $path = storage_path('app/public/' . $value);
-        if (file_exists($path)) {
-            $type = pathinfo($path, PATHINFO_EXTENSION);
-            $data = file_get_contents($path);
-            return 'logo/'. base64_encode($data);
-        }
+    //     $path = storage_path('app/public/' . $value);
+    //     if (file_exists($path)) {
+    //         $type = pathinfo($path, PATHINFO_EXTENSION);
+    //         $data = file_get_contents($path);
+    //         return 'logo/'. base64_encode($data);
+    //     }
 
-        return $value;
-    }
+    //     return $value;
+    // }
 }
