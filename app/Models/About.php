@@ -27,7 +27,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class About extends Model
 {
-    protected $fillable =[
+    protected $fillable = [
         'denomination',
         'details',
         'register',
@@ -38,19 +38,17 @@ class About extends Model
         'logo'
     ];
 
-    // public function getLogoAttribute($value)
-    // {
-    //     if (!$value) {
-    //         return null;
-    //     }
+    public function getLogoBase64()
+    {
+        if (!$this->logo) return null;
 
-    //     $path = storage_path('app/public/' . $value);
-    //     if (file_exists($path)) {
-    //         $type = pathinfo($path, PATHINFO_EXTENSION);
-    //         $data = file_get_contents($path);
-    //         return 'logo/' . $type . ';base64,' . base64_encode($data);
-    //     }
+        $path = storage_path('app/public/' . $this->logo);
+        if (file_exists($path)) {
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data = file_get_contents($path);
+            return 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
 
-    //     return $value;
-    // }
+        return $this->logo;
+    }
 }

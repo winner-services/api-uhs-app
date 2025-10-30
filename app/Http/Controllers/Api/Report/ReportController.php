@@ -25,7 +25,19 @@ class ReportController extends Controller
     {
         $date_start = request('date_start', date('Y-m-01'));
         $date_end = request('date_end', date('Y-m-d'));
+
         $about = About::first();
+        $about->logo = $about->getLogoBase64();
+        // if ($about && $about->logo) {
+        //     $path = storage_path('app/public/' . $about->logo);
+
+        //     if (file_exists($path)) {
+        //         $type = pathinfo($path, PATHINFO_EXTENSION);
+        //         $data = file_get_contents($path);
+        //         $about->logo = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        //     }
+        // }
+
         $data = PointEau::where('status', 'Actif')
             ->latest()->get();
         return response()->json([
