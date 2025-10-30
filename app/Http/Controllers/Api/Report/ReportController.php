@@ -7,7 +7,9 @@ use App\Models\About;
 use App\Models\Facturation;
 use App\Models\PointEau;
 use App\Models\PointEauAbonne;
+use App\Models\Rapport;
 use App\Models\Ticket;
+use App\Models\TrasactionTresorerie;
 use App\Models\Versement;
 use Illuminate\Http\Request;
 
@@ -318,6 +320,119 @@ class ReportController extends Controller
                 'u1.name as addedBy',
                 'u2.name as technicien'
             )->whereBetween('date_ouverture', [$date_start, $date_end])->get();
+        $result = [
+            'message' => "OK",
+            'success' => true,
+            'status'  => 200,
+            'data'    => $data,
+            'company_info' => $about
+        ];
+
+        return response()->json($result);
+    }
+
+    /**
+     * @OA\Get(
+     * path="/api/rapport.trasactionsReport",
+     * summary="Liste des trasactionsReport",
+     * tags={"Rapports"},
+     *     @OA\Parameter(
+     *         name="date_start",
+     *         in="query",
+     *         required=false,
+     *         description="Date de début au format YYYY-MM-DD (inclus). Par défaut : début du mois courant.",
+     *         @OA\Schema(type="string", format="date", example="2025-10-01")
+     *     ),
+     *     @OA\Parameter(
+     *         name="date_end",
+     *         in="query",
+     *         required=false,
+     *         description="Date de fin au format YYYY-MM-DD (inclus). Par défaut : date du jour.",
+     *         @OA\Schema(type="string", format="date", example="2025-10-25")
+     *     ),
+     * @OA\Response(response=200, description="Liste récupérée avec succès"),
+     * )
+     */
+    public function trasactionsReport()
+    {
+        $about = About::first();
+
+        if ($about && $about->logo) {
+            $path = storage_path('app/public/' . $about->logo);
+
+            if (file_exists($path)) {
+                $mime = mime_content_type($path);
+                $data = base64_encode(file_get_contents($path));
+                $about->logo = "data:$mime;base64,$data";
+            } else {
+                // Si fichier manquant, on peut utiliser une image par défaut
+                $about->logo = asset('images/default-logo.png');
+            }
+        }
+
+        $date_start = request('date_start', date('Y-m-01'));
+        $date_end = request('date_end', date('Y-m-d'));
+
+        $data = TrasactionTresorerie::join('users', 'trasaction_tresoreries.addedBy', '=', 'users.id')
+            ->join('tresoreries', 'trasaction_tresoreries.account_id', '=', 'tresoreries.id')
+            ->select('trasaction_tresoreries.*', 'users.name as addedBy', 'tresoreries.designation as account_name')
+            ->where('trasaction_tresoreries.status', true)
+            ->whereBetween('transaction_date', [$date_start, $date_end])->get();
+
+        $result = [
+            'message' => "OK",
+            'success' => true,
+            'status'  => 200,
+            'data'    => $data,
+            'company_info' => $about
+        ];
+
+        return response()->json($result);
+    }
+
+     /**
+     * @OA\Get(
+     * path="/api/rapport.depenseReport",
+     * summary="Liste des depenseReport",
+     * tags={"Rapports"},
+     *     @OA\Parameter(
+     *         name="date_start",
+     *         in="query",
+     *         required=false,
+     *         description="Date de début au format YYYY-MM-DD (inclus). Par défaut : début du mois courant.",
+     *         @OA\Schema(type="string", format="date", example="2025-10-01")
+     *     ),
+     *     @OA\Parameter(
+     *         name="date_end",
+     *         in="query",
+     *         required=false,
+     *         description="Date de fin au format YYYY-MM-DD (inclus). Par défaut : date du jour.",
+     *         @OA\Schema(type="string", format="date", example="2025-10-25")
+     *     ),
+     * @OA\Response(response=200, description="Liste récupérée avec succès"),
+     * )
+     */
+    public function depenseReport()
+    {
+        $about = About::first();
+
+        if ($about && $about->logo) {
+            $path = storage_path('app/public/' . $about->logo);
+
+            if (file_exists($path)) {
+                $mime = mime_content_type($path);
+                $data = base64_encode(file_get_contents($path));
+                $about->logo = "data:$mime;base64,$data";
+            } else {
+                // Si fichier manquant, on peut utiliser une image par défaut
+                $about->logo = asset('images/default-logo.png');
+            }
+        }
+        $date_start = request('date_start', date('Y-m-01'));
+        $date_end = request('date_end', date('Y-m-d'));
+
+        $data = Rapport::with(['details', 'ticket', 'user', 'ticket.point'])
+            ->whereBetween('date', [$date_start, $date_end])->get();
         $result = [
             'message' => "OK",
             'success' => true,

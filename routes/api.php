@@ -155,5 +155,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/rapport.facturations', 'rapportFacturations');
         Route::get('/rapport.versements', 'versements');
         Route::get('/rapport.tickets', 'rapportTickets');
+        Route::get('/rapport.trasactionsReport', 'trasactionsReport');
+        Route::get('/rapport.depenseReport', 'depenseReport');
     });
 });

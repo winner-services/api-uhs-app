@@ -92,27 +92,6 @@ class RapportController extends Controller
         }
     }
 
-    // public function indexDepense()
-    // {
-    //     try {
-    //         $depenses = Rapport::with(['details', 'ticket','user'])
-    //             ->latest()
-    //             ->get();
-
-    //         return response()->json([
-    //             'status' => 200,
-    //             'message' => 'Liste des dépenses récupérée avec succès',
-    //             'data' => $depenses
-    //         ], 200);
-    //     } catch (Exception $e) {
-    //         return response()->json([
-    //             'status' => 500,
-    //             'message' => 'Erreur lors de la récupération des dépenses',
-    //             'error' => $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
-
     /**
      * @OA\Post(
      *     path="/api/depenses.store",
