@@ -27,27 +27,61 @@ class ReportController extends Controller
         $date_end = request('date_end', date('Y-m-d'));
 
         $about = About::first();
-        $about->logo = $about->getLogoBase64();
-        // if ($about && $about->logo) {
-        //     $path = storage_path('app/public/' . $about->logo);
 
-        //     if (file_exists($path)) {
-        //         $type = pathinfo($path, PATHINFO_EXTENSION);
-        //         $data = file_get_contents($path);
-        //         $about->logo = 'data:image/' . $type . ';base64,' . base64_encode($data);
-        //     }
-        // }
+        // 🔧 Vérifier si le logo existe et générer base64
+        if ($about && $about->logo) {
+            $path = storage_path('app/public/' . $about->logo);
+
+            if (file_exists($path)) {
+                $mime = mime_content_type($path);
+                $data = base64_encode(file_get_contents($path));
+                $about->logo = "data:$mime;base64,$data";
+            } else {
+                // Si fichier manquant, on peut utiliser une image par défaut
+                $about->logo = asset('images/default-logo.png');
+            }
+        }
 
         $data = PointEau::where('status', 'Actif')
-            ->latest()->get();
+            ->latest()
+            ->get();
+
         return response()->json([
             'message' => 'success',
             'success' => true,
             'status' => 200,
             'data' => $data,
-            'company_info' => $about
+            'company_info' => $about,
         ]);
     }
+
+    // public function rapportBorne()
+    // {
+    //     $date_start = request('date_start', date('Y-m-01'));
+    //     $date_end = request('date_end', date('Y-m-d'));
+
+    //     $about = About::first();
+    //     $about->logo = $about->getLogoBase64();
+    //     // if ($about && $about->logo) {
+    //     //     $path = storage_path('app/public/' . $about->logo);
+
+    //     //     if (file_exists($path)) {
+    //     //         $type = pathinfo($path, PATHINFO_EXTENSION);
+    //     //         $data = file_get_contents($path);
+    //     //         $about->logo = 'data:image/' . $type . ';base64,' . base64_encode($data);
+    //     //     }
+    //     // }
+
+    //     $data = PointEau::where('status', 'Actif')
+    //         ->latest()->get();
+    //     return response()->json([
+    //         'message' => 'success',
+    //         'success' => true,
+    //         'status' => 200,
+    //         'data' => $data,
+    //         'company_info' => $about
+    //     ]);
+    // }
     /**
      * @OA\Get(
      * path="/api/rapport.point-eau-abonne",
