@@ -17,7 +17,8 @@ return new class extends Migration
             $table->string('reference')->unique();
             $table->decimal('loan_amount', 10, 2);
             $table->decimal('paid_amount', 10, 2);
-            $table->foreignId('point_eau_abonnes_id')->nullable()->constrained('point_eau_abonnes')->nullOnDelete();
+            $table->boolean('status')->default(true);
+            $table->foreignId('abonne_id')->nullable()->constrained('abonnes')->nullOnDelete();
             $table->foreignId('account_id')->nullable()->constrained('tresoreries')->nullOnDelete();
             $table->foreignId('addedBy')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

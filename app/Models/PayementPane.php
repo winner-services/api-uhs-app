@@ -11,7 +11,7 @@ class PayementPane extends Model
         'reference',
         'loan_amount',
         'paid_amount',
-        'point_eau_abonnes_id',
+        'abonne_id',
         'acount_id',
         'addedBy'
     ];

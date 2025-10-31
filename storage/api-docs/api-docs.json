@@ -1109,6 +1109,68 @@
                 }
             }
         },
+        "/api/payement-maintenance": {
+            "post": {
+                "tags": [
+                    "Payement Maintenance"
+                ],
+                "summary": "Créer un nouveau paiement",
+                "operationId": "ba27f7e263f7edb61c120b250ef8e5b2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "loan_amount",
+                                    "paid_amount",
+                                    "transaction_date",
+                                    "account_id"
+                                ],
+                                "properties": {
+                                    "loan_amount": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 1000
+                                    },
+                                    "paid_amount": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 500
+                                    },
+                                    "transaction_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-09-27"
+                                    },
+                                    "ticket_id": {
+                                        "type": "integer",
+                                        "example": 3,
+                                        "nullable": true
+                                    },
+                                    "account_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Paiement créé avec succès"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur"
+                    }
+                }
+            }
+        },
         "/api/payements.getAllData": {
             "get": {
                 "tags": [
@@ -3810,6 +3872,10 @@
         {
             "name": "Versements",
             "description": "Versements"
+        },
+        {
+            "name": "Payement Maintenance",
+            "description": "Payement Maintenance"
         },
         {
             "name": "Payements",
