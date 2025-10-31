@@ -41,7 +41,7 @@ class MaintenanceController extends Controller
     public function storeMaintenance(Request $request)
     {
         $rules = [
-            'transaction_date' => 'required|date',
+            'transaction_date' => 'required',
             'loan_amount'      => 'required|numeric|min:0',
             'paid_amount'      => 'required|numeric|min:0',
             'ticket_id'        => 'nullable|exists:tickets,id',
@@ -51,7 +51,6 @@ class MaintenanceController extends Controller
 
         $messages = [
             'transaction_date.required' => 'La date de la transaction est obligatoire.',
-            'transaction_date.date'     => 'La date de la transaction doit être valide.',
             'loan_amount.required'      => 'Le montant du prêt est obligatoire.',
             'loan_amount.numeric'       => 'Le montant du prêt doit être un nombre.',
             'loan_amount.min'           => 'Le montant du prêt doit être au moins 0.',
@@ -140,7 +139,7 @@ class MaintenanceController extends Controller
 
             // 3️⃣ Création du paiement
             $payement = PayementPane::create([
-                'transacion_date' => $request->transaction_date,
+                'transaction_date' => $request->transaction_date,
                 'reference'        => fake()->unique()->numerify('PAY-#####'),
                 'loan_amount'      => $loanAmount,
                 'paid_amount'      => $montantPaye,
