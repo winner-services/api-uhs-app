@@ -117,6 +117,21 @@ class MaintenanceController extends Controller
                 ->first();
             $solde = $lastTransaction ? $lastTransaction->solde : 0;
 
+            // 1️⃣ Vérifier si montant payé <= 0
+            if ($montantPaye <= 0) {
+                return response()->json([
+                    'message' => 'Le montant payé doit être supérieur à 0.',
+                    'status'  => 422,
+                ], 422);
+            }
+
+            if ($montantPaye > $loanAmount) {
+                return response()->json([
+                    'message' => 'Le montant payé ne doit pas être supérieur au montant du prêt.',
+                    'status'  => 422,
+                ], 422);
+            }
+
             TrasactionTresorerie::create([
                 'motif'            => 'Paiement facture maintenance',
                 'transaction_type' => 'RECETTE',
