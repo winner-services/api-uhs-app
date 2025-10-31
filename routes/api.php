@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\DashBoard\DashBoardController;
 use App\Http\Controllers\Api\Facturation\FacturationController;
 use App\Http\Controllers\Api\Intervention\RapportInterventionController;
 use App\Http\Controllers\Api\Payement\AutrePayementController;
+use App\Http\Controllers\Api\Payement\MaintenanceController;
 use App\Http\Controllers\Api\Payement\PayementController;
 use App\Http\Controllers\Api\Permission\PermissionController;
 use App\Http\Controllers\Api\PointEau\PointEauAbonne\PointEauAbonneController;
@@ -157,5 +158,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/rapport.tickets', 'rapportTickets');
         Route::get('/rapport.trasactionsReport', 'trasactionsReport');
         Route::get('/rapport.depenseReport', 'depenseReport');
+    });
+
+    Route::controller(MaintenanceController::class)->group(function(){
+        Route::post('payement-maintenance','storeMaintenance');
     });
 });
