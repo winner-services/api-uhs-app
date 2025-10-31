@@ -140,7 +140,7 @@ class MaintenanceController extends Controller
 
             // 3️⃣ Création du paiement
             $payement = PayementPane::create([
-                'transaction_date' => $request->transaction_date,
+                'transacion_date' => $request->transaction_date,
                 'reference'        => fake()->unique()->numerify('PAY-#####'),
                 'loan_amount'      => $loanAmount,
                 'paid_amount'      => $montantPaye,
