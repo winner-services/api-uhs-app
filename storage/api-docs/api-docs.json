@@ -2029,6 +2029,82 @@
                 }
             }
         },
+        "/api/rapport.trasactionsReport": {
+            "get": {
+                "tags": [
+                    "Rapports"
+                ],
+                "summary": "Liste des trasactionsReport",
+                "operationId": "80b5aba8c1fbcda70d902966f20d6b92",
+                "parameters": [
+                    {
+                        "name": "date_start",
+                        "in": "query",
+                        "description": "Date de début au format YYYY-MM-DD (inclus). Par défaut : début du mois courant.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-10-01"
+                        }
+                    },
+                    {
+                        "name": "date_end",
+                        "in": "query",
+                        "description": "Date de fin au format YYYY-MM-DD (inclus). Par défaut : date du jour.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-10-25"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
+        "/api/rapport.depenseReport": {
+            "get": {
+                "tags": [
+                    "Rapports"
+                ],
+                "summary": "Liste des depenseReport",
+                "operationId": "773da7d46a3a9693aa5b43b91218dcdc",
+                "parameters": [
+                    {
+                        "name": "date_start",
+                        "in": "query",
+                        "description": "Date de début au format YYYY-MM-DD (inclus). Par défaut : début du mois courant.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-10-01"
+                        }
+                    },
+                    {
+                        "name": "date_end",
+                        "in": "query",
+                        "description": "Date de fin au format YYYY-MM-DD (inclus). Par défaut : date du jour.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-10-25"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
         "/api/role.store": {
             "post": {
                 "tags": [
