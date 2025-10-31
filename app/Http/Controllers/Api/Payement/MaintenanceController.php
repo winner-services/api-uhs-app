@@ -126,9 +126,13 @@ class MaintenanceController extends Controller
                 ], 404);
             }
 
-            // 1️⃣ Mise à jour de la dette
-            $rapport->dette_amount = $dette - $montantPaye;
-            $rapport->status = ($rapport->dette_amount == 0) ? 'payé' : 'acompte';
+            if ($montantPaye == $dette) {
+                $rapport->dette_amount   = 0;
+                $rapport->status  = 'payé';
+            } else {
+                $rapport->dette_amount   = $dette - $montantPaye;
+                $rapport->status  = 'acompte';
+            }
             $rapport->save();
 
             // 2️⃣ Dernier solde
