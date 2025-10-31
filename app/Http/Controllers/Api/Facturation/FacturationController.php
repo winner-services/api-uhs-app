@@ -38,8 +38,8 @@ class FacturationController extends Controller
             CASE 
                 WHEN status = 'impayé'  THEN 1
                 WHEN status = 'acompte' THEN 2
-                WHEN status = 'insoldée' THEN 3
-                WHEN status = 'payé'    THEN 4
+                WHEN status = 'payé' THEN 3
+                WHEN status = 'insoldée'    THEN 4
                 ELSE 5
             END
         ")
