@@ -268,7 +268,7 @@ class PayementController extends Controller
                 'success' => true,
                 'status'  => 201,
                 'data'    => $payement,
-                // 'company_info' => $about
+                'company_info' => $about
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
