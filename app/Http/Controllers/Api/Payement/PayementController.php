@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Payement;
 
 use App\Http\Controllers\Controller;
+use App\Models\About;
 use App\Models\Facturation;
 use App\Models\Payement;
 use App\Models\TrasactionTresorerie;
@@ -164,6 +165,22 @@ class PayementController extends Controller
 
         DB::beginTransaction();
         try {
+
+            $about = About::first();
+
+            if ($about && $about->logo) {
+                $path = storage_path('app/public/' . $about->logo);
+
+                if (file_exists($path)) {
+                    $mime = mime_content_type($path);
+                    $data = base64_encode(file_get_contents($path));
+                    $about->logo = "data:$mime;base64,$data";
+                } else {
+                    // Si fichier manquant, on peut utiliser une image par défaut
+                    $about->logo = asset('images/default-logo.png');
+                }
+            }
+
             $user    = Auth::user();
             $facture = Facturation::findOrFail($request->facture_id);
 
@@ -251,6 +268,7 @@ class PayementController extends Controller
                 'success' => true,
                 'status'  => 201,
                 'data'    => $payement,
+                'logoBase64' => $about
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
