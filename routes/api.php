@@ -160,7 +160,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/rapport.depenseReport', 'depenseReport');
     });
 
-    Route::controller(MaintenanceController::class)->group(function(){
-        Route::post('payement-maintenance','storeMaintenance');
+    Route::controller(MaintenanceController::class)->group(function () {
+        Route::post('payement-maintenance', 'storeMaintenance');
+        Route::get('/payementMaintMobile.getData', 'getPayementMaintenance');
+        Route::get('/payementMaintWeb.getData', 'getPayementMaintenanceWeb');
     });
 });

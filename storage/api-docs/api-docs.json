@@ -1109,6 +1109,84 @@
                 }
             }
         },
+        "/api/payementMaintMobile.getData": {
+            "get": {
+                "tags": [
+                    "Payement Maintenance"
+                ],
+                "summary": "Liste des Payements",
+                "description": "Récupérer toutes les Payements avec leurs abonnés",
+                "operationId": "4d571edd18eb11c3b222fce58f221c73",
+                "responses": {
+                    "200": {
+                        "description": "Liste des Payements",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Facturation"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/payementMaintWeb.getData": {
+            "get": {
+                "tags": [
+                    "Payement Maintenance"
+                ],
+                "summary": "Liste des Payements",
+                "description": "Récupérer toutes les Payements avec leurs abonnés",
+                "operationId": "686dc0a9a55e593eef8e7e6d1e459ee6",
+                "responses": {
+                    "200": {
+                        "description": "Liste des Payements",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Facturation"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/payement-maintenance": {
             "post": {
                 "tags": [

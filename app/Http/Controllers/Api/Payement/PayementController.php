@@ -44,8 +44,8 @@ class PayementController extends Controller
             ], 401);
         }
 
-        $page = request("paginate", 10);
-        $q = request("q", "");
+        // $page = request("paginate", 10);
+        // $q = request("q", "");
         $sort_direction = request('sort_direction', 'desc');
         $sort_field = request('sort_field', 'id');
         $data = Payement::join('tresoreries', 'payements.account_id', '=', 'tresoreries.id')
@@ -57,8 +57,8 @@ class PayementController extends Controller
             ->latest()
             // ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
-            ->where('payements.addedBy', $user->id)
-            ->paginate($page);
+            ->where('payements.addedBy', $user->id)->get();
+        // ->paginate($page);
         $result = [
             'message' => "OK",
             'success' => true,

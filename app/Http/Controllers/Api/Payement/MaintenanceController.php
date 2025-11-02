@@ -18,6 +18,99 @@ class MaintenanceController extends Controller
 {
 
     /**
+     * @OA\Get(
+     *     path="/api/payementMaintMobile.getData",
+     *     summary="Liste des Payements",
+     *     description="Récupérer toutes les Payements avec leurs abonnés",
+     *     tags={"Payement Maintenance"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des Payements",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Facturation"))
+     *         )
+     *     )
+     * )
+     */
+
+    public function getPayementMaintenance()
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Utilisateur non authentifié',
+                'success' => false,
+                'status' => 401
+            ], 401);
+        }
+
+        // $page = request("paginate", 10);
+        // $q = request("q", "");
+        $sort_direction = request('sort_direction', 'desc');
+        $sort_field = request('sort_field', 'id');
+        $data = PayementPane::join('tresoreries', 'payement_panes.account_id', '=', 'tresoreries.id')
+            ->join('users', 'payement_panes.addedBy', '=', 'users.id')
+            ->join('abonnes', 'payement_panes.abonne_id', '=', 'abonnes.id')
+            ->select('payement_panes.*', 'abonnes.nom as abonne', 'users.name as addedBy', 'tresoreries.designation as tresorerie')
+            ->latest()
+            // ->searh(trim($q))
+            ->orderBy($sort_field, $sort_direction)
+            ->where('payement_panes.addedBy', $user->id)->get();
+        // ->paginate($page);
+        $result = [
+            'message' => "OK",
+            'success' => true,
+            'data' => $data,
+            'status' => 200
+        ];
+        return response()->json($result);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/payementMaintWeb.getData",
+     *     summary="Liste des Payements",
+     *     description="Récupérer toutes les Payements avec leurs abonnés",
+     *     tags={"Payement Maintenance"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des Payements",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Facturation"))
+     *         )
+     *     )
+     * )
+     */
+
+    public function getPayementMaintenanceWeb()
+    {
+        $page = request("paginate", 10);
+        $q = request("q", "");
+        $sort_direction = request('sort_direction', 'desc');
+        $sort_field = request('sort_field', 'id');
+        $data = PayementPane::join('tresoreries', 'payement_panes.account_id', '=', 'tresoreries.id')
+            ->join('users', 'payement_panes.addedBy', '=', 'users.id')
+            ->join('abonnes', 'payement_panes.abonne_id', '=', 'abonnes.id')
+            ->select('payement_panes.*', 'abonnes.nom as abonne', 'users.name as addedBy', 'tresoreries.designation as tresorerie')
+            ->latest()
+            ->searh(trim($q))
+            ->orderBy($sort_field, $sort_direction)
+            ->paginate($page);
+        $result = [
+            'message' => "OK",
+            'success' => true,
+            'status' => 200,
+            'data' => $data
+        ];
+        return response()->json($result);
+    }
+
+    /**
      * @OA\Post(
      *     path="/api/payement-maintenance",
      *     summary="Créer un nouveau paiement",

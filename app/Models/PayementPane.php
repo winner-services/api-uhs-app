@@ -13,6 +13,17 @@ class PayementPane extends Model
         'paid_amount',
         'abonne_id',
         'acount_id',
-        'addedBy'
+        'addedBy',
+        'status'
     ];
+
+    public function scopeSearh($query, $term)
+    {
+        $term = "%$term%";
+        $query->where(function ($query) use ($term) {
+            $query->where('payement_panes.transaction_date', 'like', $term)
+                ->orWhere('payement_panes.reference', 'like', $term)
+                ->orWhere('status', 'like', $term);
+        });
+    }
 }

@@ -16,4 +16,14 @@ class Payement extends Model
         'reference',
         'facture_id'
     ];
+
+    public function scopeSearh($query, $term)
+    {
+        $term = "%$term%";
+        $query->where(function ($query) use ($term) {
+            $query->where('payements.transaction_date', 'like', $term)
+                ->orWhere('payements.reference', 'like', $term)
+                ->orWhere('status', 'like', $term);
+        });
+    }
 }
