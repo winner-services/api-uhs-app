@@ -170,7 +170,7 @@ class MaintenanceController extends Controller
             $montantPaye = $request->paid_amount;
             $loanAmount  = $request->loan_amount;
 
-            $rapport = Rapport::where('ticket_id', $request->ticket_id)->first();
+            $rapport = Rapport::find($request->ticket_id);
             if (!$rapport) {
                 return response()->json([
                     'success' => false,
@@ -186,14 +186,14 @@ class MaintenanceController extends Controller
                 ], 422);
             }
 
-            if ($montantPaye > $dette) {
+            if ($montantPaye > $loanAmount) {
                 return response()->json([
                     'message' => 'Le montant payé ne doit pas être supérieur au montant de la dette.',
                     'status'  => 422,
                 ], 422);
             }
 
-            $ticket = Ticket::find($request->ticket_id);
+            $ticket = Ticket::find($rapport->ticket_id);
             if (!$ticket) {
                 return response()->json([
                     'success' => false,
@@ -217,11 +217,11 @@ class MaintenanceController extends Controller
                 ], 404);
             }
 
-            if ($montantPaye == $dette) {
+            if ($montantPaye == $loanAmount) {
                 $rapport->dette_amount   = 0;
                 $rapport->status  = 'payé';
             } else {
-                $rapport->dette_amount   = $dette - $montantPaye;
+                $rapport->dette_amount   = $loanAmount - $montantPaye;
                 $rapport->status  = 'acompte';
             }
             $rapport->save();
