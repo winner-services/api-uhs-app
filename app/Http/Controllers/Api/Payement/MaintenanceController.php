@@ -137,8 +137,8 @@ class MaintenanceController extends Controller
             'transaction_date' => 'required',
             'loan_amount'      => 'required|numeric|min:0',
             'paid_amount'      => 'required|numeric|min:0',
-            'ticket_id'        => 'nullable|exists:tickets,id',
-            'account_id'       => 'nullable|exists:tresoreries,id',
+            'ticket_id'        => 'required',
+            'account_id'       => 'required|exists:tresoreries,id',
         ];
 
         $messages = [
@@ -182,7 +182,7 @@ class MaintenanceController extends Controller
             if ($montantPaye <= 0) {
                 return response()->json([
                     'message' => 'Le montant payé doit être supérieur à 0.',
-                    'status'  => 422,
+                    'status' => 422,
                 ], 422);
             }
 
