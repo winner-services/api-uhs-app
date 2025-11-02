@@ -139,7 +139,6 @@ class MaintenanceController extends Controller
             'paid_amount'      => 'required|numeric|min:0',
             'ticket_id'        => 'nullable|exists:tickets,id',
             'account_id'       => 'nullable|exists:tresoreries,id',
-            'facture_id'       => 'nullable|exists:facturations,id',
         ];
 
         $messages = [
@@ -152,7 +151,6 @@ class MaintenanceController extends Controller
             'paid_amount.min'           => 'Le montant payé doit être au moins 0.',
             'ticket_id.exists'          => 'Le ticket sélectionné n’existe pas.',
             'account_id.exists'         => 'Le compte sélectionné n’existe pas.',
-            'facture_id.exists'         => 'La facture sélectionnée n’existe pas.',
         ];
 
         $validator = Validator::make($request->all(), $rules, $messages);
