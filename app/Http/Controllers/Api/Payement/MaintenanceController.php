@@ -186,7 +186,7 @@ class MaintenanceController extends Controller
                 ], 422);
             }
 
-            if ($montantPaye > $loanAmount) {
+            if ($montantPaye > $dette) {
                 return response()->json([
                     'message' => 'Le montant payé ne doit pas être supérieur au montant de la dette.',
                     'status'  => 422,
@@ -217,11 +217,11 @@ class MaintenanceController extends Controller
                 ], 404);
             }
 
-            if ($montantPaye == $loanAmount) {
+            if ($montantPaye == $dette) {
                 $rapport->dette_amount   = 0;
                 $rapport->status  = 'payé';
             } else {
-                $rapport->dette_amount   = $loanAmount - $montantPaye;
+                $rapport->dette_amount   = $dette - $montantPaye;
                 $rapport->status  = 'acompte';
             }
             $rapport->save();
