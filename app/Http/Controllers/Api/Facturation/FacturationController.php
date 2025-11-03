@@ -185,7 +185,8 @@ class FacturationController extends Controller
                 // 🔹 Calcul de la dette
                 if ($facturePrecedente) {
                     if ($facturePrecedente->status !== 'payé') {
-                        $dette = $facturePrecedente->dette + $facturePrecedente->montant;
+                        $dette = $facturePrecedente->dette + $facturePrecedente->dete_en_cours;
+                        $facturePrecedente->dete_en_cours = $prixMensuel;
                         $status = 'impayé';
                         $facturePrecedente->update(['status' => 'insoldée']);
                     } else {
@@ -202,7 +203,7 @@ class FacturationController extends Controller
                     'point_eau_abonnes_id' => $raccordement->id,
                     'mois'                 => $mois,
                     'montant'              => $prixMensuel,
-                    'dete_en_cours'             => $prixMensuel,
+                    'dete_en_cours'        => $prixMensuel,
                     'deja_paye'            => 0,
                     'dette'                => $dette,
                     'status'               => $status,
