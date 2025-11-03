@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Model;
  *     @OA\Property(property="mois", type="string", example="09-2025"),
  *     @OA\Property(property="montant", type="number", format="float", example=150.75),
  *     @OA\Property(property="dette", type="number", format="float", example=50.00),
+ *     @OA\Property(property="dete_en_cours", type="number", format="float", example=50.00),
+ *     @OA\Property(property="deja_paye", type="number", format="float", example=50.00),
  *     @OA\Property(property="status", type="string", example="Non payé"),
  *     @OA\Property(property="reference", type="string", example="FAC-6637"),
  *     @OA\Property(property="date_emission", type="string", format="date", example="2025-09-01"),
@@ -35,7 +37,9 @@ class Facturation extends Model
         'date_emission',
         'date_paiement',
         'addedBy',
-        'reference'
+        'reference',
+        'dete_en_cours',
+        'deja_paye'
     ];
 
     public function pointEauAbonne()

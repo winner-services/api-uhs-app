@@ -188,6 +188,8 @@ class PayementController extends Controller
             $loanAmount   = $request->loan_amount;
             $dette        = $facture->dette;
             $montant      = $facture->montant;
+            $dete_en_cours      = $facture->dete_en_cours;
+            $deja_paye      = $facture->deja_paye;
 
             $lastTransaction = TrasactionTresorerie::where('account_id', $request->account_id)
                 ->latest('id')
@@ -213,7 +215,9 @@ class PayementController extends Controller
             // 3️⃣ Cas montant payé = loan_amount → facture réglée totalement
             if ($montantPaye == $loanAmount) {
                 $facture->dette   = 0;
-                $facture->montant = 0;
+                // $facture->montant = 0;
+                $facture->dete_en_cours = 0;
+                $facture->deja_paye = $montantPaye;
                 $facture->status  = 'payé';
                 $facture->date_paiement  = $request->transaction_date;
             }
@@ -223,13 +227,15 @@ class PayementController extends Controller
                     // On couvre la dette d'abord
                     $reste = $montantPaye - $dette;
                     $facture->dette   = 0;
-                    $facture->montant = max(0, $montant - $reste);
+                    $facture->dete_en_cours = max(0, $dete_en_cours - $reste);
+                    $facture->deja_paye = max(0, $deja_paye + $montantPaye);
                     $facture->status  = 'acompte';
                     $facture->date_paiement  = $request->transaction_date;
                 } else {
                     // On réduit uniquement la dette
                     $facture->dette  = $dette - $montantPaye;
                     $facture->status = 'acompte';
+                    $facture->deja_paye = $deja_paye + $montantPaye;
                     $facture->date_paiement  = $request->transaction_date;
                 }
             }

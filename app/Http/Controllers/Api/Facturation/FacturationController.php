@@ -202,6 +202,8 @@ class FacturationController extends Controller
                     'point_eau_abonnes_id' => $raccordement->id,
                     'mois'                 => $mois,
                     'montant'              => $prixMensuel,
+                    'dete_en_cours'             => $prixMensuel,
+                    'deja_paye'            => 0,
                     'dette'                => $dette,
                     'status'               => $status,
                     'date_emission'        => $date->toDateString(),
