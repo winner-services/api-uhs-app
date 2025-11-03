@@ -30,9 +30,6 @@ class Payement extends Model
                 ->orWhere('payements.reference', 'like', $term)
                 ->orWhere('payements.status', 'like', $term)
                 ->orWhere('abonnes.nom', 'like', $term);
-                // ->orWhereHas('facture.abonne', function ($q) use ($term) {
-                //     $q->where('abonnes.nom', 'like', $term);
-                // });
         });
     }
 }
