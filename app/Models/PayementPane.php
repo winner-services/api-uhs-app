@@ -12,7 +12,7 @@ class PayementPane extends Model
         'loan_amount',
         'paid_amount',
         'abonne_id',
-        'acount_id',
+        'account_id',
         'addedBy',
         'status'
     ];
