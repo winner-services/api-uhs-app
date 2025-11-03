@@ -17,13 +17,21 @@ class Payement extends Model
         'facture_id'
     ];
 
+    public function pointEauAbonne()
+    {
+        return $this->belongsTo(PointEauAbonne::class);
+    }
+
     public function scopeSearh($query, $term)
     {
         $term = "%$term%";
         $query->where(function ($query) use ($term) {
             $query->where('payements.transaction_date', 'like', $term)
                 ->orWhere('payements.reference', 'like', $term)
-                ->orWhere('status', 'like', $term);
+                ->orWhere('status', 'like', $term)
+                ->orWhereHas('pointEauAbonne.abonne', function ($q) use ($term) {
+                    $q->where('abonnes.nom', 'like', $term);
+                });
         });
     }
 }
