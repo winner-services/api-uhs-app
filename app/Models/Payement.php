@@ -17,9 +17,9 @@ class Payement extends Model
         'facture_id'
     ];
 
-    public function pointEauAbonne()
+    public function facture()
     {
-        return $this->belongsTo(PointEauAbonne::class);
+        return $this->belongsTo(Facturation::class, 'facture_id');
     }
 
     public function scopeSearh($query, $term)
@@ -29,7 +29,7 @@ class Payement extends Model
             $query->where('payements.transaction_date', 'like', $term)
                 ->orWhere('payements.reference', 'like', $term)
                 ->orWhere('payements.status', 'like', $term)
-                ->orWhereHas('pointEauAbonne.abonne', function ($q) use ($term) {
+                ->orWhereHas('facture.abonne', function ($q) use ($term) {
                     $q->where('abonnes.nom', 'like', $term);
                 });
         });
