@@ -29,7 +29,7 @@ class Payement extends Model
             $query->where('payements.transaction_date', 'like', $term)
                 ->orWhere('payements.reference', 'like', $term)
                 ->orWhere('payements.status', 'like', $term)
-                ->orWhere('abonne', 'like', $term);
+                ->orWhere('abonnes.nom', 'like', $term);
                 // ->orWhereHas('facture.abonne', function ($q) use ($term) {
                 //     $q->where('abonnes.nom', 'like', $term);
                 // });
