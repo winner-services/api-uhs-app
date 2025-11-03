@@ -47,8 +47,8 @@ class MaintenanceController extends Controller
             ], 401);
         }
 
-        // $page = request("paginate", 10);
-        // $q = request("q", "");
+        $page = request("paginate", 10);
+        $q = request("q", "");
         $sort_direction = request('sort_direction', 'desc');
         $sort_field = request('sort_field', 'id');
         $data = PayementPane::join('tresoreries', 'payement_panes.account_id', '=', 'tresoreries.id')
@@ -56,10 +56,10 @@ class MaintenanceController extends Controller
             ->join('abonnes', 'payement_panes.abonne_id', '=', 'abonnes.id')
             ->select('payement_panes.*', 'abonnes.nom as abonne', 'users.name as addedBy', 'tresoreries.designation as tresorerie')
             ->latest()
-            // ->searh(trim($q))
+            ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
-            ->where('payement_panes.addedBy', $user->id)->get();
-        // ->paginate($page);
+            ->where('payement_panes.addedBy', $user->id)
+            ->paginate($page);
         $result = [
             'message' => "OK",
             'success' => true,

@@ -28,7 +28,7 @@ class Payement extends Model
         $query->where(function ($query) use ($term) {
             $query->where('payements.transaction_date', 'like', $term)
                 ->orWhere('payements.reference', 'like', $term)
-                ->orWhere('status', 'like', $term)
+                ->orWhere('payements.status', 'like', $term)
                 ->orWhereHas('pointEauAbonne.abonne', function ($q) use ($term) {
                     $q->where('abonnes.nom', 'like', $term);
                 });

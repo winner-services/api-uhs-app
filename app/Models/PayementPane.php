@@ -17,13 +17,21 @@ class PayementPane extends Model
         'status'
     ];
 
+    public function abonne()
+    {
+        return $this->belongsTo(Abonne::class, 'abonne_id');
+    }
+
     public function scopeSearh($query, $term)
     {
         $term = "%$term%";
         $query->where(function ($query) use ($term) {
             $query->where('payement_panes.transaction_date', 'like', $term)
                 ->orWhere('payement_panes.reference', 'like', $term)
-                ->orWhere('status', 'like', $term);
+                ->orWhere('payement_panes.status', 'like', $term)
+                ->orWhereHas('abonne', function ($q2) use ($term) {
+                    $q2->where('abonnes.nom', 'like', $term);
+                });
         });
     }
 }
