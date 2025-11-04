@@ -154,8 +154,11 @@ class ReportController extends Controller
         }
 
 
-        $date_start = request('date_start', date('Y-m-01'));
-        $date_end = request('date_end', date('Y-m-d'));
+        // $date_start = request('date_start', date('Y-m-01'));
+        // $date_end = request('date_end', date('Y-m-d'));
+
+        $date_start = request('date_start');
+        $date_end   = request('date_end');
 
         $status     = request('status');
 
@@ -169,8 +172,10 @@ class ReportController extends Controller
                 ELSE 5
             END
         ")
-            ->orderBy('created_at', 'desc')
-            ->whereBetween('date_emission', [$date_start, $date_end]);
+            ->orderBy('created_at', 'desc');
+        if (!empty($date_start) && !empty($date_end)) {
+            $query->whereBetween('date_emission', [$date_start, $date_end]);
+        }
 
         // Si un status est envoyé, on filtre
         if (!empty($status)) {
