@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Payement;
 
 use App\Http\Controllers\Controller;
+use App\Models\About;
 use App\Models\PayementPane;
 use App\Models\PointEau;
 use App\Models\PointEauAbonne;
@@ -165,6 +166,22 @@ class MaintenanceController extends Controller
 
         DB::beginTransaction();
         try {
+
+            $about = About::first();
+
+            if ($about && $about->logo) {
+                $path = storage_path('app/public/' . $about->logo);
+
+                if (file_exists($path)) {
+                    $mime = mime_content_type($path);
+                    $data = base64_encode(file_get_contents($path));
+                    $about->logo = "data:$mime;base64,$data";
+                } else {
+                    // Si fichier manquant, on peut utiliser une image par défaut
+                    $about->logo = asset('images/default-logo.png');
+                }
+            }
+
             $user = Auth::user();
 
             $montantPaye = $request->paid_amount;
@@ -261,7 +278,8 @@ class MaintenanceController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Paiement enregistré avec succès',
-                'data'    => $payement
+                'data'    => $payement,
+                'company_info' => $about
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
