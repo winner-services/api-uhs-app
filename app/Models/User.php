@@ -78,7 +78,7 @@ class User extends Authenticatable
         'permissions_list',
     ];
 
-    public function scopeSearch($query, string $term): void
+    public function scopesearh($query, string $term): void
     {
         $term = "%$term%";
         $query->where(function ($query) use ($term) {
