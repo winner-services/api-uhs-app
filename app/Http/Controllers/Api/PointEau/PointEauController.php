@@ -50,7 +50,8 @@ class PointEauController extends Controller
         // $data = PointEau::doesntHave('abonnements')
         //     ->latest()
         //     ->get();
-        $data = PointEau::latest()->get();
+        $q = request("q", "");
+        $data = PointEau::latest()->searh(trim($q))->get();
 
         return response()->json([
             'message' => "OK",
