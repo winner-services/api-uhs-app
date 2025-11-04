@@ -159,7 +159,7 @@ class ReportController extends Controller
 
         $status     = request('status');
 
-        $$query = Facturation::with('pointEauAbonne.abonne', 'user')
+        $query = Facturation::with('pointEauAbonne.abonne', 'user')
             ->orderByRaw("
             CASE 
                 WHEN status = 'impayé'  THEN 1
