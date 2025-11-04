@@ -26,7 +26,9 @@ class Abonne extends Model
         $query->where(function ($query) use ($term) {
             $query->where('abonnes.nom', 'like', $term)
             ->orWhere('abonnes.adresse', 'like', $term)
-            ->orWhere('abonnement_categories.designation', 'like', $term);
+            ->orWhereHas('categorie', function ($q2) use ($term) {
+                    $q2->where('abonnement_categories.designation', 'like', $term);
+                });
         });
     }
     public function pointsEau()
