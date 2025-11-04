@@ -51,9 +51,12 @@ class AbonnementController extends Controller
      */
     public function getaAbonnellData()
     {
+        $q = request("q", "");
         return response()->json([
             'success' => true,
-            'data' => Abonne::with(['categorie', 'user'])->get(),
+            'data' => Abonne::with(['categorie', 'user'])
+            ->searh(trim($q))
+            ->get(),
             'status' => 200
         ]);
     }
