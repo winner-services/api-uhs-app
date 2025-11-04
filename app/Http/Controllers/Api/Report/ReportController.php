@@ -57,33 +57,6 @@ class ReportController extends Controller
         ]);
     }
 
-    // public function rapportBorne()
-    // {
-    //     $date_start = request('date_start', date('Y-m-01'));
-    //     $date_end = request('date_end', date('Y-m-d'));
-
-    //     $about = About::first();
-    //     $about->logo = $about->getLogoBase64();
-    //     // if ($about && $about->logo) {
-    //     //     $path = storage_path('app/public/' . $about->logo);
-
-    //     //     if (file_exists($path)) {
-    //     //         $type = pathinfo($path, PATHINFO_EXTENSION);
-    //     //         $data = file_get_contents($path);
-    //     //         $about->logo = 'data:image/' . $type . ';base64,' . base64_encode($data);
-    //     //     }
-    //     // }
-
-    //     $data = PointEau::where('status', 'Actif')
-    //         ->latest()->get();
-    //     return response()->json([
-    //         'message' => 'success',
-    //         'success' => true,
-    //         'status' => 200,
-    //         'data' => $data,
-    //         'company_info' => $about
-    //     ]);
-    // }
     /**
      * @OA\Get(
      * path="/api/rapport.point-eau-abonne",
@@ -183,7 +156,10 @@ class ReportController extends Controller
 
         $date_start = request('date_start', date('Y-m-01'));
         $date_end = request('date_end', date('Y-m-d'));
-        $data = Facturation::with('pointEauAbonne.abonne', 'user')
+
+        $status     = request('status');
+
+        $$query = Facturation::with('pointEauAbonne.abonne', 'user')
             ->orderByRaw("
             CASE 
                 WHEN status = 'impayé'  THEN 1
@@ -194,7 +170,14 @@ class ReportController extends Controller
             END
         ")
             ->orderBy('created_at', 'desc')
-            ->whereBetween('date_emission', [$date_start, $date_end])->get();
+            ->whereBetween('date_emission', [$date_start, $date_end]);
+
+        // Si un status est envoyé, on filtre
+        if (!empty($status)) {
+            $query->where('status', $status);
+        }
+
+        $data = $query->get();
 
         $result = [
             'message' => "OK",
@@ -390,7 +373,7 @@ class ReportController extends Controller
         return response()->json($result);
     }
 
-     /**
+    /**
      * @OA\Get(
      * path="/api/rapport.depenseReport",
      * summary="Liste des depenseReport",

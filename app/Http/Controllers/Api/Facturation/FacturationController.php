@@ -211,7 +211,7 @@ class FacturationController extends Controller
                     'addedBy'              => $user->id,
                     'created_at'           => now(),
                     'updated_at'           => now(),
-                    'reference'            => strtoupper('FAC-' . uniqid()),
+                    'reference'            => fake()->unique()->numerify('FAC-#####'),
                 ];
             }
 
