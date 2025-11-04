@@ -63,7 +63,7 @@ class UserController extends Controller
     public function getAllUsersOptions()
     {
         $q = request("q", "");
-        $data = User::latest()->search(trim($q))->get();
+        $data = User::latest()->searh(trim($q))->get();
         $result = [
             'message' => "OK",
             'success' => true,
