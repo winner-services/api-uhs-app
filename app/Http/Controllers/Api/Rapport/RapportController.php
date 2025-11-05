@@ -96,7 +96,7 @@ class RapportController extends Controller
                     if ($point->relationLoaded('abonnements') && $point->abonnements) {
                         // On récupère les noms d'abonnés via la relation chargée
                         $abonnes = $point->abonnements
-                            ->pluck('abonne.name') // nécessite que chaque PointEauAbonne ait la relation 'abonne' définie
+                            ->pluck('abonne.nom') // nécessite que chaque PointEauAbonne ait la relation 'abonne' définie
                             ->filter()
                             ->unique()
                             ->values()
@@ -104,7 +104,7 @@ class RapportController extends Controller
                     } elseif ($point->abonnements) {
                         // fallback si relation pas explicitement marquée comme loaded mais accessible
                         $abonnes = collect($point->abonnements)
-                            ->pluck('abonne.name')
+                            ->pluck('abonne.nom')
                             ->filter()
                             ->unique()
                             ->values()
