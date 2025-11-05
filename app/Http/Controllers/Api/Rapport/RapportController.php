@@ -63,11 +63,11 @@ class RapportController extends Controller
             $data = Rapport::with([
                 'details',
                 'ticket.user', // si ticket a un user
-                'ticket.point.pointEauAbonnes.abonne', // nested eager load important
+                'ticket.point.abonnements.abonne', // utilise la relation 'abonnements' que tu as définie
                 'user'
             ])
                 ->when(trim($q) !== '', function ($query) use ($q) {
-                    // Exemple de recherche sur la description, le ticket, l'utilisateur ou l'abonné
+                    // recherche sur description, ticket.titre, user.name, ou abonne.name via abonnements
                     $query->where(function ($query) use ($q) {
                         $query->where('description', 'LIKE', "%{$q}%")
                             ->orWhereHas('ticket', function ($q2) use ($q) {
@@ -76,8 +76,7 @@ class RapportController extends Controller
                             ->orWhereHas('user', function ($q3) use ($q) {
                                 $q3->where('name', 'LIKE', "%{$q}%");
                             })
-                            // recherche par nom d'abonné via ticket -> point -> pointEauAbonnes -> abonne
-                            ->orWhereHas('ticket.point.pointEauAbonnes', function ($q4) use ($q) {
+                            ->orWhereHas('ticket.point.abonnements', function ($q4) use ($q) {
                                 $q4->whereHas('abonne', function ($q5) use ($q) {
                                     $q5->where('name', 'LIKE', "%{$q}%");
                                 });
@@ -94,23 +93,25 @@ class RapportController extends Controller
                 if ($rapport->ticket && $rapport->ticket->point) {
                     $point = $rapport->ticket->point;
 
-                    // si la relation pointEauAbonnes est chargée ou existe, on tente de récupérer les noms
-                    if ($point->relationLoaded('pointEauAbonnes') || $point->pointEauAbonnes) {
-                        $collection = $point->pointEauAbonnes;
-
-                        // On extrait les noms d'abonnés si la relation 'abonne' est disponible
-                        if ($collection instanceof \Illuminate\Support\Collection) {
-                            $abonnes = $collection
-                                ->pluck('abonne.name') // nécessite que 'abonne' soit chargé sur chaque item
-                                ->filter()
-                                ->unique()
-                                ->values()
-                                ->all();
-                        }
+                    if ($point->relationLoaded('abonnements') && $point->abonnements) {
+                        // On récupère les noms d'abonnés via la relation chargée
+                        $abonnes = $point->abonnements
+                            ->pluck('abonne.name') // nécessite que chaque PointEauAbonne ait la relation 'abonne' définie
+                            ->filter()
+                            ->unique()
+                            ->values()
+                            ->all();
+                    } elseif ($point->abonnements) {
+                        // fallback si relation pas explicitement marquée comme loaded mais accessible
+                        $abonnes = collect($point->abonnements)
+                            ->pluck('abonne.name')
+                            ->filter()
+                            ->unique()
+                            ->values()
+                            ->all();
                     }
                 }
 
-                // ajoute l'attribut à l'objet (non persistant)
                 $rapport->setAttribute('abonnes', $abonnes);
 
                 return $rapport;

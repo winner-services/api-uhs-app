@@ -23,4 +23,8 @@ class PointEau extends Model
     {
         return $this->hasMany(PointEauAbonne::class, 'point_eau_id');
     }
+    public function pointEauAbonnes()
+{
+    return $this->hasMany(PointEauAbonne::class, 'point_eau_id');
+}
 }
