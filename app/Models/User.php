@@ -43,7 +43,8 @@ class User extends Authenticatable
         'email',
         'password',
         'phone',
-        'active'
+        'active',
+        'point_eau_id'
     ];
 
     /**

@@ -70,7 +70,7 @@ class RapportController extends Controller
                     $query->where(function ($query) use ($q) {
                         $query->where('description', 'LIKE', "%{$q}%")
                             ->orWhereHas('ticket', function ($q2) use ($q) {
-                                $q2->where('titre', 'LIKE', "%{$q}%");
+                                $q2->where('reference', 'LIKE', "%{$q}%");
                             })
                             ->orWhereHas('user', function ($q3) use ($q) {
                                 $q3->where('name', 'LIKE', "%{$q}%");
