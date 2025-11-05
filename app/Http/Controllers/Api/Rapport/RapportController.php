@@ -60,19 +60,61 @@ class RapportController extends Controller
             $sort_direction = request('sort_direction', 'desc');
             $sort_field = request('sort_field', 'id');
 
-            $data = Rapport::with(['details', 'ticket', 'user', 'ticket.point'])
+            $data = Rapport::with([
+                'details',
+                'ticket.user', // si ticket a un user
+                'ticket.point.pointEauAbonnes.abonne', // nested eager load important
+                'user'
+            ])
                 ->when(trim($q) !== '', function ($query) use ($q) {
-                    // Exemple de recherche sur la description ou le ticket
-                    $query->where('description', 'LIKE', "%{$q}%")
-                        ->orWhereHas('ticket', function ($q2) use ($q) {
-                            $q2->where('titre', 'LIKE', "%{$q}%");
-                        })
-                        ->orWhereHas('user', function ($q3) use ($q) {
-                            $q3->where('name', 'LIKE', "%{$q}%");
-                        });
+                    // Exemple de recherche sur la description, le ticket, l'utilisateur ou l'abonné
+                    $query->where(function ($query) use ($q) {
+                        $query->where('description', 'LIKE', "%{$q}%")
+                            ->orWhereHas('ticket', function ($q2) use ($q) {
+                                $q2->where('titre', 'LIKE', "%{$q}%");
+                            })
+                            ->orWhereHas('user', function ($q3) use ($q) {
+                                $q3->where('name', 'LIKE', "%{$q}%");
+                            })
+                            // recherche par nom d'abonné via ticket -> point -> pointEauAbonnes -> abonne
+                            ->orWhereHas('ticket.point.pointEauAbonnes', function ($q4) use ($q) {
+                                $q4->whereHas('abonne', function ($q5) use ($q) {
+                                    $q5->where('name', 'LIKE', "%{$q}%");
+                                });
+                            });
+                    });
                 })
                 ->orderBy($sort_field, $sort_direction)
                 ->paginate($page);
+
+            // Ajoute un champ 'abonnes' (array des noms d'abonnés) à chaque item du paginate
+            $data->getCollection()->transform(function ($rapport) {
+                $abonnes = [];
+
+                if ($rapport->ticket && $rapport->ticket->point) {
+                    $point = $rapport->ticket->point;
+
+                    // si la relation pointEauAbonnes est chargée ou existe, on tente de récupérer les noms
+                    if ($point->relationLoaded('pointEauAbonnes') || $point->pointEauAbonnes) {
+                        $collection = $point->pointEauAbonnes;
+
+                        // On extrait les noms d'abonnés si la relation 'abonne' est disponible
+                        if ($collection instanceof \Illuminate\Support\Collection) {
+                            $abonnes = $collection
+                                ->pluck('abonne.name') // nécessite que 'abonne' soit chargé sur chaque item
+                                ->filter()
+                                ->unique()
+                                ->values()
+                                ->all();
+                        }
+                    }
+                }
+
+                // ajoute l'attribut à l'objet (non persistant)
+                $rapport->setAttribute('abonnes', $abonnes);
+
+                return $rapport;
+            });
 
             $result = [
                 'message' => 'Liste des dépenses récupérée avec succès',
@@ -91,6 +133,46 @@ class RapportController extends Controller
             ], 500);
         }
     }
+
+    // public function indexDepense()
+    // {
+    //     try {
+    //         $page = request('paginate', 10);
+    //         $q = request('q', '');
+    //         $sort_direction = request('sort_direction', 'desc');
+    //         $sort_field = request('sort_field', 'id');
+
+    //         $data = Rapport::with(['details', 'ticket', 'user', 'ticket.point'])
+    //             ->when(trim($q) !== '', function ($query) use ($q) {
+    //                 // Exemple de recherche sur la description ou le ticket
+    //                 $query->where('description', 'LIKE', "%{$q}%")
+    //                     ->orWhereHas('ticket', function ($q2) use ($q) {
+    //                         $q2->where('titre', 'LIKE', "%{$q}%");
+    //                     })
+    //                     ->orWhereHas('user', function ($q3) use ($q) {
+    //                         $q3->where('name', 'LIKE', "%{$q}%");
+    //                     });
+    //             })
+    //             ->orderBy($sort_field, $sort_direction)
+    //             ->paginate($page);
+
+    //         $result = [
+    //             'message' => 'Liste des dépenses récupérée avec succès',
+    //             'success' => true,
+    //             'status' => 200,
+    //             'data' => $data,
+    //         ];
+
+    //         return response()->json($result);
+    //     } catch (Exception $e) {
+    //         return response()->json([
+    //             'message' => 'Erreur lors de la récupération des dépenses',
+    //             'success' => false,
+    //             'status' => 500,
+    //             'error' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
 
     /**
      * @OA\Post(
