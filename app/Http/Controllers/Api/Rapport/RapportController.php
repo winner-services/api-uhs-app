@@ -77,7 +77,7 @@ class RapportController extends Controller
                             })
                             ->orWhereHas('ticket.point.abonnements', function ($q4) use ($q) {
                                 $q4->whereHas('abonne', function ($q5) use ($q) {
-                                    $q5->where('name', 'LIKE', "%{$q}%");
+                                    $q5->where('nom', 'LIKE', "%{$q}%");
                                 });
                             });
                     });
@@ -95,12 +95,12 @@ class RapportController extends Controller
                     // Si la relation 'abonnements' est chargée et non vide
                     if ($point->relationLoaded('abonnements') && $point->abonnements->isNotEmpty()) {
                         $first = $point->abonnements->first();
-                        $abonnes = ($first && $first->abonne && !empty($first->abonne->name)) ? $first->abonne->name : '';
+                        $abonnes = ($first && $first->abonne && !empty($first->abonne->nom)) ? $first->abonne->nom : '';
                     }
                     // fallback si relation accessible mais pas marquée "loaded"
                     elseif ($point->abonnements && is_iterable($point->abonnements) && count($point->abonnements) > 0) {
                         $first = collect($point->abonnements)->first();
-                        $abonnes = ($first && isset($first->abonne->name)) ? $first->abonne->name : '';
+                        $abonnes = ($first && isset($first->abonne->nom)) ? $first->abonne->nom : '';
                     }
                 }
 
