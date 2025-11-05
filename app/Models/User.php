@@ -23,6 +23,7 @@ use Spatie\Permission\Traits\HasRoles;
  *     @OA\Property(property="phone", type="string", example="+243900000000"),
  *     @OA\Property(property="role", type="string", example="admin"),
  *     @OA\Property(property="permissions", type="array", @OA\Items(type="string", example="create_user")),
+ *     @OA\Property(property="point_eau_id", type="integer", example=1),
  *     @OA\Property(property="created_at", type="string", format="date-time"),
  *     @OA\Property(property="updated_at", type="string", format="date-time")
  * )

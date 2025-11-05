@@ -3204,6 +3204,10 @@
                                         "format": "password",
                                         "example": "Winner00"
                                     },
+                                    "point_eau_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
                                     "role_id": {
                                         "type": "integer",
                                         "example": 1
@@ -3325,6 +3329,10 @@
                                         "example": "+243999999999"
                                     },
                                     "role_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "point_eau_id": {
                                         "type": "integer",
                                         "example": 2
                                     },
@@ -3676,6 +3684,16 @@
                         "format": "float",
                         "example": 50
                     },
+                    "dete_en_cours": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 50
+                    },
+                    "deja_paye": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 50
+                    },
                     "status": {
                         "type": "string",
                         "example": "Non payé"
@@ -3843,6 +3861,10 @@
                             "type": "string",
                             "example": "create_user"
                         }
+                    },
+                    "point_eau_id": {
+                        "type": "integer",
+                        "example": 1
                     },
                     "created_at": {
                         "type": "string",
