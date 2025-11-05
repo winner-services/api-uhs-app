@@ -62,12 +62,11 @@ class RapportController extends Controller
 
             $data = Rapport::with([
                 'details',
-                'ticket.user', // si ticket a un user
-                'ticket.point.abonnements.abonne', // utilise la relation 'abonnements' que tu as définie
+                'ticket.user',
+                'ticket.point.abonnements.abonne', // eager load nécessaire
                 'user'
             ])
                 ->when(trim($q) !== '', function ($query) use ($q) {
-                    // recherche sur description, ticket.titre, user.name, ou abonne.name via abonnements
                     $query->where(function ($query) use ($q) {
                         $query->where('description', 'LIKE', "%{$q}%")
                             ->orWhereHas('ticket', function ($q2) use ($q) {
@@ -86,33 +85,26 @@ class RapportController extends Controller
                 ->orderBy($sort_field, $sort_direction)
                 ->paginate($page);
 
-            // Ajoute un champ 'abonnes' (array des noms d'abonnés) à chaque item du paginate
+            // Transformer la collection paginée pour ajouter un champ "abonnes" en tant que chaîne (1 seul abonné)
             $data->getCollection()->transform(function ($rapport) {
-                $abonnes = [];
+                $abonnes = '';
 
                 if ($rapport->ticket && $rapport->ticket->point) {
                     $point = $rapport->ticket->point;
 
-                    if ($point->relationLoaded('abonnements') && $point->abonnements) {
-                        // On récupère les noms d'abonnés via la relation chargée
-                        $abonnes = $point->abonnements
-                            ->pluck('abonne.nom') // nécessite que chaque PointEauAbonne ait la relation 'abonne' définie
-                            ->filter()
-                            ->unique()
-                            ->values()
-                            ->all();
-                    } elseif ($point->abonnements) {
-                        // fallback si relation pas explicitement marquée comme loaded mais accessible
-                        $abonnes = collect($point->abonnements)
-                            ->pluck('abonne.nom')
-                            ->filter()
-                            ->unique()
-                            ->values()
-                            ->all();
+                    // Si la relation 'abonnements' est chargée et non vide
+                    if ($point->relationLoaded('abonnements') && $point->abonnements->isNotEmpty()) {
+                        $first = $point->abonnements->first();
+                        $abonnes = ($first && $first->abonne && !empty($first->abonne->name)) ? $first->abonne->name : '';
+                    }
+                    // fallback si relation accessible mais pas marquée "loaded"
+                    elseif ($point->abonnements && is_iterable($point->abonnements) && count($point->abonnements) > 0) {
+                        $first = collect($point->abonnements)->first();
+                        $abonnes = ($first && isset($first->abonne->name)) ? $first->abonne->name : '';
                     }
                 }
 
-                $rapport->setAttribute('abonnes', $abonnes);
+                $rapport->setAttribute('abonne', $abonnes);
 
                 return $rapport;
             });
