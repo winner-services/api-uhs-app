@@ -51,4 +51,16 @@ class Facturation extends Model
     {
         return $this->belongsTo(User::class, 'addedBy');
     }
+
+    public function scopeSearh($query, $term)
+    {
+        $term = "%$term%";
+        $query->where(function ($query) use ($term) {
+            $query->where('facturations.reference', 'like', $term)
+            ->orWhere('facturations.status', 'like', $term)
+            ->orWhereHas('pointEauAbonne', function ($q2) use ($term) {
+                    $q2->where('abonne.nom', 'like', $term);
+                });
+        });
+    }
 }
