@@ -119,7 +119,7 @@ class BornierController extends Controller
                 'nom' => $request->nom,
                 'phone' => $request->phone,
                 'adresse' => $request->adresse,
-                'borne_is' => $request->borne_id,
+                'borne_id' => $request->borne_id,
                 'addedBy' => $user->id
             ]);
 
