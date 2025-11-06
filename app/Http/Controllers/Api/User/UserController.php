@@ -92,12 +92,20 @@ class UserController extends Controller
     public function getTechnicienOptions()
     {
         $q = request("q", "");
-        $data = User::whereHas('role', function ($query) {
-            $query->where('name', 'technicien'); 
+
+        $data = User::whereHas('roles', function ($query) {
+            $query->where('name', 'technicien'); // ou selon ton slug exact
         })
-            ->searh(trim($q))
+            ->when($q, function ($query, $q) {
+                $term = "%$q%";
+                $query->where(function ($subQuery) use ($term) {
+                    $subQuery->where('name', 'like', $term)
+                        ->orWhere('email', 'like', $term)
+                        ->orWhere('phone', 'like', $term);
+                });
+            })
             ->latest()
-            ->get();
+            ->get(['id', 'name', 'email']); // Tu peux ajouter d'autres colonnes si besoin
 
         return response()->json([
             'message' => "OK",
