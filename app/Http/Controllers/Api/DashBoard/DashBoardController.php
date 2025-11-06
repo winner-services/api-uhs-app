@@ -91,7 +91,7 @@ class DashBoardController extends Controller
             'ticketsResolus' => $ticketsResolus,
             'ticketsAttente' => $ticketsAttente,
             'interventionCloture' => $interventionCloture,
-            'payementMaintenance' => $payementMaintenance,
+            'chargeBorne' => $payementMaintenance,
             'randomBornes' => $randomBornes
             
         ]);
