@@ -32,7 +32,7 @@ class FacturationController extends Controller
     public function index()
     {
         $page = request("paginate", 10);
-
+        $q = request("q", "");
         $data = Facturation::with('pointEauAbonne.abonne', 'user')
             ->orderByRaw("
             CASE 
@@ -44,6 +44,7 @@ class FacturationController extends Controller
             END
         ")
             ->orderBy('created_at', 'desc')
+            ->searh(trim($q))
             ->paginate($page);
 
         $result = [
