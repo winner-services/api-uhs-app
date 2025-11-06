@@ -131,8 +131,7 @@ class UserController extends Controller
      * @OA\Property(property="name", type="string", example="Winner Kambale"),
      * @OA\Property(property="email", type="string", format="email", example="winner@gmail.com"),
      * @OA\Property(property="phone", type="string", example="+243997604471"),
-     * @OA\Property(property="password", type="string", format="password", example="Winner00"),
-     * @OA\Property(property="point_id", type="integer", example=1), 
+     * @OA\Property(property="password", type="string", format="password", example="Winner00"), 
      * @OA\Property(property="role_id", type="integer", example=1),
      * ),
      * ),
@@ -198,7 +197,6 @@ class UserController extends Controller
                 'name'       => $request->input('name'),
                 'email'      => $request->input('email'),
                 'phone'      => $request->input('phone'),
-                'point_eau_id' => $request->point_id,
                 'password'   => bcrypt($request->input('password'))
             ]);
 
@@ -243,7 +241,6 @@ class UserController extends Controller
      * @OA\Property(property="email", type="string", format="email", example="winner.updated@gmail.com"),
      * @OA\Property(property="phone", type="string", example="+243999999999"),
      * @OA\Property(property="role_id", type="integer", example=2),
-     * @OA\Property(property="point_id", type="integer", example=2),
      * @OA\Property(property="service_id", type="integer", example=2)
      * )
      * ),
@@ -307,8 +304,6 @@ class UserController extends Controller
                 'email',
                 'phone',
             ]));
-
-            $user->point_eau_id = $request->point_id;
 
             if ($request->has('password')) {
                 $user->password = bcrypt($request->input('password'));
