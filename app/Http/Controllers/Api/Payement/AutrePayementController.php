@@ -39,7 +39,7 @@ class AutrePayementController extends Controller
             ->join('borniers as u2', 'versements.agent_id', '=', 'u2.id')
             ->select('versements.*', 'u2.nom as agent', 'u1.name as addedBy', 'tresoreries.designation as tresorerie')
             ->latest()
-            // ->searh(trim($q))
+            ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
             ->paginate($page);
         $result = [
