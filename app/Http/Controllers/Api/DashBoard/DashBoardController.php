@@ -76,7 +76,7 @@ class DashBoardController extends Controller
         $montantFacture = $montantPaye + $montantImpayes;
         $ticketsOuverts = Ticket::whereBetween('date_ouverture', [$date_start, $date_end])->count();
         $ticketsResolus = Ticket::where('statut', 'CLOTURE')->whereBetween('date_cloture', [$date_start, $date_end])->count();
-        $ticketsAttente = Ticket::where('statut', 'En attente')->whereBetween('date_ouverture', [$date_start, $date_end])->count();
+        $ticketsAttente = Ticket::where('statut', 'EN_COURS')->whereBetween('date_ouverture', [$date_start, $date_end])->count();
         $interventionCloture = Ticket::where('statut', 'CLOTURE')->whereBetween('date_cloture', [$date_start, $date_end])->count();
         $randomBornes = PointEau::all();
 
