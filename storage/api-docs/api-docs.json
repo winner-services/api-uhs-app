@@ -3204,7 +3204,7 @@
                                         "format": "password",
                                         "example": "Winner00"
                                     },
-                                    "point_eau_id": {
+                                    "point_id": {
                                         "type": "integer",
                                         "example": 1
                                     },
@@ -3332,7 +3332,7 @@
                                         "type": "integer",
                                         "example": 2
                                     },
-                                    "point_eau_id": {
+                                    "point_id": {
                                         "type": "integer",
                                         "example": 2
                                     },
