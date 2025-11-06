@@ -58,8 +58,8 @@ class Facturation extends Model
         $query->where(function ($query) use ($term) {
             $query->where('facturations.reference', 'like', $term)
             ->orWhere('facturations.status', 'like', $term)
-            ->orWhereHas('pointEauAbonne', function ($q2) use ($term) {
-                    $q2->where('abonne.nom', 'like', $term);
+            ->orWhereHas('pointEauAbonne.abonne', function ($q2) use ($term) {
+                    $q2->where('abonnes.nom', 'like', $term);
                 });
         });
     }
