@@ -36,7 +36,7 @@ class Versement extends Model
     {
         $term = "%$term%";
         $query->where(function ($query) use ($term) {
-            $query->where('-versements.reference', 'like', $term)
+            $query->where('versements.reference', 'like', $term)
                 ->orWhere('versements.transaction_date', 'like', $term)
                 ->orWhereHas('bornier', function ($q2) use ($term) {
                     $q2->where('borniers.nom', 'like', $term);
