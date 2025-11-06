@@ -68,6 +68,11 @@ class DashBoardController extends Controller
         $montantImpayes = Facturation::where('status', 'insoldée')
             ->whereBetween('date_emission', [$date_start, $date_end])
             ->sum('montant');
+        $payementMaintenance =         $montantPaye = TrasactionTresorerie::query()
+            ->where('transaction_type', 'RECETTE')
+            ->where('motif', 'LIKE', '%Paiement facture maintenance%')
+            ->whereBetween('transaction_date', [$date_start, $date_end])
+            ->sum('amount');
         $montantFacture = $montantPaye + $montantImpayes;
         $ticketsOuverts = Ticket::whereBetween('date_ouverture', [$date_start, $date_end])->count();
         $ticketsResolus = Ticket::where('statut', 'CLOTURE')->whereBetween('date_cloture', [$date_start, $date_end])->count();
@@ -86,7 +91,8 @@ class DashBoardController extends Controller
             'ticketsResolus' => $ticketsResolus,
             'ticketsAttente' => $ticketsAttente,
             'interventionCloture' => $interventionCloture,
-            'randomBornes' => $randomBornes
+            'randomBornes' => $randomBornes,
+            'payementMaintenance' => $payementMaintenance
         ]);
     }
 
