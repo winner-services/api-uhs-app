@@ -156,7 +156,7 @@ class UserController extends Controller
                 'name'       => $request->input('name'),
                 'email'      => $request->input('email'),
                 'phone'      => $request->input('phone'),
-                'point_eau_id' => $request->point_eau_id,
+                'point_eau_id' => $request->borne_id,
                 'password'   => bcrypt($request->input('password'))
             ]);
 
