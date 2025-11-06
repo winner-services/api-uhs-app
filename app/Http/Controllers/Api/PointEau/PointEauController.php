@@ -73,7 +73,7 @@ class PointEauController extends Controller
     public function borneOptionsPointData()
     {
         // $data = PointEau::latest()->get();
-        $data = PointEau::doesntHave('abonnements')
+        $data = PointEau::doesntHave('abonnements','borniers')
             ->latest()
             ->get();
         $result = [

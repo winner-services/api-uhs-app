@@ -23,4 +23,9 @@ class PointEau extends Model
     {
         return $this->hasMany(PointEauAbonne::class, 'point_eau_id');
     }
+
+    public function borniers()
+    {
+        return $this->hasMany(Bornier::class, 'borne_id');
+    }
 }
