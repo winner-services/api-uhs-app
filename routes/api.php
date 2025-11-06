@@ -86,6 +86,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::controller(PointEauController::class)->group(function () {
+        Route::get('/borne.getOptionsData', 'borneOptionsPointData');
         Route::get('/point-eaux.getAllData', 'indexPoint');
         Route::get('/point-eaux.getOptionsData', 'getOptionsPointData');
         Route::post('/point-eaux.store', 'store');
@@ -94,7 +95,6 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::controller(PointEauAbonneController::class)->group(function () {
-        Route::get('/borne.getOptionsData', 'borneOptionsPointData');
         Route::get('/point-eau-abonne.getAllData', 'indexPointAbonne');
         Route::post('/point-eau-abonnes.store', 'store');
         Route::put('/point-eau-abonnes/{id}', 'update');
