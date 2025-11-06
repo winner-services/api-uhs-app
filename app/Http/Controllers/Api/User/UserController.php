@@ -264,8 +264,9 @@ class UserController extends Controller
                 'name',
                 'email',
                 'phone',
-                'point_id'
             ]));
+
+            $user->point_eau_id = $request->point_id;
 
             if ($request->has('password')) {
                 $user->password = bcrypt($request->input('password'));
