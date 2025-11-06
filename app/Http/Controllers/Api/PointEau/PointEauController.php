@@ -61,17 +61,29 @@ class PointEauController extends Controller
         ]);
     }
 
-    // public function getOptionsPointData()
-    // {
-    //     $data = PointEau::latest()->get();
-    //     $result = [
-    //         'message' => "OK",
-    //         'success' => true,
-    //         'data' => $data,
-    //         'status' => 200
-    //     ];
-    //     return response()->json($result);
-    // }
+    /**
+     * @OA\Get(
+     * path="/api/borne.getOptionsData",
+     * summary="Liste des points d’eau",
+     * tags={"Points d’eau"},
+     * @OA\Response(response=200, description="Liste récupérée avec succès"),
+     * )
+     */
+
+    public function borneOptionsPointData()
+    {
+        // $data = PointEau::latest()->get();
+        $data = PointEau::doesntHave('abonnements')
+            ->latest()
+            ->get();
+        $result = [
+            'message' => "OK",
+            'success' => true,
+            'data' => $data,
+            'status' => 200
+        ];
+        return response()->json($result);
+    }
 
     /**
      * @OA\Post(

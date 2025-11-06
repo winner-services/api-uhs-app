@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('phone')->nullable();
             $table->string('adresse')->nullable();
             $table->foreignId('borne_id')->nullable()->constrained('point_eaus')->nullOnDelete();
+            $table->foreignId('addedBy')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

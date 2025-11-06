@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\Abonnement\AbonnementCategoryController;
 use App\Http\Controllers\Api\Abonnement\AbonnementController;
 use App\Http\Controllers\Api\About\AboutController;
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\Bornier\BornierController;
 use App\Http\Controllers\Api\DashBoard\DashBoardController;
 use App\Http\Controllers\Api\Facturation\FacturationController;
 use App\Http\Controllers\Api\Intervention\RapportInterventionController;
@@ -92,6 +93,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::controller(PointEauAbonneController::class)->group(function () {
+        Route::get('/borne.getOptionsData', 'borneOptionsPointData');
         Route::get('/point-eau-abonne.getAllData', 'indexPointAbonne');
         Route::post('/point-eau-abonnes.store', 'store');
         Route::put('/point-eau-abonnes/{id}', 'update');
@@ -164,5 +166,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('payement-maintenance', 'storeMaintenance');
         Route::get('/payementMaintMobile.getData', 'getPayementMaintenance');
         Route::get('/payementMaintWeb.getData', 'getPayementMaintenanceWeb');
+    });
+
+    Route::controller(BornierController::class)->group(function () {
+        Route::get('/Borniers.Options', 'indexOptions');
+        Route::get('/Borniers.getAllData', 'indexBornier');
+        Route::post('/borniers.store', 'storeBornier');
+        Route::put('/borniers.update/{id}', 'updateBornier');
+        Route::delete('/borniers.delete/{id}', 'destroyBornier');
     });
 });

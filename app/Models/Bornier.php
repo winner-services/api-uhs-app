@@ -10,6 +10,17 @@ class Bornier extends Model
         'nom',
         'phone',
         'adresse',
-        'borne_id'
+        'borne_id',
+        'addedBy'
     ];
+
+    public function scopeSearh($query, $term)
+    {
+        $term = "%$term%";
+        $query->where(function ($query) use ($term) {
+            $query->where('borniers.nom', 'like', $term)
+                ->orWhere('phone', 'like', $term)
+                ->orWhere('adresse', 'like', $term);
+        });
+    }
 }

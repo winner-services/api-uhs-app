@@ -566,6 +566,231 @@
                 ]
             }
         },
+        "/api/Borniers.Options": {
+            "get": {
+                "tags": [
+                    "Borniers"
+                ],
+                "summary": "Liste des borniers",
+                "operationId": "fb7d1cf04a78b6059117b2eb14785c8a",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
+        "/api/Borniers.getAllData": {
+            "get": {
+                "tags": [
+                    "Borniers"
+                ],
+                "summary": "Liste des borniers",
+                "operationId": "95590284e446a72af3306c3b610feee0",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
+        "/api/borniers.store": {
+            "post": {
+                "tags": [
+                    "Borniers"
+                ],
+                "summary": "Créer un nouveau bornier",
+                "description": "Crée un enregistrement de bornier avec les informations fournies.",
+                "operationId": "7cfab445056458ea05fc3dcaf1e36fba",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nom"
+                                ],
+                                "properties": {
+                                    "nom": {
+                                        "type": "string",
+                                        "example": "Bornier central"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+243971234567"
+                                    },
+                                    "adresse": {
+                                        "type": "string",
+                                        "example": "Avenue Lumumba, Goma"
+                                    },
+                                    "borne_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Bornier créé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Bornier créé avec succès."
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                }
+            }
+        },
+        "/api/borniers.update/{id}": {
+            "put": {
+                "tags": [
+                    "Borniers"
+                ],
+                "summary": "Mettre à jour un bornier existant",
+                "description": "Met à jour les informations d’un bornier existant à partir de son ID.",
+                "operationId": "a98c95464b1d0df088f3ced6267dcb90",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du bornier",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "nom": {
+                                        "type": "string",
+                                        "example": "Bornier nord"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+243820000000"
+                                    },
+                                    "adresse": {
+                                        "type": "string",
+                                        "example": "Quartier Katindo, Goma"
+                                    },
+                                    "borne_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Bornier mis à jour avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Bornier mis à jour avec succès."
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Bornier introuvable"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                }
+            }
+        },
+        "/api/borniers.delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Borniers"
+                ],
+                "summary": "Supprimer un bornier",
+                "description": "Supprime un bornier existant par son ID.",
+                "operationId": "5420b4c331bbab7b108f1dc8d89c5abe",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du bornier",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bornier supprimé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Bornier supprimé avec succès."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Bornier introuvable"
+                    }
+                }
+            }
+        },
         "/api/dashBoardAdmin.getData": {
             "get": {
                 "tags": [
@@ -1577,6 +1802,20 @@
                 ],
                 "summary": "Liste des points d’eau",
                 "operationId": "f425f32162147965d1d6a73136326553",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
+        "/api/borne.getOptionsData": {
+            "get": {
+                "tags": [
+                    "Points d’eau"
+                ],
+                "summary": "Liste des points d’eau",
+                "operationId": "baa81e2e54204fd54ac437a43224d7c6",
                 "responses": {
                     "200": {
                         "description": "Liste récupérée avec succès"
@@ -3956,6 +4195,10 @@
         {
             "name": "Auth",
             "description": "Auth"
+        },
+        {
+            "name": "Borniers",
+            "description": "Borniers"
         },
         {
             "name": "DashBoard",
