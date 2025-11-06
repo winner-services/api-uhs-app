@@ -36,10 +36,10 @@ class AutrePayementController extends Controller
         $sort_field = request('sort_field', 'id');
         $data = Versement::join('tresoreries', 'versements.account_id', '=', 'tresoreries.id')
             ->join('users as u1', 'versements.addedBy', '=', 'u1.id')
-            ->join('users as u2', 'versements.agent_id', '=', 'u2.id')
-            ->select('versements.*', 'u2.name as agent', 'u1.name as addedBy', 'tresoreries.designation as tresorerie')
+            ->join('borniers as u2', 'versements.agent_id', '=', 'u2.id')
+            ->select('versements.*', 'u2.nom as agent', 'u1.name as addedBy', 'tresoreries.designation as tresorerie')
             ->latest()
-            // ->searh(trim($q))
+            ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
             ->paginate($page);
         $result = [
@@ -95,7 +95,7 @@ class AutrePayementController extends Controller
             'paid_amount'      => ['required', 'numeric', 'min:0'],
             'taux'             => ['nullable', 'numeric', 'min:0', 'max:100'],
             'account_id'       => ['nullable', 'exists:tresoreries,id'],
-            'agent_id'         => ['nullable', 'exists:users,id']
+            'agent_id'         => ['nullable', 'exists:borniers,id']
         ]);
 
         return DB::transaction(function () use ($validated) {
@@ -191,7 +191,7 @@ class AutrePayementController extends Controller
             'paid_amount'      => ['required', 'numeric', 'min:0'],
             'taux'             => ['nullable', 'numeric', 'min:0', 'max:100'],
             'account_id'       => ['nullable', 'exists:tresoreries,id'],
-            'agent_id'         => ['nullable', 'exists:users,id']
+            'agent_id'         => ['nullable', 'exists:borniers,id']
         ]);
 
         $versement = Versement::find($id);
