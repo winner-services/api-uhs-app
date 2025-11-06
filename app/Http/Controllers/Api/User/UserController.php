@@ -74,6 +74,40 @@ class UserController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *      path="/api/technicien.Options",
+     *      operationId="getTechnicienOptions",
+     *      tags={"Techniciens"},
+     *      summary="Get list of Users",
+     *      description="Returns list of Users",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     * *          @OA\MediaType(
+     *           mediaType="application/json",
+     *      )
+     *       ),
+     *     )
+     */
+    public function getTechnicienOptions()
+    {
+        $q = request("q", "");
+        $data = User::whereHas('role', function ($query) {
+            $query->where('name', 'technicien'); 
+        })
+            ->searh(trim($q))
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'message' => "OK",
+            'success' => true,
+            'status'  => 200,
+            'data'    => $data
+        ]);
+    }
+
+    /**
      * @OA\Post(
      * path="/api/user.store",
      * summary="Create User",

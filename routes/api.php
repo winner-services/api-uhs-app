@@ -39,6 +39,7 @@ Route::prefix('auth')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(UserController::class)->group(function () {
+        Route::get('/technicien.Options','getTechnicienOptions');
         Route::get('/users.getData', 'index');
         Route::get('/user.Options', 'getAllUsersOptions');
         Route::post('/user.store', 'store');
