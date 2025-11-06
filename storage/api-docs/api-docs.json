@@ -3404,6 +3404,24 @@
                 }
             }
         },
+        "/api/technicien.Options": {
+            "get": {
+                "tags": [
+                    "Techniciens"
+                ],
+                "summary": "Get list of Users",
+                "description": "Returns list of Users",
+                "operationId": "getTechnicienOptions",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                }
+            }
+        },
         "/api/user.store": {
             "post": {
                 "tags": [
@@ -4263,6 +4281,10 @@
         {
             "name": "Trésoreries",
             "description": "Trésoreries"
+        },
+        {
+            "name": "Techniciens",
+            "description": "Techniciens"
         }
     ]
 }
