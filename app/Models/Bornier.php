@@ -19,8 +19,8 @@ class Bornier extends Model
         $term = "%$term%";
         $query->where(function ($query) use ($term) {
             $query->where('borniers.nom', 'like', $term)
-                ->orWhere('phone', 'like', $term)
-                ->orWhere('adresse', 'like', $term);
+                ->orWhere('borniers.phone', 'like', $term)
+                ->orWhere('borniers.adresse', 'like', $term);
         });
     }
 }
