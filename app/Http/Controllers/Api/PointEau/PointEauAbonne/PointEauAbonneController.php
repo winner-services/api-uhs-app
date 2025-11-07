@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\PointEau\PointEauAbonne;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bornier;
 use App\Models\PointEauAbonne;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -27,8 +28,8 @@ class PointEauAbonneController extends Controller
         $sort_field = request('sort_field', 'id');
         $data = PointEauAbonne::join('abonnes', 'point_eau_abonnes.abonne_id', '=', 'abonnes.id')
             ->join('users', 'point_eau_abonnes.addedBy', '=', 'users.id')
-            ->join('point_eaus','point_eau_abonnes.point_eau_id','=','point_eaus.id')
-            ->select('point_eau_abonnes.*','point_eaus.numero_compteur','point_eaus.matricule', 'abonnes.nom as abonne', 'users.name as addedBy')
+            ->join('point_eaus', 'point_eau_abonnes.point_eau_id', '=', 'point_eaus.id')
+            ->select('point_eau_abonnes.*', 'point_eaus.numero_compteur', 'point_eaus.matricule', 'abonnes.nom as abonne', 'users.name as addedBy')
             ->latest()
             // ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
@@ -205,6 +206,14 @@ class PointEauAbonneController extends Controller
                 ->where('point_eau_id', $request->point_eau_id)
                 ->where('id', '!=', $id)
                 ->first();
+            // Vérification si le borne_id existe déjà dans la table PointEauAbonne
+            if ($request->has('borne_id') && Bornier::where('borne_id', $request->borne_id)->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Borne ID déjà attribuée à un bornier.',
+                    'status' => 400
+                ], 400);
+            }
 
             if ($exists) {
                 return response()->json([
