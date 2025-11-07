@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Bornier;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bornier;
+use App\Models\PointEauAbonne;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -185,6 +186,7 @@ class BornierController extends Controller
     {
         $bornier = Bornier::find($id);
         $user = Auth::user();
+
         if (!$bornier) {
             return response()->json([
                 'success' => false,
@@ -209,11 +211,30 @@ class BornierController extends Controller
             ], 422);
         }
 
+        // Vérification si le borne_id existe déjà dans la table PointEauAbonne
+        if ($request->has('borne_id') && PointEauAbonne::where('point_eau_id', $request->borne_id)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Borne ID déjà attribuée à un abonné.',
+                'status' => 400
+            ], 400);
+        }
+
+        // Vérification si le borne_id existe déjà dans la table Bornier, excepté pour l'ID en cours
+        if ($request->has('borne_id') && Bornier::where('borne_id', $request->borne_id)->where('id', '!=', $id)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ce Borne ID existe déjà pour un autre Bornier.',
+                'status' => 400
+            ], 400);
+        }
+
+        // Mise à jour des données
         $bornier->update([
             'nom' => $request->nom,
             'phone' => $request->phone,
             'adresse' => $request->adresse,
-            'borne_is' => $request->borne_id,
+            'borne_id' => $request->borne_id,
             'addedBy' => $user->id
         ]);
 
