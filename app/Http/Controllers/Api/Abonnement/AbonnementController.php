@@ -13,7 +13,7 @@ class AbonnementController extends Controller
 {
     /**
      * @OA\Get(
-     * path="/api/rapport.abonnne{categorie_id}",
+     * path="/api/rapport.abonne{categorie_id}",
      * summary="Liste des abonnés par categorie",
      * tags={"Abonnés"},
      * @OA\Response(response=200, description="Liste récupérée avec succès"),
