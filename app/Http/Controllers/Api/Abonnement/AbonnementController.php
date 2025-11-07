@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Abonnement;
 
 use App\Http\Controllers\Controller;
 use App\Models\Abonne;
+use App\Models\About;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,6 +23,20 @@ class AbonnementController extends Controller
 
     public function getByCategorie()
     {
+        $about = About::first();
+
+        if ($about && $about->logo) {
+            $path = storage_path('app/public/' . $about->logo);
+
+            if (file_exists($path)) {
+                $mime = mime_content_type($path);
+                $data = base64_encode(file_get_contents($path));
+                $about->logo = "data:$mime;base64,$data";
+            } else {
+                // Si fichier manquant, on peut utiliser une image par défaut
+                $about->logo = asset('images/default-logo.png');
+            }
+        }
         $categorie_id = request('categorie_id');
         // On récupère tous les abonnés qui appartiennent à la catégorie donnée
         $abonnes = Abonne::join('abonnement_categories', 'abonnes.categorie_id', '=', 'abonnement_categories.id')
@@ -43,7 +58,8 @@ class AbonnementController extends Controller
             'success' => true,
             'message' => "Liste des abonnés de la catégorie sélectionnée.",
             'status'  => 200,
-            'data'    => $abonnes
+            'data'    => $abonnes,
+            'company_info' => $about
         ]);
     }
 
