@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Rapport;
 
 use App\Http\Controllers\Controller;
 use App\Models\Rapport;
+use App\Models\Ticket;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -187,6 +188,11 @@ class RapportController extends Controller
         try {
             $depense = DB::transaction(function () use ($request) {
                 $user = Auth::user();
+
+                $ticket = Ticket::findOrFail($request->input('main.ticket_id'));
+                $ticket->statut = $request->input('main.status');
+                $ticket->save();
+
                 $mainData = $request->input('main');
                 $mainData['addedBy'] = $user->id;
                 $mainData['dette_amount'] = $request->input('main.total_price', 0);
