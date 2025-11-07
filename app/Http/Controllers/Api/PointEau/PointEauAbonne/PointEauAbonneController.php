@@ -206,7 +206,7 @@ class PointEauAbonneController extends Controller
                 ->where('point_eau_id', $request->point_eau_id)
                 ->where('id', '!=', $id)
                 ->first();
-            // Vérification si le borne_id existe déjà dans la table PointEauAbonne
+            // Vérification si le borne_id existe déjà dans la table bornier
             if ($request->has('borne_id') && Bornier::where('borne_id', $request->borne_id)->exists()) {
                 return response()->json([
                     'success' => false,
