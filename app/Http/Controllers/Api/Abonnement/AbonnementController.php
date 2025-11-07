@@ -13,6 +13,43 @@ class AbonnementController extends Controller
 {
     /**
      * @OA\Get(
+     * path="/api/rapport.abonnne{categorie_id}",
+     * summary="Liste des abonnés par categorie",
+     * tags={"Abonnés"},
+     * @OA\Response(response=200, description="Liste récupérée avec succès"),
+     * )
+     */
+
+    public function getByCategorie($categorie_id)
+    {
+        // On récupère tous les abonnés qui appartiennent à la catégorie donnée
+        $abonnes = Abonne::join('abonnement_categories', 'abonnes.categorie_id', '=', 'abonnement_categories.id')
+            ->join('users', 'abonnes.addedBy', '=', 'users.id')
+            ->select('abonnes.*', 'abonnement_categories.designation as category', 'users.name as addedBy')
+            ->where('abonnes.categorie_id', $categorie_id)->get();
+        // Si aucun abonné trouvé
+        if ($abonnes->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => "Aucun abonné trouvé pour cette catégorie.",
+                'status'  => 404,
+                'data'    => []
+            ]);
+        }
+
+        // Retour succès
+        return response()->json([
+            'success' => true,
+            'message' => "Liste des abonnés de la catégorie sélectionnée.",
+            'status'  => 200,
+            'data'    => $abonnes
+        ]);
+    }
+
+
+
+    /**
+     * @OA\Get(
      * path="/api/abonnes.getAllData",
      * summary="Liste des abonnés",
      * tags={"Abonnés"},
@@ -55,8 +92,8 @@ class AbonnementController extends Controller
         return response()->json([
             'success' => true,
             'data' => Abonne::with(['categorie', 'user'])
-            ->searh(trim($q))
-            ->get(),
+                ->searh(trim($q))
+                ->get(),
             'status' => 200
         ]);
     }
@@ -83,7 +120,7 @@ class AbonnementController extends Controller
      */
     public function store(Request $request)
     {
-            
+
 
         $rules = [
             'nom'          => ['required', 'string', 'max:255'],

@@ -157,6 +157,20 @@
                 }
             }
         },
+        "/api/rapport.abonnne{categorie_id}": {
+            "get": {
+                "tags": [
+                    "Abonnés"
+                ],
+                "summary": "Liste des abonnés par categorie",
+                "operationId": "a535610cdb7c4b2d431af6af6fe4065a",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
         "/api/abonnes.getAllData": {
             "get": {
                 "tags": [
@@ -3461,10 +3475,6 @@
                                         "format": "password",
                                         "example": "Winner00"
                                     },
-                                    "point_id": {
-                                        "type": "integer",
-                                        "example": 1
-                                    },
                                     "role_id": {
                                         "type": "integer",
                                         "example": 1
@@ -3586,10 +3596,6 @@
                                         "example": "+243999999999"
                                     },
                                     "role_id": {
-                                        "type": "integer",
-                                        "example": 2
-                                    },
-                                    "point_id": {
                                         "type": "integer",
                                         "example": 2
                                     },
@@ -4118,10 +4124,6 @@
                             "type": "string",
                             "example": "create_user"
                         }
-                    },
-                    "point_eau_id": {
-                        "type": "integer",
-                        "example": 1
                     },
                     "created_at": {
                         "type": "string",

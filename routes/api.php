@@ -75,6 +75,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/abonnes.getAllData', 'index');
         Route::get('/abonnes.getOptionsData', 'getaAbonnellData');
         Route::post('/abonnes.store', 'store');
+        Route::get('/rapport.abonnne{categorie_id}','getByCategorie');
         Route::put('/abonnes.update/{id}', 'update');
         Route::delete('/abonnes.delete/{id}', 'destroy');
     });
