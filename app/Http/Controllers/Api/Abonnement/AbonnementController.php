@@ -13,15 +13,16 @@ class AbonnementController extends Controller
 {
     /**
      * @OA\Get(
-     * path="/api/rapport.abonne{categorie_id}",
+     * path="/api/rapport.abonne",
      * summary="Liste des abonnés par categorie",
      * tags={"Abonnés"},
      * @OA\Response(response=200, description="Liste récupérée avec succès"),
      * )
      */
 
-    public function getByCategorie($categorie_id)
+    public function getByCategorie()
     {
+        $categorie_id = request('categorie_id');
         // On récupère tous les abonnés qui appartiennent à la catégorie donnée
         $abonnes = Abonne::join('abonnement_categories', 'abonnes.categorie_id', '=', 'abonnement_categories.id')
             ->join('users', 'abonnes.addedBy', '=', 'users.id')

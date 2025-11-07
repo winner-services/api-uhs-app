@@ -267,6 +267,13 @@ class PayementController extends Controller
                 'facturation_id'   => $request->facture_id
             ]);
 
+            // $client_name = $data = Payement::join('tresoreries', 'payements.account_id', '=', 'tresoreries.id')
+            // ->join('facturations', 'payements.facture_id', '=', 'facturations.id')
+            // ->join('point_eau_abonnes', 'facturations.point_eau_abonnes_id', '=', 'point_eau_abonnes.id')
+            // ->join('abonnes', 'point_eau_abonnes.abonne_id', '=', 'abonnes.id')
+            // ->select('payements.*', 'abonnes.nom as abonne', 'users.name as addedBy', 'tresoreries.designation as tresorerie')
+            // ->latest()
+
             DB::commit();
 
             return response()->json([
@@ -274,6 +281,7 @@ class PayementController extends Controller
                 'success' => true,
                 'status'  => 201,
                 'data'    => $payement,
+                'agent_name' => $user->name,
                 'company_info' => $about
             ], 201);
         } catch (\Exception $e) {
