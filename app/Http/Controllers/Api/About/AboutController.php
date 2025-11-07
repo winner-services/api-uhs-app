@@ -106,25 +106,7 @@ class AboutController extends Controller
             ], $status);
         });
     }
-    // public function store(Request $request)
-    // {
-    //     $data = $request->all();
-
-    //     if ($request->hasFile('logo')) {
-    //         $path = $request->file('logo')->store('logo', 'public');
-    //         $data['logo'] = $path;
-    //     }
-
-    //     $about = About::create($data);
-
-    //     return response()->json($about, 201);
-    //      return response()->json([
-    //         'message' => 'succes',
-    //         'status' => 201,
-    //         'success' => true
-    //     ]);
-    // }
-
+    
     /**
      * @OA\Post(
      *     path="/api/about.update/{id}",
