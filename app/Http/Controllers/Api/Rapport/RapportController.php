@@ -165,13 +165,14 @@ class RapportController extends Controller
      *     @OA\Response(response=500, description="Erreur serveur interne")
      * )
      */
+
     public function storeDepense(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'main.date' => 'required|date',
             'main.description' => 'nullable|string',
             'main.status' => 'required|string',
-            'main.total_price' => 'required',
+            'main.total_price' => 'required|numeric|min:0',
             'main.ticket_id' => 'required|integer|exists:tickets,id',
             'details' => 'required|array|min:1',
             'details.*.motif' => 'required|string',
@@ -189,33 +190,92 @@ class RapportController extends Controller
             $depense = DB::transaction(function () use ($request) {
                 $user = Auth::user();
 
+                // 🔹 Mise à jour du ticket lié
                 $ticket = Ticket::findOrFail($request->input('main.ticket_id'));
                 $ticket->statut = $request->input('main.status');
                 $ticket->save();
 
+                // 🔹 Création du rapport principal
                 $mainData = $request->input('main');
                 $mainData['addedBy'] = $user->id;
                 $mainData['dette_amount'] = $request->input('main.total_price', 0);
 
                 $depense = Rapport::create($mainData);
 
+                // 🔹 Ajout des détails
                 foreach ($request->input('details') as $detail) {
                     $depense->details()->create($detail);
                 }
+
+                return $depense; // ✅ important pour récupérer le rapport créé
             });
 
             return response()->json([
-                'message' => 'Dépense créée avec succès',
+                'message' => 'Dépense créée avec succès.',
                 'success' => true,
-                'status' => 201
+                'status' => 201,
+                'data' => $depense
             ], 201);
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'Erreur lors de la création de la dépense',
+                'message' => 'Erreur lors de la création de la dépense.',
+                'success' => false,
                 'error' => $e->getMessage()
             ], 500);
         }
     }
+
+    // public function storeDepense(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'main.date' => 'required|date',
+    //         'main.description' => 'nullable|string',
+    //         'main.status' => 'required|string',
+    //         'main.total_price' => 'required',
+    //         'main.ticket_id' => 'required|integer|exists:tickets,id',
+    //         'details' => 'required|array|min:1',
+    //         'details.*.motif' => 'required|string',
+    //         'details.*.amount' => 'required|numeric|min:0',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'message' => 'Les données envoyées ne sont pas valides.',
+    //             'errors'  => $validator->errors(),
+    //         ], 422);
+    //     }
+
+    //     try {
+    //         $depense = DB::transaction(function () use ($request) {
+    //             $user = Auth::user();
+
+    //             $ticket = Ticket::findOrFail($request->input('main.ticket_id'));
+    //             $ticket->statut = $request->input('main.status');
+    //             $ticket->save();
+
+    //             $mainData = $request->input('main');
+    //             $mainData['addedBy'] = $user->id;
+    //             $mainData['dette_amount'] = $request->input('main.total_price', 0);
+
+    //             $depense = Rapport::create($mainData);
+
+    //             foreach ($request->input('details') as $detail) {
+    //                 $depense->details()->create($detail);
+    //             }
+    //         });
+
+    //         return response()->json([
+    //             'message' => 'Dépense créée avec succès',
+    //             'success' => true,
+    //             'status' => 201
+    //         ], 201);
+    //     } catch (Exception $e) {
+    //         return response()->json([
+    //             'message' => 'Erreur lors de la création de la dépense',
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
 
     /**
      * @OA\Put(
