@@ -46,7 +46,22 @@ class TicketController extends Controller
         $sort_direction = request('sort_direction', 'desc');
         $sort_field = request('sort_field', 'id');
 
+        // $query = Ticket::join('point_eaus', 'tickets.point_id', '=', 'point_eaus.id')
+        //     ->join('users as u1', 'tickets.addedBy', '=', 'u1.id')
+        //     ->join('users as u2', 'tickets.technicien_id', '=', 'u2.id')
+        //     ->select(
+        //         'tickets.*',
+        //         'tickets.statut as status',
+        //         'point_eaus.matricule as point_eau',
+        //         'point_eaus.numero_compteur',
+        //         'point_eaus.lat',
+        //         'point_eaus.long',
+        //         'u1.name as addedBy',
+        //         'u2.name as technicien'
+        //     );
         $query = Ticket::join('point_eaus', 'tickets.point_id', '=', 'point_eaus.id')
+            ->join('point_eau_abonnes', 'point_eau_abonnes.point_eau_id', '=', 'point_eaus.id')
+            ->join('abonnes', 'point_eau_abonnes.abonne_id', '=', 'abonnes.id')
             ->join('users as u1', 'tickets.addedBy', '=', 'u1.id')
             ->join('users as u2', 'tickets.technicien_id', '=', 'u2.id')
             ->select(
@@ -57,7 +72,10 @@ class TicketController extends Controller
                 'point_eaus.lat',
                 'point_eaus.long',
                 'u1.name as addedBy',
-                'u2.name as technicien'
+                'u2.name as technicien',
+                'abonnes.nom as abonne_nom',
+                'abonnes.phone as abonne_phone',
+                'abonnes.adresse as abonne_adresse'
             );
 
         // --- Filtrage selon le rôle ---
