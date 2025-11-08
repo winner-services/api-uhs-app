@@ -75,7 +75,7 @@ class DashBoardController extends Controller
         // $montantImpayes = Facturation::where('status', 'insoldée')
         //     ->whereBetween('date_emission', [$date_start, $date_end])
         //     ->sum('montant');
-        $payementMaintenance =         $montantPaye = TrasactionTresorerie::query()
+        $payementMaintenance = TrasactionTresorerie::query()
             ->where('transaction_type', 'RECETTE')
             ->where('motif', 'LIKE', '%Paiement facture maintenance%')
             ->whereBetween('transaction_date', [$date_start, $date_end])
