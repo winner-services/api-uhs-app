@@ -74,7 +74,7 @@ class TicketController extends Controller
                 'u1.name as addedBy',
                 'u2.name as technicien',
                 'abonnes.nom as abonne_nom',
-                'abonnes.phone as abonne_phone',
+                'abonnes.telephone as abonne_phone',
                 'abonnes.adresse as abonne_adresse'
             );
 
