@@ -193,7 +193,7 @@ class RapportController extends Controller
                 // 🔹 Mise à jour du ticket lié
                 $ticket = Ticket::findOrFail($request->input('main.ticket_id'));
                 $ticket->statut = $request->input('main.status');
-                if ($request->input('main.status') === 'Cloturer') {
+                if ($request->input('main.status') === 'CLOTURE') {
                     $ticket->date_cloture = $request->input('main.date') ?? now();
                 }
                 $ticket->save();
