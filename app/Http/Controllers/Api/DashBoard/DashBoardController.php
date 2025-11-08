@@ -65,9 +65,16 @@ class DashBoardController extends Controller
             ->where('motif', 'LIKE', '%Paiement de la facture%')
             ->whereBetween('transaction_date', [$date_start, $date_end])
             ->sum('amount');
-        $montantImpayes = Facturation::where('status', 'insoldée')
+        $montantImpayes = Facturation::where(function ($query) {
+            $query->where('status', 'insoldée')
+                ->orWhere('status', 'impayé');
+        })
             ->whereBetween('date_emission', [$date_start, $date_end])
             ->sum('montant');
+
+        // $montantImpayes = Facturation::where('status', 'insoldée')
+        //     ->whereBetween('date_emission', [$date_start, $date_end])
+        //     ->sum('montant');
         $payementMaintenance =         $montantPaye = TrasactionTresorerie::query()
             ->where('transaction_type', 'RECETTE')
             ->where('motif', 'LIKE', '%Paiement facture maintenance%')
@@ -93,7 +100,7 @@ class DashBoardController extends Controller
             'interventionCloture' => $interventionCloture,
             'chargeBorne' => $payementMaintenance,
             'randomBornes' => $randomBornes
-            
+
         ]);
     }
 
