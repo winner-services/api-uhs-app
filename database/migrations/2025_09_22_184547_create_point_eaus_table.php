@@ -15,6 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('lat')->nullable();
             $table->string('long')->nullable();
+            $table->string('village')->nullable();
+            $table->string('quartier')->nullable();
+            $table->string('num_avenue')->nullable();
+            $table->string('num_parcelle')->nullable();
+            $table->string('nom_chef')->nullable();
+            $table->string('contact')->nullable();
             $table->string('numero_compteur')->nullable();
             $table->string('status')->default('Actif');
             $table->string('matricule')->nullable();

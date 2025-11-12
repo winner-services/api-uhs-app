@@ -157,13 +157,13 @@
                 }
             }
         },
-        "/api/rapport.abonnne{categorie_id}": {
+        "/api/rapport.abonne": {
             "get": {
                 "tags": [
                     "Abonnés"
                 ],
                 "summary": "Liste des abonnés par categorie",
-                "operationId": "a535610cdb7c4b2d431af6af6fe4065a",
+                "operationId": "ea80364f8770f8d39787013180fe51c4",
                 "responses": {
                     "200": {
                         "description": "Liste récupérée avec succès"
@@ -1865,6 +1865,30 @@
                                         "example": "29.2345"
                                     },
                                     "numero_compteur": {
+                                        "type": "string",
+                                        "example": "COMP-001"
+                                    },
+                                    "village": {
+                                        "type": "string",
+                                        "example": "COMP-001"
+                                    },
+                                    "quartier": {
+                                        "type": "string",
+                                        "example": "COMP-001"
+                                    },
+                                    "num_avenue": {
+                                        "type": "string",
+                                        "example": "COMP-001"
+                                    },
+                                    "num_parcelle": {
+                                        "type": "string",
+                                        "example": "COMP-001"
+                                    },
+                                    "nom_chef": {
+                                        "type": "string",
+                                        "example": "COMP-001"
+                                    },
+                                    "contact": {
                                         "type": "string",
                                         "example": "COMP-001"
                                     },

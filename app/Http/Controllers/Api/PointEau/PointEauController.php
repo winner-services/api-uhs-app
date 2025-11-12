@@ -98,6 +98,12 @@ class PointEauController extends Controller
      *       @OA\Property(property="lat", type="string", example="-1.6789"),
      *       @OA\Property(property="long", type="string", example="29.2345"),
      *       @OA\Property(property="numero_compteur", type="string", example="COMP-001"),
+     *       @OA\Property(property="village", type="string", example="COMP-001"),
+     *       @OA\Property(property="quartier", type="string", example="COMP-001"),
+     *       @OA\Property(property="num_avenue", type="string", example="COMP-001"),
+     *       @OA\Property(property="num_parcelle", type="string", example="COMP-001"),
+     *       @OA\Property(property="nom_chef", type="string", example="COMP-001"),
+     *       @OA\Property(property="contact", type="string", example="COMP-001"),
      *       @OA\Property(property="status", type="string", example="Actif")
      *    )
      * ),
@@ -112,6 +118,12 @@ class PointEauController extends Controller
             'long'            => ['nullable'],
             'numero_compteur' => ['nullable'],
             'status'          => ['nullable'],
+            'village'          => ['nullable'],
+            'quartier'          => ['nullable'],
+            'num_avenue'          => ['nullable'],
+            'num_parcelle'          => ['nullable'],
+            'nom_chef'          => ['nullable'],
+            'contact'          => ['nullable'],
         ];
 
         $messages = [
@@ -135,6 +147,12 @@ class PointEauController extends Controller
                 'long'            => $request->input('long'),
                 'numero_compteur' => $request->input('numero_compteur'),
                 'status'          => $request->input('status'),
+                'village'          => $request->input('village'),
+                'quartier'          => $request->input('quartier'),
+                'num_avenue'          => $request->input('num_avenue'),
+                'num_parcelle'          => $request->input('num_parcelle'),
+                'nom_chef'          => $request->input('nom_chef'),
+                'contact'          => $request->input('contact'),
                 'matricule'       => fake()->unique()->numerify('BRN-#####')
             ]);
 
@@ -188,6 +206,12 @@ class PointEauController extends Controller
             'long'            => ['nullable'],
             'numero_compteur' => ['nullable'],
             'status'          => ['nullable'],
+            'village'          => ['nullable'],
+            'quartier'          => ['nullable'],
+            'num_avenue'          => ['nullable'],
+            'num_parcelle'          => ['nullable'],
+            'nom_chef'          => ['nullable'],
+            'contact'          => ['nullable'],
         ];
 
         $validator = Validator::make($request->all(), $rules);
