@@ -6,8 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Abonne extends Model
 {
-   protected $fillable = [
-        'nom', 'categorie_id', 'telephone', 'adresse', 'addedBy'
+    protected $fillable = [
+        'nom',
+        'categorie_id',
+        'telephone',
+        'adresse',
+        'addedBy',
+        'genre',
+        'statut'
     ];
 
     public function categorie()
@@ -25,8 +31,10 @@ class Abonne extends Model
         $term = "%$term%";
         $query->where(function ($query) use ($term) {
             $query->where('abonnes.nom', 'like', $term)
-            ->orWhere('abonnes.adresse', 'like', $term)
-            ->orWhereHas('categorie', function ($q2) use ($term) {
+                ->orWhere('abonnes.adresse', 'like', $term)
+                ->orWhere('abonnes.statut', 'like', $term)
+                ->orWhere('abonnes.genre', 'like', $term)
+                ->orWhereHas('categorie', function ($q2) use ($term) {
                     $q2->where('abonnement_categories.designation', 'like', $term);
                 });
         });

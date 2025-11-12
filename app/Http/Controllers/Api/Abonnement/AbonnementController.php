@@ -144,6 +144,8 @@ class AbonnementController extends Controller
             'categorie_id' => ['required', 'integer', 'exists:abonnement_categories,id'],
             'telephone'    => ['nullable', 'string', 'max:20'],
             'adresse'      => ['nullable', 'string', 'max:255'],
+            'genre'      => ['nullable', 'string', 'max:255'],
+            'statut'      => ['nullable', 'string', 'max:255'],
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -165,6 +167,8 @@ class AbonnementController extends Controller
                 'categorie_id' => $request->categorie_id,
                 'telephone' => $request->telephone,
                 'adresse' => $request->adresse,
+                'genre' => $request->genre,
+                'statut' => $request->statut,
                 'addedBy' => $user->id
             ]);
 
@@ -197,7 +201,9 @@ class AbonnementController extends Controller
      *       @OA\Property(property="nom", type="string", example="Hôpital Heal Africa"),
      *       @OA\Property(property="categorie_id", type="integer", example=2),
      *       @OA\Property(property="telephone", type="string", example="+243991234567"),
-     *       @OA\Property(property="adresse", type="string", example="Kinshasa, RDC")
+     *       @OA\Property(property="adresse", type="string", example="Kinshasa, RDC"),
+     *       @OA\Property(property="genre", type="string", example="Masculin"),
+     *       @OA\Property(property="statut", type="string", example="propriétaire")
      *    )
      * ),
      * @OA\Response(response=200, description="Abonné mis à jour avec succès"),
@@ -218,6 +224,8 @@ class AbonnementController extends Controller
             'categorie_id' => ['nullable', 'integer', 'exists:abonnement_categories,id'],
             'telephone'    => ['nullable', 'string', 'max:20'],
             'adresse'      => ['nullable', 'string', 'max:255'],
+            'genre' => ['nullable'],
+            'statut' => ['nullable']
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -237,6 +245,8 @@ class AbonnementController extends Controller
                 'categorie_id' => $request->categorie_id,
                 'telephone' => $request->telephone,
                 'adresse' => $request->adresse,
+                'genre' => $request->genre,
+                'statut' => $request->statut,
                 'addedBy' => $user->id
             ]);
 

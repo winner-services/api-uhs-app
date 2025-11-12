@@ -19,6 +19,8 @@ return new class extends Migration
                 ->constrained('abonnement_categories')
                 ->nullOnDelete();
             $table->string('telephone')->nullable();
+            $table->string('statut')->nullable();
+            $table->string('genre')->nullable();
             $table->string('adresse')->nullable();
             $table->foreignId('addedBy')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();

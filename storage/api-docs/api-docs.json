@@ -289,6 +289,14 @@
                                     "adresse": {
                                         "type": "string",
                                         "example": "Kinshasa, RDC"
+                                    },
+                                    "genre": {
+                                        "type": "string",
+                                        "example": "Masculin"
+                                    },
+                                    "statut": {
+                                        "type": "string",
+                                        "example": "propriétaire"
                                     }
                                 },
                                 "type": "object"
