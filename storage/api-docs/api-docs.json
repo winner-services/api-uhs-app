@@ -233,6 +233,18 @@
                                         "type": "string",
                                         "example": "Goma, RDC"
                                     },
+                                    "genre": {
+                                        "type": "string",
+                                        "example": "Masculin"
+                                    },
+                                    "statut": {
+                                        "type": "string",
+                                        "example": "propriétaire"
+                                    },
+                                    "num_piece": {
+                                        "type": "string",
+                                        "example": "33305869789"
+                                    },
                                     "addedBy": {
                                         "type": "integer",
                                         "example": 2
@@ -297,6 +309,10 @@
                                     "statut": {
                                         "type": "string",
                                         "example": "propriétaire"
+                                    },
+                                    "num_piece": {
+                                        "type": "string",
+                                        "example": "33305869789"
                                     }
                                 },
                                 "type": "object"

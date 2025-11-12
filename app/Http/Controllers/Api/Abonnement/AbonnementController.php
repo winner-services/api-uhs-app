@@ -8,7 +8,9 @@ use App\Models\About;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class AbonnementController extends Controller
 {
@@ -128,6 +130,9 @@ class AbonnementController extends Controller
      *       @OA\Property(property="categorie_id", type="integer", example=1),
      *       @OA\Property(property="telephone", type="string", example="+243900000000"),
      *       @OA\Property(property="adresse", type="string", example="Goma, RDC"),
+     *       @OA\Property(property="genre", type="string", example="Masculin"),
+     *       @OA\Property(property="statut", type="string", example="propriétaire"),
+     *       @OA\Property(property="num_piece", type="string", example="33305869789"),
      *       @OA\Property(property="addedBy", type="integer", example=2)
      *    )
      * ),
@@ -137,15 +142,15 @@ class AbonnementController extends Controller
      */
     public function store(Request $request)
     {
-
-
         $rules = [
-            'nom'          => ['required', 'string', 'max:255'],
+            'nom' => ['required', 'string', 'max:255'],
             'categorie_id' => ['required', 'integer', 'exists:abonnement_categories,id'],
-            'telephone'    => ['nullable', 'string', 'max:20'],
-            'adresse'      => ['nullable', 'string', 'max:255'],
-            'genre'      => ['nullable', 'string', 'max:255'],
-            'statut'      => ['nullable', 'string', 'max:255'],
+            'telephone' => ['nullable', 'string', 'max:20'],
+            'adresse' => ['nullable', 'string', 'max:255'],
+            'genre' => ['nullable', 'string', 'max:255'],
+            'statut' => ['nullable', 'string', 'max:255'],
+            'num_piece' => ['nullable', 'string', 'max:255'],
+            'piece_identite' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -155,6 +160,22 @@ class AbonnementController extends Controller
                 'message' => 'Les données envoyées ne sont pas valides.',
                 'errors'  => $validator->errors()
             ], 422);
+        }
+
+        $piecePath = null;
+
+        // Si fichier présent et valide, on le stocke
+        if ($request->hasFile('piece_identite')) {
+            $piece = $request->file('piece_identite');
+
+            if ($piece->isValid()) {
+                $pieceName = time() . '_' . uniqid() . '.' . $piece->getClientOriginalExtension();
+                $piecePath = $piece->storeAs('pieces_identite', $pieceName, 'public');
+            } else {
+                return response()->json([
+                    'message' => 'Le fichier uploadé est invalide.'
+                ], 400);
+            }
         }
 
         try {
@@ -169,6 +190,8 @@ class AbonnementController extends Controller
                 'adresse' => $request->adresse,
                 'genre' => $request->genre,
                 'statut' => $request->statut,
+                'num_piece' => $request->num_piece,
+                'piece_identite' => $piecePath,
                 'addedBy' => $user->id
             ]);
 
@@ -182,12 +205,87 @@ class AbonnementController extends Controller
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
+
+            // Si on avait stocké un fichier, le supprimer pour éviter les fichiers orphelins
+            if ($piecePath && Storage::disk('public')->exists($piecePath)) {
+                try {
+                    Storage::disk('public')->delete($piecePath);
+                } catch (\Exception $ex) {
+                    // log si tu veux : Log::error(...)
+                }
+            }
+
             return response()->json([
                 'message' => 'Erreur lors de la création de l\'abonné.',
                 'error'   => $e->getMessage()
             ], 500);
         }
     }
+    // public function store(Request $request)
+    // {
+
+
+    //     $rules = [
+    //         'nom'          => ['required', 'string', 'max:255'],
+    //         'categorie_id' => ['required', 'integer', 'exists:abonnement_categories,id'],
+    //         'telephone'    => ['nullable', 'string', 'max:20'],
+    //         'adresse'      => ['nullable', 'string', 'max:255'],
+    //         'genre'      => ['nullable', 'string', 'max:255'],
+    //         'statut'      => ['nullable', 'string', 'max:255'],
+    //         'num_piece' => ['nullable'],
+    //         'piece_identite' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+    //     ];
+
+    //     $piecePath = null;
+
+    //     $validator = Validator::make($request->all(), $rules);
+
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'message' => 'Les données envoyées ne sont pas valides.',
+    //             'errors'  => $validator->errors()
+    //         ], 422);
+    //     }
+
+    //     if ($request->hasFile('piece_identite')) {
+    //         $piece = $request->file('piece_identite');
+    //         $pieceName = time() . '_' . uniqid() . '.' . $piece->getClientOriginalExtension();
+    //         $piecePath = $piece->storeAs('pieces_identite', $pieceName, 'public');
+    //     }
+
+    //     try {
+    //         DB::beginTransaction();
+
+    //         $user = Auth::user();
+
+    //         $abonne = Abonne::create([
+    //             'nom' => $request->nom,
+    //             'categorie_id' => $request->categorie_id,
+    //             'telephone' => $request->telephone,
+    //             'adresse' => $request->adresse,
+    //             'genre' => $request->genre,
+    //             'statut' => $request->statut,
+    //             'num_piece' => $request->num_piece,
+    //             'piece_identite' => $piecePath,
+    //             'addedBy' => $user->id
+    //         ]);
+
+    //         DB::commit();
+
+    //         return response()->json([
+    //             'message' => "Abonné ajouté avec succès",
+    //             'success' => true,
+    //             'status'  => 201,
+    //             'data'    => $abonne
+    //         ], 201);
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         return response()->json([
+    //             'message' => 'Erreur lors de la création de l\'abonné.',
+    //             'error'   => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
 
     /**
      * @OA\Put(
@@ -203,7 +301,8 @@ class AbonnementController extends Controller
      *       @OA\Property(property="telephone", type="string", example="+243991234567"),
      *       @OA\Property(property="adresse", type="string", example="Kinshasa, RDC"),
      *       @OA\Property(property="genre", type="string", example="Masculin"),
-     *       @OA\Property(property="statut", type="string", example="propriétaire")
+     *       @OA\Property(property="statut", type="string", example="propriétaire"),
+     *       @OA\Property(property="num_piece", type="string", example="33305869789"),
      *    )
      * ),
      * @OA\Response(response=200, description="Abonné mis à jour avec succès"),
@@ -212,20 +311,22 @@ class AbonnementController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $abonne = Abonne::find($id);
-        if (!$abonne) {
-            return response()->json([
-                'message' => 'Abonné non trouvé'
-            ], 404);
-        }
+        $abonne = Abonne::findOrFail($id);
 
         $rules = [
-            'nom'          => ['nullable', 'string', 'max:255'],
-            'categorie_id' => ['nullable', 'integer', 'exists:abonnement_categories,id'],
-            'telephone'    => ['nullable', 'string', 'max:20'],
-            'adresse'      => ['nullable', 'string', 'max:255'],
-            'genre' => ['nullable'],
-            'statut' => ['nullable']
+            'nom' => ['required', 'string', 'max:255'],
+            'categorie_id' => ['required', 'integer', 'exists:abonnement_categories,id'],
+            'telephone' => ['nullable', 'string', 'max:20'],
+            'adresse' => ['nullable', 'string', 'max:255'],
+            'genre' => ['nullable', 'string', 'max:255'],
+            'statut' => ['nullable', 'string', 'max:255'],
+            'num_piece' => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::unique('abonnes', 'num_piece')->ignore($abonne->id),
+            ],
+            'piece_identite' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -233,39 +334,137 @@ class AbonnementController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Les données envoyées ne sont pas valides.',
-                'errors'  => $validator->errors()
+                'errors' => $validator->errors()
             ], 422);
+        }
+
+        $newPiecePath = null;
+        $oldPiecePath = $abonne->piece_identite;
+
+        // 🔹 Si un nouveau fichier est uploadé, on le stocke avant la transaction
+        if ($request->hasFile('piece_identite')) {
+            $file = $request->file('piece_identite');
+
+            if (!$file->isValid()) {
+                return response()->json([
+                    'message' => 'Le fichier uploadé est invalide.'
+                ], 400);
+            }
+
+            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $newPiecePath = $file->storeAs('pieces_identite', $fileName, 'public');
         }
 
         try {
             DB::beginTransaction();
+
             $user = Auth::user();
-            $abonne->update([
-                'nom' => $request->nom,
-                'categorie_id' => $request->categorie_id,
-                'telephone' => $request->telephone,
-                'adresse' => $request->adresse,
-                'genre' => $request->genre,
-                'statut' => $request->statut,
-                'addedBy' => $user->id
-            ]);
+
+            // 🔸 Mise à jour des informations
+            $abonne->nom = $request->nom;
+            $abonne->categorie_id = $request->categorie_id;
+            $abonne->telephone = $request->telephone;
+            $abonne->adresse = $request->adresse;
+            $abonne->genre = $request->genre;
+            $abonne->statut = $request->statut;
+            $abonne->num_piece = $request->num_piece;
+            $abonne->addedBy = $user->id;
+
+            if ($newPiecePath) {
+                $abonne->piece_identite = $newPiecePath;
+            }
+
+            $abonne->save();
 
             DB::commit();
 
+            // 🔹 Après commit : si nouveau fichier, supprimer l’ancien
+            if ($newPiecePath && $oldPiecePath && Storage::disk('public')->exists($oldPiecePath)) {
+                try {
+                    Storage::disk('public')->delete($oldPiecePath);
+                } catch (\Exception $e) {
+                    // Optionnel : journaliser l'erreur
+                }
+            }
+
             return response()->json([
-                'message' => "Abonné mis à jour avec succès",
+                'message' => 'Abonné mis à jour avec succès.',
                 'success' => true,
-                'status'  => 200,
-                'data'    => $abonne
+                'status' => 200,
+                'data' => $abonne
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
+
+            // 🔸 Si la transaction échoue, supprimer le nouveau fichier uploadé
+            if ($newPiecePath && Storage::disk('public')->exists($newPiecePath)) {
+                Storage::disk('public')->delete($newPiecePath);
+            }
+
             return response()->json([
-                'message' => 'Erreur lors de la mise à jour.',
-                'error'   => $e->getMessage()
+                'message' => 'Erreur lors de la mise à jour de l\'abonné.',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
+    // public function update(Request $request, $id)
+    // {
+    //     $abonne = Abonne::find($id);
+    //     if (!$abonne) {
+    //         return response()->json([
+    //             'message' => 'Abonné non trouvé'
+    //         ], 404);
+    //     }
+
+    //     $rules = [
+    //         'nom'          => ['nullable', 'string', 'max:255'],
+    //         'categorie_id' => ['nullable', 'integer', 'exists:abonnement_categories,id'],
+    //         'telephone'    => ['nullable', 'string', 'max:20'],
+    //         'adresse'      => ['nullable', 'string', 'max:255'],
+    //         'genre' => ['nullable'],
+    //         'statut' => ['nullable'],
+    //         'num_piece' => ['nullable']
+    //     ];
+
+    //     $validator = Validator::make($request->all(), $rules);
+
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'message' => 'Les données envoyées ne sont pas valides.',
+    //             'errors'  => $validator->errors()
+    //         ], 422);
+    //     }
+
+    //     try {
+    //         DB::beginTransaction();
+    //         $user = Auth::user();
+    //         $abonne->update([
+    //             'nom' => $request->nom,
+    //             'categorie_id' => $request->categorie_id,
+    //             'telephone' => $request->telephone,
+    //             'adresse' => $request->adresse,
+    //             'genre' => $request->genre,
+    //             'statut' => $request->statut,
+    //             'num_piece' => $request->num_piece,
+    //             'addedBy' => $user->id
+    //         ]);
+
+    //         DB::commit();
+
+    //         return response()->json([
+    //             'message' => "Abonné mis à jour avec succès",
+    //             'success' => true,
+    //             'status'  => 200,
+    //             'data'    => $abonne
+    //         ], 200);
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         return response()->json([
+    //             'message' => 'Erreur lors de la mise à jour.',
+    //             'error'   => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
 
     /**
      * @OA\Delete(

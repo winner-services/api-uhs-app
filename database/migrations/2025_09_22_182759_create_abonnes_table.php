@@ -22,6 +22,8 @@ return new class extends Migration
             $table->string('statut')->nullable();
             $table->string('genre')->nullable();
             $table->string('adresse')->nullable();
+            $table->string('piece_identite')->nullable();
+            $table->string('num_piece')->nullable();
             $table->foreignId('addedBy')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
