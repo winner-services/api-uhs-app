@@ -104,11 +104,11 @@ class EntreeController extends Controller
 
     public function storeEntree(Request $request)
     {
-        // ✅ Validation des données entrantes
+        // Validation des données entrantes
         $validator = Validator::make($request->all(), [
-            'quantite'        => 'required|integer|min:1',
-            'prix_unit_achat' => 'nullable|numeric|min:0',
-            'product_id'      => 'required|exists:produits,id',
+            'quantite'         => 'required|integer|min:1',
+            'prix_unit_achat'  => 'nullable|numeric|min:0',
+            'product_id'       => 'required|exists:produits,id',
         ], [
             'quantite.required' => 'La quantité est obligatoire.',
             'quantite.integer'  => 'La quantité doit être un nombre entier.',
@@ -122,54 +122,143 @@ class EntreeController extends Controller
                 'success' => false,
                 'message' => 'Erreur de validation',
                 'errors'  => $validator->errors(),
+                'status'  => 422,
             ], 422);
         }
 
-        // ✅ Vérification supplémentaire (sécurité côté logique)
+        // Vérification supplémentaire côté logique
         if ($request->quantite <= 0) {
             return response()->json([
                 'success' => false,
                 'message' => 'La quantité doit être supérieure à 0.',
+                'status'  => 400,
             ], 400);
         }
 
-        try {
+        // Récupération du produit avant la transaction (fail fast)
+        $produit = Produit::findOrFail($request->product_id);
 
+        try {
             DB::beginTransaction();
-            $user = Auth::user();
-            $produit = Produit::findOrFail($request->product_id);
+
+            $userId = Auth::id(); // peut être null si non authentifié
+
+            // Création de l'entrée
             $entree = Entree::create([
-                'quantite'        => $request->quantite,
-                'prix_unit_achat' => $request->prix_unit_achat,
-                'product_id'      => $request->product_id,
-                'reference'            => fake()->unique()->numerify('ENT-#####'),
-                'addedBy'         => $user->id
+                'quantite'         => $request->quantite,
+                'prix_unit_achat'  => $request->prix_unit_achat,
+                'product_id'       => $request->product_id,
+                'reference'        => strtoupper('ENT-' . uniqid()),
+                'addedBy'          => $userId,
             ]);
+
+            // Enregistrement de la logistique (quantité précédente / nouvelle quantité)
+            $previousQuantity = $produit->quantite;
+            $newQuantity = $previousQuantity + $request->quantite;
+
             Logistique::create([
-                'date_transaction' => date('Y-m-d'),
-                'previous_quantity' => $produit->quantite,
-                'new_quantity' => $request->quantite + $produit->quantite,
-                'motif' => 'Achat des produits',
-                'type_transaction' => 'Entrée',
-                'product_id' => $request->product_id,
-                'reference'            => fake()->unique()->numerify('ENT-#####'),
-                'addedBy' => $user ? $user->id : null
+                'date_transaction'  => now()->toDateString(),
+                'previous_quantity' => $previousQuantity,
+                'new_quantity'      => $newQuantity,
+                'motif'             => 'Achat des produits',
+                'type_transaction'  => 'Entrée',
+                'product_id'        => $request->product_id,
+                'reference'         => strtoupper('ENT-' . uniqid()),
+                'addedBy'           => $userId,
             ]);
+
+            // Mise à jour atomique du stock : incrémenter la quantité en base
             $produit->increment('quantite', $request->quantite);
+
+            // Optionnel : recharger le modèle si besoin ($produit->refresh();)
 
             DB::commit();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Entrée ajoutée avec succès.',
-                'status' => 201,
+                'status'  => 201,
                 'data'    => $entree,
             ], 201);
         } catch (\Exception $e) {
+            DB::rollBack();
+
+            // Log de l'erreur si nécessaire : \Log::error($e);
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'insertion : ' . $e->getMessage(),
+                'status'  => 500,
             ], 500);
         }
     }
+    // public function storeEntree(Request $request)
+    // {
+    //     // ✅ Validation des données entrantes
+    //     $validator = Validator::make($request->all(), [
+    //         'quantite'        => 'required|integer|min:1',
+    //         'prix_unit_achat' => 'nullable|numeric|min:0',
+    //         'product_id'      => 'required|exists:produits,id',
+    //     ], [
+    //         'quantite.required' => 'La quantité est obligatoire.',
+    //         'quantite.integer'  => 'La quantité doit être un nombre entier.',
+    //         'quantite.min'      => 'La quantité doit être supérieure à 0.',
+    //         'prix_unit_achat.numeric' => 'Le prix unitaire d\'achat doit être un nombre.',
+    //         'product_id.exists' => 'Le produit sélectionné est invalide.',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Erreur de validation',
+    //             'errors'  => $validator->errors(),
+    //         ], 422);
+    //     }
+
+    //     // ✅ Vérification supplémentaire (sécurité côté logique)
+    //     if ($request->quantite <= 0) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'La quantité doit être supérieure à 0.',
+    //         ], 400);
+    //     }
+
+    //     try {
+
+    //         DB::beginTransaction();
+    //         $user = Auth::user();
+    //         $produit = Produit::findOrFail($request->product_id);
+    //         $entree = Entree::create([
+    //             'quantite'        => $request->quantite,
+    //             'prix_unit_achat' => $request->prix_unit_achat,
+    //             'product_id'      => $request->product_id,
+    //             'reference'            => fake()->unique()->numerify('ENT-#####'),
+    //             'addedBy'         => $user->id
+    //         ]);
+    //         Logistique::create([
+    //             'date_transaction' => date('Y-m-d'),
+    //             'previous_quantity' => $produit->quantite,
+    //             'new_quantity' => $request->quantite + $produit->quantite,
+    //             'motif' => 'Achat des produits',
+    //             'type_transaction' => 'Entrée',
+    //             'product_id' => $request->product_id,
+    //             'reference'            => fake()->unique()->numerify('ENT-#####'),
+    //             'addedBy' => $user ? $user->id : null
+    //         ]);
+    //         $produit->increment('quantite', $request->quantite);
+
+    //         DB::commit();
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Entrée ajoutée avec succès.',
+    //             'status' => 201,
+    //             'data'    => $entree,
+    //         ], 201);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Erreur lors de l\'insertion : ' . $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
 }
