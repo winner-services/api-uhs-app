@@ -191,9 +191,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(EntreeController::class)->group(function(){
         Route::post('/entrees.store','storeEntree');
+        Route::get('/entrees.getAllData','getallEntree');
     });
 
     Route::controller(SortieController::class)->group(function(){
         Route::post('/sortie.store','storeSortie');
+        Route::get('/sorties.getAllDatas','getallSortie');
+
     });
 });

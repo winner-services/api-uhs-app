@@ -133,17 +133,27 @@ class SortieController extends Controller
                 'status' => 400
             ], 400);
         }
+        $produit1 = Produit::findOrFail($request->product_id);
+        if ($request->quantite >  $produit1->quantite) {
+            return response()->json([
+                'success' => false,
+                'message' => 'La quantité ne doit pas être supérieure au stock.',
+                'status' => 400
+            ], 400);
+        }
 
         try {
 
             DB::beginTransaction();
             $user = Auth::user();
             $produit = Produit::findOrFail($request->product_id);
+
             $entree = Sortie::create([
                 'quantite'        => $request->quantite,
                 'prix_unit_vente' => $request->prix_unit_vente,
                 'product_id'      => $request->product_id,
-                'reference'            => fake()->unique()->numerify('SORT-#####'),                'addedBy'         => $user->id
+                'reference'            => fake()->unique()->numerify('SORT-#####'),
+                'addedBy'         => $user->id
             ]);
             Logistique::create([
                 'date_transaction' => date('Y-m-d'),
