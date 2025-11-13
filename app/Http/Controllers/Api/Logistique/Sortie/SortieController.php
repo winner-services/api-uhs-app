@@ -13,6 +13,34 @@ use Illuminate\Support\Facades\Validator;
 
 class SortieController extends Controller
 {
+
+    /**
+     * @OA\Get(
+     * path="/api/sorties.getAllData",
+     * summary="Liste",
+     * tags={"Sorties"},
+     * @OA\Response(response=200, description="Liste récupérée avec succès"),
+     * )
+     */
+    public function getallSortie()
+    {
+        $page = request("paginate", 10);
+        // $q = request("q", "");
+        $sort_direction = request('sort_direction', 'desc');
+        $sort_field = request('sort_field', 'id');
+        $data = Sortie::join('produits', 'sorties.product_id', '=', 'produits.id')
+            ->join('users', 'sorties.addedBy', '=', 'users.id')
+            ->select('sorties.*', 'users.name as addedBy', 'produits.designation as produit')
+            ->orderBy($sort_field, $sort_direction)
+            ->paginate($page);
+        $result = [
+            'message' => "OK",
+            'success' => true,
+            'data' => $data,
+            'status' => 200
+        ];
+        return response()->json($result);
+    }
     /**
      * @OA\Post(
      *     path="/api/sortie.store",

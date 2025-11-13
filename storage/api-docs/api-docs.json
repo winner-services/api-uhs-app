@@ -1144,6 +1144,20 @@
                 }
             }
         },
+        "/api/entrees.getAllData": {
+            "get": {
+                "tags": [
+                    "Entrees"
+                ],
+                "summary": "Liste",
+                "operationId": "490453cc425bb498d7443d5ae60a4fe2",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
         "/api/entrees.store": {
             "post": {
                 "tags": [
@@ -1516,6 +1530,20 @@
                         "bearerAuth": []
                     }
                 ]
+            }
+        },
+        "/api/sorties.getAllData": {
+            "get": {
+                "tags": [
+                    "Sorties"
+                ],
+                "summary": "Liste",
+                "operationId": "7c2150f689aba3842207cf1c5b2ce602",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
             }
         },
         "/api/sortie.store": {

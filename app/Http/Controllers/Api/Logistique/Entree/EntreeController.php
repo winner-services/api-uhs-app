@@ -15,6 +15,34 @@ class EntreeController extends Controller
 {
 
     /**
+     * @OA\Get(
+     * path="/api/entrees.getAllData",
+     * summary="Liste",
+     * tags={"Entrees"},
+     * @OA\Response(response=200, description="Liste récupérée avec succès"),
+     * )
+     */
+    public function getallEntree()
+    {
+        $page = request("paginate", 10);
+        // $q = request("q", "");
+        $sort_direction = request('sort_direction', 'desc');
+        $sort_field = request('sort_field', 'id');
+        $data = Entree::join('produits', 'entrees.product_id', '=', 'produits.id')
+            ->join('users', 'entrees.addedBy', '=', 'users.id')
+            ->select('entrees.*', 'users.name as addedBy', 'produits.designation as produit')
+            ->orderBy($sort_field, $sort_direction)
+            ->paginate($page);
+        $result = [
+            'message' => "OK",
+            'success' => true,
+            'data' => $data,
+            'status' => 200
+        ];
+        return response()->json($result);
+    }
+
+    /**
      * @OA\Post(
      *     path="/api/entrees.store",
      *     summary="Créer une entrée de stock",
