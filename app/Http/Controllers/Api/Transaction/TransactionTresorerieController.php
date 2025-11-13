@@ -85,7 +85,8 @@ class TransactionTresorerieController extends Controller
             'transaction_date' => ['required', 'date'],
             'account_id'       => ['required', 'exists:tresoreries,id'],
             'amount'           => ['required', 'numeric'],
-            'transaction_type' => ['required', 'string']
+            'transaction_type' => ['required', 'string'],
+            'beneficiaire' => 'nullable'
         ];
 
         $messages = [
@@ -126,6 +127,7 @@ class TransactionTresorerieController extends Controller
                     : ($request->input('transaction_type') === 'DEPENSE' ? $solde - $request->input('amount') : $solde),
                 'reference'        => fake()->unique()->numerify('TRANS-#####'),
                 'addedBy'          => $user->id,
+                'beneficiaire' => $request->beneficiaire
             ];
             $transaction['motif'] = $request->filled('motif') ? $request->motif : '-';
 

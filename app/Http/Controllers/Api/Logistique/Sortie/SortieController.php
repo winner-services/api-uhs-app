@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Logistique;
 use App\Models\Produit;
 use App\Models\Sortie;
+use App\Models\TrasactionTresorerie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -69,6 +70,7 @@ class SortieController extends Controller
      *                 @OA\Property(property="prix_unit_achat", type="number", format="float", example=2.50),
      *                 @OA\Property(property="product_id", type="integer", example=1),
      *                 @OA\Property(property="addedBy", type="integer", example=5),
+     *                 @OA\Property(property="account_id", type="integer", example=1),
      *                 @OA\Property(property="created_at", type="string", example="2025-11-13T11:00:00Z")
      *             )
      *         )
@@ -108,6 +110,7 @@ class SortieController extends Controller
             'quantite'        => 'required|integer|min:1',
             'prix_unit_vente' => 'nullable|numeric|min:0',
             'product_id'      => 'required|exists:produits,id',
+            'account_id' => 'required'
         ], [
             'quantite.required' => 'La quantité est obligatoire.',
             'quantite.integer'  => 'La quantité doit être un nombre entier.',
@@ -157,6 +160,7 @@ class SortieController extends Controller
                 'product_id'      => $request->product_id,
                 // Utilise uniqid pour éviter d'avoir à importer des helpers supplémentaires
                 'reference'       => strtoupper('SORT-' . uniqid()),
+                'account_id' => $request->account_id,
                 'addedBy'         => $userId,
             ]);
 
@@ -171,13 +175,37 @@ class SortieController extends Controller
                 'motif'              => 'Vente des produits',
                 'type_transaction'   => 'Sortie',
                 'product_id'         => $request->product_id,
-                'reference'          => strtoupper('SORT-' . uniqid()),
+                'reference'          => fake()->unique()->numerify('SORT-#####'),
                 'addedBy'            => $userId,
             ]);
 
             $produit->decrement('quantite', $request->quantite);
 
             $produit->refresh();
+
+            $lastTransaction = TrasactionTresorerie::where('account_id', $request->account_id)
+                ->latest('id')
+                ->first();
+            $solde = $lastTransaction ? $lastTransaction->solde : 0;
+
+            // 1️⃣ Vérifier si montant payé <= 0
+            if ($request->prix_unit_vente <= 0) {
+                return response()->json([
+                    'message' => 'Le montant payé doit être supérieur à 0.',
+                    'status'  => 422,
+                ], 422);
+            }
+            // Enregistrement dans la trésorerie
+            TrasactionTresorerie::create([
+                'motif'            => 'Paiement de la Vente Produits',
+                'transaction_type' => 'RECETTE',
+                'amount'           => $request->prix_unit_vente,
+                'account_id'       => $request->account_id,
+                'transaction_date' => now()->toDateString(),
+                'addedBy'          => $userId,
+                'reference'        => fake()->unique()->numerify('TRANS-#####'),
+                'solde'            => $solde + $request->prix_unit_vente
+            ]);
 
             DB::commit();
 

@@ -17,6 +17,7 @@ class TrasactionTresorerie extends Model
         'status',
         'reference',
         'addedBy',
+        'beneficiaire'
     ];
 
     public function scopeSearh($query, $term)

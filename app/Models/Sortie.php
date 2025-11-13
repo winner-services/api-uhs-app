@@ -11,6 +11,7 @@ class Sortie extends Model
         'prix_unit_vente',
         'product_id',
         'addedBy',
-        'reference'
+        'reference',
+        'account_id'
     ];
 }

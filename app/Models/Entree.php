@@ -11,6 +11,7 @@ class Entree extends Model
         'prix_unit_achat',
         'product_id',
         'addedBy',
-        'reference'
+        'reference',
+        'account_id'
     ];
 }

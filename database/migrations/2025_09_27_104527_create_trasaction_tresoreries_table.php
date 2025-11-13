@@ -26,6 +26,7 @@ return new class extends Migration
             $table->boolean('status')->default(true);
             $table->string('reference')->nullable();
             $table->foreignId('addedBy')->constrained('users');
+            $table->string('beneficiaire')->nullable();
             $table->timestamps();
         });
     }

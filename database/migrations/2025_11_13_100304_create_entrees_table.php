@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('product_id')->nullable()->constrained('produits')->nullOnDelete();
             $table->foreignId('addedBy')->nullable()->constrained('users')->nullOnDelete();
             $table->string('reference')->unique();
+            $table->foreignId('account_id')->constrained('tresoreries');
             $table->timestamps();
         });
     }
