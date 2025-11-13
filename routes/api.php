@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Bornier\BornierController;
 use App\Http\Controllers\Api\DashBoard\DashBoardController;
 use App\Http\Controllers\Api\Facturation\FacturationController;
 use App\Http\Controllers\Api\Intervention\RapportInterventionController;
+use App\Http\Controllers\Api\Logistique\LogistiqueController;
 use App\Http\Controllers\Api\Payement\AutrePayementController;
 use App\Http\Controllers\Api\Payement\MaintenanceController;
 use App\Http\Controllers\Api\Payement\PayementController;
@@ -176,5 +177,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/borniers.store', 'storeBornier');
         Route::put('/borniers.update/{id}', 'updateBornier');
         Route::delete('/borniers.delete/{id}', 'destroyBornier');
+    });
+
+    Route::controller(LogistiqueController::class)->group(function(){
+        Route::post('/produits.store','storeProduit');
+        Route::put('/produits.update/{id}','updateProduit');
+        Route::get('/produits.getOptionsData','getallProduit');
+        Route::get('/produits.getAllData','getallProduitData');
+        Route::delete('/produits.delete/{id}','destroyProduit');
     });
 });
