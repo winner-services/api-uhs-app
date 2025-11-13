@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('type_transaction');
             $table->foreignId('product_id')->nullable()->constrained('produits')->nullOnDelete();
             $table->foreignId('addedBy')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('reference')->unique();
             $table->timestamps();
         });
     }

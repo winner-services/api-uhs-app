@@ -17,6 +17,7 @@ return new class extends Migration
             $table->decimal('prix_unit_achat',10,2)->nullable();
             $table->foreignId('product_id')->nullable()->constrained('produits')->nullOnDelete();
             $table->foreignId('addedBy')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('reference')->unique();
             $table->timestamps();
         });
     }

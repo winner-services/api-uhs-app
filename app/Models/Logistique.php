@@ -13,6 +13,7 @@ class Logistique extends Model
         'motif',
         'type_transaction',
         'product_id',
-        'addedBy'
+        'addedBy',
+        'reference'
     ];
 }

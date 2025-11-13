@@ -8,7 +8,9 @@ use App\Http\Controllers\Api\Bornier\BornierController;
 use App\Http\Controllers\Api\DashBoard\DashBoardController;
 use App\Http\Controllers\Api\Facturation\FacturationController;
 use App\Http\Controllers\Api\Intervention\RapportInterventionController;
+use App\Http\Controllers\Api\Logistique\Entree\EntreeController;
 use App\Http\Controllers\Api\Logistique\LogistiqueController;
+use App\Http\Controllers\Api\Logistique\Sortie\SortieController;
 use App\Http\Controllers\Api\Payement\AutrePayementController;
 use App\Http\Controllers\Api\Payement\MaintenanceController;
 use App\Http\Controllers\Api\Payement\PayementController;
@@ -185,5 +187,13 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/produits.getOptionsData','getallProduit');
         Route::get('/produits.getAllData','getallProduitData');
         Route::delete('/produits.delete/{id}','destroyProduit');
+    });
+
+    Route::controller(EntreeController::class)->group(function(){
+        Route::post('/entrees.store','storeEntree');
+    });
+
+    Route::controller(SortieController::class)->group(function(){
+        Route::post('/sortie.store','storeSortie');
     });
 });

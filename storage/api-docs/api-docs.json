@@ -1144,6 +1144,171 @@
                 }
             }
         },
+        "/api/entrees.store": {
+            "post": {
+                "tags": [
+                    "Entrees"
+                ],
+                "summary": "Créer une entrée de stock",
+                "description": "Crée une entrée dans la table `entrees`. La création s'effectue à l'intérieur d'une transaction DB et vérifie que `quantite` > 0.",
+                "operationId": "ca3e5994079f6d0e65748c689ffd869f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "quantite",
+                                    "product_id"
+                                ],
+                                "properties": {
+                                    "quantite": {
+                                        "description": "Quantité entrée (doit être > 0)",
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "prix_unit_achat": {
+                                        "description": "Prix unitaire d'achat (optionnel)",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 2.5,
+                                        "nullable": true
+                                    },
+                                    "product_id": {
+                                        "description": "ID du produit (doit exister dans la table produits)",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "addedBy": {
+                                        "description": "ID de l'utilisateur ayant ajouté (optionnel — généralement récupéré depuis le token)",
+                                        "type": "integer",
+                                        "example": 5,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Entrée créée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Entrée ajoutée avec succès."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "quantite": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "prix_unit_achat": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 2.5
+                                                },
+                                                "product_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "addedBy": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "example": "2025-11-13T11:00:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Requête incorrecte (ex: quantite <= 0)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "La quantité doit être supérieure à 0."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur de validation"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur lors de l'insertion : ..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/produits.getAllData": {
             "get": {
                 "tags": [
@@ -1344,6 +1509,171 @@
                     },
                     "500": {
                         "description": "Erreur serveur"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/sortie.store": {
+            "post": {
+                "tags": [
+                    "Sorties"
+                ],
+                "summary": "Créer une entrée de stock",
+                "description": "Crée une entrée dans la table `entrees`. La création s'effectue à l'intérieur d'une transaction DB et vérifie que `quantite` > 0.",
+                "operationId": "6dcd2f73dedbe695c39f21fb4aa67ee1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "quantite",
+                                    "product_id"
+                                ],
+                                "properties": {
+                                    "quantite": {
+                                        "description": "Quantité entrée (doit être > 0)",
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "prix_unit_vente": {
+                                        "description": "Prix unitaire d'achat (optionnel)",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 2.5,
+                                        "nullable": true
+                                    },
+                                    "product_id": {
+                                        "description": "ID du produit (doit exister dans la table produits)",
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "addedBy": {
+                                        "description": "ID de l'utilisateur ayant ajouté (optionnel — généralement récupéré depuis le token)",
+                                        "type": "integer",
+                                        "example": 5,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Entrée créée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Entrée ajoutée avec succès."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "quantite": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "prix_unit_achat": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 2.5
+                                                },
+                                                "product_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "addedBy": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "example": "2025-11-13T11:00:00Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Requête incorrecte (ex: quantite <= 0)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "La quantité doit être supérieure à 0."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur de validation"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur lors de l'insertion : ..."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -4490,8 +4820,16 @@
             "description": "RapportInterventions"
         },
         {
+            "name": "Entrees",
+            "description": "Entrees"
+        },
+        {
             "name": "Produits",
             "description": "Produits"
+        },
+        {
+            "name": "Sorties",
+            "description": "Sorties"
         },
         {
             "name": "Versements",

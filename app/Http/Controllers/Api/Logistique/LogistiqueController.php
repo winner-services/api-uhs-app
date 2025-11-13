@@ -122,6 +122,7 @@ class LogistiqueController extends Controller
                 'motif' => 'Initialisation du stock',
                 'type_transaction' => 'Entrée',
                 'product_id' => $produit->id,
+                'reference'            => fake()->unique()->numerify('ENT-#####'),
                 'addedBy' => $user ? $user->id : null
             ];
 
