@@ -153,13 +153,26 @@ class SortieController extends Controller
 
             $userId = Auth::id(); // peut être null si non authentifié
 
+            $lastTransaction = TrasactionTresorerie::where('account_id', $request->account_id)
+                ->latest('id')
+                ->first();
+            $solde = $lastTransaction ? $lastTransaction->solde : 0;
+
+            // 1️⃣ Vérifier si montant payé <= 0
+            if ($request->prix_unit_vente <= 0) {
+                return response()->json([
+                    'message' => 'Le montant payé doit être supérieur à 0.',
+                    'status'  => 422,
+                ], 422);
+            }
+
             // Création de la sortie (nommé $sortie ici, pas $entree)
             $sortie = Sortie::create([
                 'quantite'        => $request->quantite,
                 'prix_unit_vente' => $request->prix_unit_vente,
                 'product_id'      => $request->product_id,
                 // Utilise uniqid pour éviter d'avoir à importer des helpers supplémentaires
-                'reference'       => strtoupper('SORT-' . uniqid()),
+                'reference'       => fake()->unique()->numerify('SORT-#####'),
                 'account_id' => $request->account_id,
                 'addedBy'         => $userId,
             ]);
@@ -183,18 +196,7 @@ class SortieController extends Controller
 
             $produit->refresh();
 
-            $lastTransaction = TrasactionTresorerie::where('account_id', $request->account_id)
-                ->latest('id')
-                ->first();
-            $solde = $lastTransaction ? $lastTransaction->solde : 0;
 
-            // 1️⃣ Vérifier si montant payé <= 0
-            if ($request->prix_unit_vente <= 0) {
-                return response()->json([
-                    'message' => 'Le montant payé doit être supérieur à 0.',
-                    'status'  => 422,
-                ], 422);
-            }
             // Enregistrement dans la trésorerie
             TrasactionTresorerie::create([
                 'motif'            => 'Paiement de la Vente Produits',

@@ -70,7 +70,8 @@ class TransactionTresorerieController extends Controller
      *             @OA\Property(property="transaction_date", type="string", format="date", example="2025-09-27"),
      *             @OA\Property(property="account_id", type="integer", example=1),
      *             @OA\Property(property="amount", type="number", format="decimal", example=500.00),
-     *             @OA\Property(property="transaction_type", type="string", example="depot")
+     *             @OA\Property(property="transaction_type", type="string", example="depot"),
+     *             @OA\Property(property="beneficiaire", type="string", example="winner")
      *         )
      *     ),
      *     @OA\Response(response=201, description="Transaction créée avec succès"),
@@ -168,7 +169,8 @@ class TransactionTresorerieController extends Controller
      *             @OA\Property(property="transaction_date", type="string", format="date", example="2025-09-27"),
      *             @OA\Property(property="account_id", type="integer", example=1),
      *             @OA\Property(property="amount", type="number", format="decimal", example=500.00),
-     *             @OA\Property(property="transaction_type", type="string", example="DEPENSE")
+     *             @OA\Property(property="transaction_type", type="string", example="DEPENSE"),
+     *             @OA\Property(property="beneficiaire", type="string", example="winner")
      *         )
      *     ),
      *     @OA\Response(response=200, description="Transaction mise à jour avec succès"),
@@ -187,6 +189,7 @@ class TransactionTresorerieController extends Controller
             'account_id'       => ['sometimes', 'required', 'exists:tresoreries,id'],
             'amount'           => ['sometimes', 'required', 'numeric'],
             'transaction_type' => ['sometimes', 'required', 'string'],
+            'beneficiaire' => 'nullable'
         ];
 
         $messages = [
@@ -236,6 +239,7 @@ class TransactionTresorerieController extends Controller
                 'amount'           => $request->input('amount', $transaction->amount),
                 'transaction_type' => $request->input('transaction_type', $transaction->transaction_type),
                 'solde'            => $solde,
+                'beneficiaire' => $request->beneficiaire
             ]);
 
             DB::commit();

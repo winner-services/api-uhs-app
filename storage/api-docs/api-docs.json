@@ -1235,13 +1235,9 @@
                                                     "type": "integer",
                                                     "example": 1
                                                 },
-                                                "addedBy": {
+                                                "account_id": {
                                                     "type": "integer",
-                                                    "example": 5
-                                                },
-                                                "created_at": {
-                                                    "type": "string",
-                                                    "example": "2025-11-13T11:00:00Z"
+                                                    "example": 1
                                                 }
                                             },
                                             "type": "object"
@@ -1626,6 +1622,10 @@
                                                 "addedBy": {
                                                     "type": "integer",
                                                     "example": 5
+                                                },
+                                                "account_id": {
+                                                    "type": "integer",
+                                                    "example": 1
                                                 },
                                                 "created_at": {
                                                     "type": "string",
@@ -3721,6 +3721,10 @@
                                     "transaction_type": {
                                         "type": "string",
                                         "example": "depot"
+                                    },
+                                    "beneficiaire": {
+                                        "type": "string",
+                                        "example": "winner"
                                     }
                                 },
                                 "type": "object"
@@ -3786,6 +3790,10 @@
                                     "transaction_type": {
                                         "type": "string",
                                         "example": "DEPENSE"
+                                    },
+                                    "beneficiaire": {
+                                        "type": "string",
+                                        "example": "winner"
                                     }
                                 },
                                 "type": "object"

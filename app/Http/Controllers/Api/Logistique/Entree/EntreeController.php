@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Entree;
 use App\Models\Logistique;
 use App\Models\Produit;
+use App\Models\TrasactionTresorerie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -69,8 +70,7 @@ class EntreeController extends Controller
      *                 @OA\Property(property="quantite", type="integer", example=10),
      *                 @OA\Property(property="prix_unit_achat", type="number", format="float", example=2.50),
      *                 @OA\Property(property="product_id", type="integer", example=1),
-     *                 @OA\Property(property="addedBy", type="integer", example=5),
-     *                 @OA\Property(property="created_at", type="string", example="2025-11-13T11:00:00Z")
+     *                 @OA\Property(property="account_id", type="integer", example=1)
      *             )
      *         )
      *     ),
@@ -109,6 +109,7 @@ class EntreeController extends Controller
             'quantite'         => 'required|integer|min:1',
             'prix_unit_achat'  => 'nullable|numeric|min:0',
             'product_id'       => 'required|exists:produits,id',
+            'account_id' => 'nullable'
         ], [
             'quantite.required' => 'La quantité est obligatoire.',
             'quantite.integer'  => 'La quantité doit être un nombre entier.',
@@ -143,12 +144,26 @@ class EntreeController extends Controller
 
             $userId = Auth::id(); // peut être null si non authentifié
 
+            $lastTransaction = TrasactionTresorerie::where('account_id', $request->account_id)
+                ->latest('id')
+                ->first();
+            $solde = $lastTransaction ? $lastTransaction->solde : 0;
+
+            // 1️⃣ Vérifier si montant payé <= 0
+            if ($request->prix_unit_vente <= 0) {
+                return response()->json([
+                    'message' => 'Le montant payé doit être supérieur à 0.',
+                    'status'  => 422,
+                ], 422);
+            }
+
             // Création de l'entrée
             $entree = Entree::create([
                 'quantite'         => $request->quantite,
                 'prix_unit_achat'  => $request->prix_unit_achat,
                 'product_id'       => $request->product_id,
-                'reference'        => strtoupper('ENT-' . uniqid()),
+                'reference'        => fake()->unique()->numerify('ENTR-#####'),
+                'account_id' => $request->account_id,
                 'addedBy'          => $userId,
             ]);
 
@@ -163,7 +178,7 @@ class EntreeController extends Controller
                 'motif'             => 'Achat des produits',
                 'type_transaction'  => 'Entrée',
                 'product_id'        => $request->product_id,
-                'reference'         => strtoupper('ENT-' . uniqid()),
+                'reference'         => fake()->unique()->numerify('ENTR-#####'),
                 'addedBy'           => $userId,
             ]);
 
@@ -171,6 +186,18 @@ class EntreeController extends Controller
             $produit->increment('quantite', $request->quantite);
 
             // Optionnel : recharger le modèle si besoin ($produit->refresh();)
+
+            // Enregistrement dans la trésorerie
+            TrasactionTresorerie::create([
+                'motif'            => 'Paiement Approvisionnement',
+                'transaction_type' => 'DEPENSE',
+                'amount'           => $request->prix_unit_achat,
+                'account_id'       => $request->account_id,
+                'transaction_date' => now()->toDateString(),
+                'addedBy'          => $userId,
+                'reference'        => fake()->unique()->numerify('TRANS-#####'),
+                'solde'            => $solde - $request->prix_unit_achat
+            ]);
 
             DB::commit();
 
