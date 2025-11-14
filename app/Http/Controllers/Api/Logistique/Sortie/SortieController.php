@@ -174,6 +174,7 @@ class SortieController extends Controller
                 // Utilise uniqid pour éviter d'avoir à importer des helpers supplémentaires
                 'reference'       => fake()->unique()->numerify('SORT-#####'),
                 'account_id' => $request->account_id,
+                'date_transaction' => date('Y-m-d'),
                 'addedBy'         => $userId,
             ]);
 

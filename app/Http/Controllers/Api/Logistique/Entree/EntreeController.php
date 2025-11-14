@@ -164,6 +164,7 @@ class EntreeController extends Controller
                 'product_id'       => $request->product_id,
                 'reference'        => fake()->unique()->numerify('ENTR-#####'),
                 'account_id' => $request->account_id,
+                'date_transaction' => date('Y-m-d'),
                 'addedBy'          => $userId,
             ]);
 

@@ -12,6 +12,8 @@ class Sortie extends Model
         'product_id',
         'addedBy',
         'reference',
-        'account_id'
+        'account_id',
+        'date_transaction',
+        'deleted'
     ];
 }
