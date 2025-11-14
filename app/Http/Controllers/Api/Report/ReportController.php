@@ -434,23 +434,25 @@ class ReportController extends Controller
     }
 
 
-    public function stockSummary(Request $request)
-    {
-        $request->validate([
-            'date_start' => ['required', 'date'],
-            'date_end'   => ['required', 'date'],
-        ]);
+   public function stockReportData(Request $request)
+{
+    // 🔹 Validation minimale
+    $request->validate([
+        'date_start' => ['required', 'date'],
+        'date_end'   => ['required', 'date'],
+        'q'          => ['nullable', 'string'],
+    ]);
 
-        $date_start = $request->input('date_start');
-        $date_end   = $request->input('date_end');
-        $searchTerm = '%' . ($request->query('q', '')) . '%';
+    $date_start = $request->input('date_start');
+    $date_end   = $request->input('date_end');
+    $searchTerm = '%' . $request->query('q', '') . '%';
 
-        // 1) stock avant date_start (logistiques)
-        $stockBefore = DB::table('logistiques')
-            ->select(
-                'product_id',
-                DB::raw('COUNT(*) as tx_count'),
-                DB::raw("
+    // --- Sous-requêtes ---
+    $stockBefore = DB::table('logistiques')
+        ->select(
+            'product_id',
+            DB::raw('COUNT(*) as tx_count'),
+            DB::raw("
                 SUM(
                     CASE
                         WHEN type_transaction IN ('Entree','initial') THEN new_quantity
@@ -459,57 +461,50 @@ class ReportController extends Controller
                     END
                 ) AS stock_before_start
             ")
-            )
-            ->where('date_transaction', '<', $date_start)
-            ->groupBy('product_id');
+        )
+        ->where('date_transaction', '<', $date_start)
+        ->groupBy('product_id');
 
-        // 2) fallback initial (dernière initialisation)
-        $lastInit = DB::table('logistiques')
-            ->select('product_id', DB::raw('MAX(date_transaction) as max_date'))
-            ->where('type_transaction', 'initial')
-            ->groupBy('product_id');
+    $lastInit = DB::table('logistiques')
+        ->select('product_id', DB::raw('MAX(date_transaction) as max_date'))
+        ->where('type_transaction', 'initial')
+        ->groupBy('product_id');
 
-        $fallbackInit = DB::table('logistiques as lg')
-            ->select('lg.product_id', 'lg.new_quantity as fallback_quantity')
-            ->joinSub($lastInit, 'latest_init', function ($join) {
-                $join->on('lg.product_id', '=', 'latest_init.product_id')
-                    ->on('lg.date_transaction', '=', 'latest_init.max_date');
-            })
-            ->where('lg.type_transaction', 'initial');
+    $fallbackInit = DB::table('logistiques as lg')
+        ->select('lg.product_id', 'lg.new_quantity as fallback_quantity')
+        ->joinSub($lastInit, 'latest_init', function ($join) {
+            $join->on('lg.product_id', '=', 'latest_init.product_id')
+                 ->on('lg.date_transaction', '=', 'latest_init.max_date');
+        })
+        ->where('lg.type_transaction', 'initial');
 
-        // 3) total entrées
-        $achatsSummary = DB::table('entrees')
-            ->select('product_id', DB::raw('SUM(quantite) as total_entry'))
-            ->where('deleted', 0)
-            ->whereBetween('date_transaction', [$date_start, $date_end])
-            ->groupBy('product_id');
+    $achatsSummary = DB::table('entrees')
+        ->select('product_id', DB::raw('SUM(quantite) as total_entry'))
+        ->where('deleted', 0)
+        ->whereBetween('date_transaction', [$date_start, $date_end])
+        ->groupBy('product_id');
 
-        // 4) total sorties
-        $ventesSummary = DB::table('sorties')
-            ->select('product_id', DB::raw('SUM(quantite) as total_exit'))
-            ->where('deleted', 0)
-            ->whereBetween('date_transaction', [$date_start, $date_end])
-            ->groupBy('product_id');
+    $ventesSummary = DB::table('sorties')
+        ->select('product_id', DB::raw('SUM(quantite) as total_exit'))
+        ->where('deleted', 0)
+        ->whereBetween('date_transaction', [$date_start, $date_end])
+        ->groupBy('product_id');
 
-        // 5) Query principale — évite alias 'exit'
-        $rows = DB::table('produits as p')
-            ->select(
-                'p.id as product_id',
-                'p.designation as product_name',
-
-                // previous_quantity
-                DB::raw("
+    // --- Requête principale ---
+    $rows = DB::table('produits as p')
+        ->select(
+            'p.id as product_id',
+            'p.designation as product_name',
+            DB::raw("
                 COALESCE(
                     CASE WHEN sb.tx_count > 0 THEN sb.stock_before_start ELSE NULL END,
                     fi.fallback_quantity,
                     p.quantite
                 ) AS previous_quantity
             "),
-                DB::raw("COALESCE(a.total_entry, 0) AS total_entry"),
-                DB::raw("COALESCE(v.total_exit, 0) AS total_exit"),
-
-                // stock restant
-                DB::raw("
+            DB::raw("COALESCE(a.total_entry, 0) AS total_entry"),
+            DB::raw("COALESCE(v.total_exit, 0) AS total_exit"),
+            DB::raw("
                 (
                     COALESCE(
                         CASE WHEN sb.tx_count > 0 THEN sb.stock_before_start ELSE NULL END,
@@ -520,15 +515,13 @@ class ReportController extends Controller
                     - COALESCE(v.total_exit, 0)
                 ) AS stock_remaining
             ")
-            )
-            ->leftJoinSub($stockBefore, 'sb', fn($j) => $j->on('sb.product_id', '=', 'p.id'))
-            ->leftJoinSub($fallbackInit, 'fi', fn($j) => $j->on('fi.product_id', '=', 'p.id'))
-            ->leftJoinSub($achatsSummary, 'a', fn($j) => $j->on('a.product_id', '=', 'p.id'))
-            ->leftJoinSub($ventesSummary, 'v', fn($j) => $j->on('v.product_id', '=', 'p.id'))
-            ->where('p.designation', 'like', $searchTerm)
-
-            // Filtre : ne garder que les produits avec mouvement ou stock non nul
-            ->whereRaw("
+        )
+        ->leftJoinSub($stockBefore, 'sb', fn($j) => $j->on('sb.product_id', '=', 'p.id'))
+        ->leftJoinSub($fallbackInit, 'fi', fn($j) => $j->on('fi.product_id', '=', 'p.id'))
+        ->leftJoinSub($achatsSummary, 'a', fn($j) => $j->on('a.product_id', '=', 'p.id'))
+        ->leftJoinSub($ventesSummary, 'v', fn($j) => $j->on('v.product_id', '=', 'p.id'))
+        ->where('p.designation', 'like', $searchTerm)
+        ->whereRaw("
             (
                 COALESCE(
                     CASE WHEN sb.tx_count > 0 THEN sb.stock_before_start ELSE NULL END,
@@ -539,32 +532,26 @@ class ReportController extends Controller
                 OR COALESCE(v.total_exit, 0) <> 0
             )
         ")
+        ->orderBy('p.designation', 'asc')
+        ->get();
 
-            ->orderBy('p.designation', 'asc')
-            ->get();
+    // 🔹 Format final propre
+    $data = $rows->map(fn($row) => [
+        'product_id'       => $row->product_id,
+        'product_name'     => $row->product_name,
+        'previous_quantity'=> (float) $row->previous_quantity,
+        'entry'            => (float) $row->total_entry,
+        'exit'             => (float) $row->total_exit,
+        'stock_remaining'  => (float) $row->stock_remaining,
+    ])->toArray();
 
-        // 6) mapping (utilise total_entry / total_exit)
-        $result = $rows->map(function ($row) use ($date_start) {
-            return [
-                'product_id' => $row->product_id,
-                'product_name' => $row->product_name,
-                'transactions' => [
-                    [
-                        'type' => 'summary',
-                        'reference' => 'Résumé global',
-                        'previous_quantity' => (float) $row->previous_quantity,
-                        'entry' => isset($row->total_entry) ? (float) $row->total_entry : 0.0,
-                        'exit' => isset($row->total_exit) ? (float) $row->total_exit : 0.0,
-                        'stock_remaining' => (float) $row->stock_remaining,
-                        'date_transaction' => $date_start
-                    ]
-                ]
-            ];
-        });
+    return response()->json([
+        'success'     => true,
+        'date_start'  => $date_start,
+        'date_end'    => $date_end,
+        'count'       => count($data),
+        'data'        => $data,
+    ]);
+}
 
-        return response()->json([
-            'success' => true,
-            'data' => $result
-        ]);
-    }
 }

@@ -239,4 +239,26 @@ class FacturationController extends Controller
             ], 500);
         }
     }
+
+    public function getByStatusGrouped()
+{
+    // Statuts ciblés
+    $statuses = ['impayé', 'acompte', 'insoldée'];
+
+    // Récupération et groupement
+    $factures = Facturation::with('pointEauAbonne.abonne', 'user')
+        ->whereIn('status', $statuses)
+        ->orderBy('nom')
+        ->orderBy('created_at', 'desc')
+        ->get()
+        ->groupBy('nom');
+
+    return response()->json([
+        'message' => 'OK',
+        'success' => true,
+        'data' => $factures,
+        'status' => 200
+    ]);
+}
+
 }
