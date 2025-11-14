@@ -477,21 +477,21 @@ class ReportController extends Controller
             })
             ->where('lg.type_transaction', 'initial');
 
-        // 3) entrees entre date_start et date_end (table: entrees)
+        // 3) total entrées
         $achatsSummary = DB::table('entrees')
             ->select('product_id', DB::raw('SUM(quantite) as total_entry'))
             ->where('deleted', 0)
             ->whereBetween('date_transaction', [$date_start, $date_end])
             ->groupBy('product_id');
 
-        // 4) sorties entre date_start et date_end (table: sorties)
+        // 4) total sorties
         $ventesSummary = DB::table('sorties')
             ->select('product_id', DB::raw('SUM(quantite) as total_exit'))
             ->where('deleted', 0)
             ->whereBetween('date_transaction', [$date_start, $date_end])
             ->groupBy('product_id');
 
-        // 5) requête principale (sans unit)
+        // 5) Query principale — évite alias 'exit'
         $rows = DB::table('produits as p')
             ->select(
                 'p.id as product_id',
@@ -505,8 +505,9 @@ class ReportController extends Controller
                     p.quantite
                 ) AS previous_quantity
             "),
-                DB::raw("COALESCE(a.total_entry, 0) AS entry"),
-                DB::raw("COALESCE(v.total_exit, 0) AS exit"),
+                DB::raw("COALESCE(a.total_entry, 0) AS total_entry"),
+                DB::raw("COALESCE(v.total_exit, 0) AS total_exit"),
+
                 // stock restant
                 DB::raw("
                 (
@@ -520,23 +521,29 @@ class ReportController extends Controller
                 ) AS stock_remaining
             ")
             )
-            ->leftJoinSub($stockBefore, 'sb', function ($join) {
-                $join->on('sb.product_id', '=', 'p.id');
-            })
-            ->leftJoinSub($fallbackInit, 'fi', function ($join) {
-                $join->on('fi.product_id', '=', 'p.id');
-            })
-            ->leftJoinSub($achatsSummary, 'a', function ($join) {
-                $join->on('a.product_id', '=', 'p.id');
-            })
-            ->leftJoinSub($ventesSummary, 'v', function ($join) {
-                $join->on('v.product_id', '=', 'p.id');
-            })
+            ->leftJoinSub($stockBefore, 'sb', fn($j) => $j->on('sb.product_id', '=', 'p.id'))
+            ->leftJoinSub($fallbackInit, 'fi', fn($j) => $j->on('fi.product_id', '=', 'p.id'))
+            ->leftJoinSub($achatsSummary, 'a', fn($j) => $j->on('a.product_id', '=', 'p.id'))
+            ->leftJoinSub($ventesSummary, 'v', fn($j) => $j->on('v.product_id', '=', 'p.id'))
             ->where('p.designation', 'like', $searchTerm)
+
+            // Filtre : ne garder que les produits avec mouvement ou stock non nul
+            ->whereRaw("
+            (
+                COALESCE(
+                    CASE WHEN sb.tx_count > 0 THEN sb.stock_before_start ELSE NULL END,
+                    fi.fallback_quantity,
+                    p.quantite
+                ) <> 0
+                OR COALESCE(a.total_entry, 0) <> 0
+                OR COALESCE(v.total_exit, 0) <> 0
+            )
+        ")
+
             ->orderBy('p.designation', 'asc')
             ->get();
 
-        // 6) formatage identique à ta sortie Node (sans unit)
+        // 6) mapping (utilise total_entry / total_exit)
         $result = $rows->map(function ($row) use ($date_start) {
             return [
                 'product_id' => $row->product_id,
@@ -546,8 +553,8 @@ class ReportController extends Controller
                         'type' => 'summary',
                         'reference' => 'Résumé global',
                         'previous_quantity' => (float) $row->previous_quantity,
-                        'entry' => (float) $row->entry,
-                        'exit' => (float) $row->exit,
+                        'entry' => isset($row->total_entry) ? (float) $row->total_entry : 0.0,
+                        'exit' => isset($row->total_exit) ? (float) $row->total_exit : 0.0,
                         'stock_remaining' => (float) $row->stock_remaining,
                         'date_transaction' => $date_start
                     ]
