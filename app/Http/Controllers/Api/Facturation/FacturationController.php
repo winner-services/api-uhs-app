@@ -248,10 +248,10 @@ class FacturationController extends Controller
     // Récupération et groupement
     $factures = Facturation::with('pointEauAbonne.abonne', 'user')
         ->whereIn('status', $statuses)
-        ->orderBy('nom')
+        ->orderBy('pointEauAbonne.abonne.nom')
         ->orderBy('created_at', 'desc')
         ->get()
-        ->groupBy('nom');
+        ->groupBy('pointEauAbonne.abonne.nom');
 
     return response()->json([
         'message' => 'OK',
