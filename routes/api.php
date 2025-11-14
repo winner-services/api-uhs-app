@@ -88,7 +88,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/facturations.getAllData', 'index');
         Route::post('/facturations.store', 'genererFacturesMensuelles');
         Route::delete('/facturations.delete/{id}', 'destroy');
-        Route::get('/getByStatusGrouped','getByStatusGrouped');
+        Route::get('/getByStatusGrouped', 'getByStatusGrouped');
     });
 
     Route::controller(PointEauController::class)->group(function () {
@@ -133,7 +133,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/transaction-tresoreries.store', 'store');
         Route::get('/transaction-tresoreries.update/{id}', 'update');
         Route::get('/transaction-tresoreries.delete/{id}', 'destroy');
-        Route::post('/transfer-fonds.store','transferFunds');
+        Route::post('/transfer-fonds.store', 'transferFunds');
     });
 
     Route::controller(PayementController::class)->group(function () {
