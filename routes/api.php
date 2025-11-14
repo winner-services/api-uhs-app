@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\Rapport\RapportController;
 use App\Http\Controllers\Api\Report\ReportController;
 use App\Http\Controllers\Api\Role\RoleController;
 use App\Http\Controllers\Api\Ticket\TicketController;
+use App\Http\Controllers\Api\Transaction\CompteComptableController;
 use App\Http\Controllers\Api\Transaction\TransactionTresorerieController;
 use App\Http\Controllers\Api\Tresorerie\TresorerieController;
 use App\Http\Controllers\Api\User\UserController;
@@ -42,7 +43,7 @@ Route::prefix('auth')->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(UserController::class)->group(function () {
-        Route::get('/technicien.Options','getTechnicienOptions');
+        Route::get('/technicien.Options', 'getTechnicienOptions');
         Route::get('/users.getData', 'index');
         Route::get('/user.Options', 'getAllUsersOptions');
         Route::post('/user.store', 'store');
@@ -78,7 +79,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/abonnes.getAllData', 'index');
         Route::get('/abonnes.getOptionsData', 'getaAbonnellData');
         Route::post('/abonnes.store', 'store');
-        Route::get('/rapport.abonne','getByCategorie');
+        Route::get('/rapport.abonne', 'getByCategorie');
         Route::put('/abonnes.update/{id}', 'update');
         Route::delete('/abonnes.delete/{id}', 'destroy');
     });
@@ -181,22 +182,29 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/borniers.delete/{id}', 'destroyBornier');
     });
 
-    Route::controller(LogistiqueController::class)->group(function(){
-        Route::post('/produits.store','storeProduit');
-        Route::put('/produits.update/{id}','updateProduit');
-        Route::get('/produits.getOptionsData','getallProduit');
-        Route::get('/produits.getAllData','getallProduitData');
-        Route::delete('/produits.delete/{id}','destroyProduit');
+    Route::controller(LogistiqueController::class)->group(function () {
+        Route::post('/produits.store', 'storeProduit');
+        Route::put('/produits.update/{id}', 'updateProduit');
+        Route::get('/produits.getOptionsData', 'getallProduit');
+        Route::get('/produits.getAllData', 'getallProduitData');
+        Route::delete('/produits.delete/{id}', 'destroyProduit');
     });
 
-    Route::controller(EntreeController::class)->group(function(){
-        Route::post('/entrees.store','storeEntree');
-        Route::get('/entrees.getAllData','getallEntree');
+    Route::controller(EntreeController::class)->group(function () {
+        Route::post('/entrees.store', 'storeEntree');
+        Route::get('/entrees.getAllData', 'getallEntree');
     });
 
-    Route::controller(SortieController::class)->group(function(){
-        Route::post('/sortie.store','storeSortie');
-        Route::get('/sorties.getAllDatas','getallSortie');
+    Route::controller(SortieController::class)->group(function () {
+        Route::post('/sortie.store', 'storeSortie');
+        Route::get('/sorties.getAllDatas', 'getallSortie');
+    });
 
+    Route::controller(CompteComptableController::class)->group(function () {
+        Route::get('/compte-comptables.getOptionsData', 'getAllSpentOptions');
+        Route::get('/compte-comptables.getAllData', 'getAllSpentCategoryData');
+        Route::post('/compte-comptables.store', 'createSpentCategory');
+        Route::put('/compte-comptables.update/{id}', 'updateSpentCategory');
+        Route::delete('/compte-comptables.delete/{id}', 'deleteSpentCategory');
     });
 });
