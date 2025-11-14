@@ -88,7 +88,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/facturations.getAllData', 'index');
         Route::post('/facturations.store', 'genererFacturesMensuelles');
         Route::delete('/facturations.delete/{id}', 'destroy');
-        Route::get('/getByStatusGrouped', 'getByStatusGrouped');
+        // Route::get('/getByStatusGrouped', 'getByStatusGrouped');
     });
 
     Route::controller(PointEauController::class)->group(function () {
@@ -168,7 +168,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/rapport.tickets', 'rapportTickets');
         Route::get('/rapport.trasactionsReport', 'trasactionsReport');
         Route::get('/rapport.depenseReport', 'depenseReport');
-        // Route::post('/stockSummary.get','stockSummary');
+        Route::post('/stockSummary.get','stockSummary');
     });
 
     Route::controller(MaintenanceController::class)->group(function () {
