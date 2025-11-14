@@ -168,7 +168,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/rapport.tickets', 'rapportTickets');
         Route::get('/rapport.trasactionsReport', 'trasactionsReport');
         Route::get('/rapport.depenseReport', 'depenseReport');
-        Route::post('/stockSummary.get','stockSummary');
+        Route::post('/stockSummary.get','stockReportData');
     });
 
     Route::controller(MaintenanceController::class)->group(function () {
