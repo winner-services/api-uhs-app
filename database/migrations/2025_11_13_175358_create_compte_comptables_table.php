@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('designation');
             $table->string('description')->nullable();
-            $table->string('transaction_type');
+            $table->string('transaction_type')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
         });

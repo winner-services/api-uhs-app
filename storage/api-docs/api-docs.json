@@ -3667,6 +3667,268 @@
                 ]
             }
         },
+        "/api/compte-comptables.getOptionsData": {
+            "get": {
+                "tags": [
+                    "CompteComptable"
+                ],
+                "summary": "Get list of Categories",
+                "description": "Returns list of Categories",
+                "operationId": "getAllSpentOptions",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/api/compte-comptables.getAllData": {
+            "get": {
+                "tags": [
+                    "CompteComptable"
+                ],
+                "summary": "Get list of Categories",
+                "description": "Returns list of Categories",
+                "operationId": "getAllSpentCategoryData",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {}
+                        }
+                    }
+                }
+            }
+        },
+        "/api/compte-comptables.store": {
+            "post": {
+                "tags": [
+                    "CompteComptable"
+                ],
+                "summary": "Créer une catégorie de dépense",
+                "description": "Crée une nouvelle catégorie de compte comptable (spent category).",
+                "operationId": "672ccee9ba6705d51debeebef4c88bc3",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "designation",
+                                    "transaction_type"
+                                ],
+                                "properties": {
+                                    "designation": {
+                                        "type": "string",
+                                        "example": "Frais de bureau"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Papeterie et consommables"
+                                    },
+                                    "transaction_type": {
+                                        "type": "string",
+                                        "example": "debit"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Catégorie ajoutée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "success": {
+                                            "type": "boolean"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation failed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/api/compte-comptables.update/{id}": {
+            "put": {
+                "tags": [
+                    "CompteComptable"
+                ],
+                "summary": "Mettre à jour une catégorie de dépense",
+                "description": "Met à jour une catégorie existante identifiée par son id.",
+                "operationId": "a9a8749ff4bb4d73bb3c917a93d3a3f9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la catégorie",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "designation",
+                                    "transaction_type"
+                                ],
+                                "properties": {
+                                    "designation": {
+                                        "type": "string",
+                                        "example": "Frais de bureau modifié"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Nouvelle description"
+                                    },
+                                    "transaction_type": {
+                                        "type": "string",
+                                        "example": "debit"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Catégorie mise à jour avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Catégorie introuvable"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                }
+            }
+        },
+        "/api/compte-comptables.delete/{id}": {
+            "delete": {
+                "tags": [
+                    "CompteComptable"
+                ],
+                "summary": "Supprimer une catégorie de dépense",
+                "description": "Supprime une catégorie comptable existante par son ID.",
+                "operationId": "8929819657315a02668da86ba84d8197",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la catégorie",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Catégorie supprimée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Catégorie supprimée avec succès."
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Catégorie introuvable",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Catégorie introuvable."
+                                        },
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
+                    }
+                }
+            }
+        },
         "/api/transaction-tresoreries.getAllData": {
             "get": {
                 "tags": [
@@ -3840,6 +4102,97 @@
                         "description": "Transaction non trouvée"
                     }
                 }
+            }
+        },
+        "/api/transfer-fonds.store": {
+            "post": {
+                "tags": [
+                    "Transfert de fonds"
+                ],
+                "summary": "Transférer des fonds entre deux comptes de la trésorerie",
+                "operationId": "dd47601916cc8bcf41b4c475c3777f74",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "account_from_id",
+                                    "account_to_id",
+                                    "montant",
+                                    "type_transaction"
+                                ],
+                                "properties": {
+                                    "account_from_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "account_to_id": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "montant": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 150.5
+                                    },
+                                    "type_transaction": {
+                                        "type": "string",
+                                        "example": "Virement"
+                                    },
+                                    "date_transaction": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2025-11-14T08:00:00Z"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Transfert entre caisse et banque"
+                                    },
+                                    "beneficiaire": {
+                                        "type": "string",
+                                        "example": "Winner"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Transfert effectué avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Requête invalide"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         },
         "/api/tresoreries.getAllData": {
@@ -4908,8 +5261,16 @@
             "description": "Tickets"
         },
         {
+            "name": "CompteComptable",
+            "description": "CompteComptable"
+        },
+        {
             "name": "TransactionTrésoreries",
             "description": "TransactionTrésoreries"
+        },
+        {
+            "name": "Transfert de fonds",
+            "description": "Transfert de fonds"
         },
         {
             "name": "Tresorerie",
