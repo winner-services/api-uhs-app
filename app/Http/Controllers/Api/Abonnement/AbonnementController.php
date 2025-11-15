@@ -249,8 +249,8 @@ class AbonnementController extends Controller
         $abonne = Abonne::findOrFail($id);
 
         $rules = [
-            'nom' => ['required', 'string', 'max:255'],
-            'categorie_id' => ['required'],
+            // 'nom' => ['required', 'string'],
+            // 'categorie_id' => ['required'],
             'telephone' => ['nullable', 'string', 'max:20'],
             'adresse' => ['nullable', 'string', 'max:255'],
             'genre' => ['nullable', 'string', 'max:255'],
