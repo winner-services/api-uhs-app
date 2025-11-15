@@ -185,8 +185,7 @@ class EntreeController extends Controller
 
             // Mise à jour atomique du stock : incrémenter la quantité en base
             $produit->increment('quantite', $request->quantite);
-
-            // Optionnel : recharger le modèle si besoin ($produit->refresh();)
+            $produit->refresh();
 
             // Enregistrement dans la trésorerie
             TrasactionTresorerie::create([
@@ -198,18 +197,6 @@ class EntreeController extends Controller
                 'addedBy'          => $userId,
                 'reference'        => fake()->unique()->numerify('TRANS-#####'),
                 'solde'            => $solde - $request->prix_unit_achat
-            ]);
-
-            // Enregistrement dans la trésorerie
-            TrasactionTresorerie::create([
-                'motif'            => 'Paiement de la Vente Produits',
-                'transaction_type' => 'RECETTE',
-                'amount'           => $request->prix_unit_vente,
-                'account_id'       => $request->account_id,
-                'transaction_date' => now()->toDateString(),
-                'addedBy'          => $userId,
-                'reference'        => fake()->unique()->numerify('TRANS-#####'),
-                'solde'            => $solde + $request->prix_unit_vente
             ]);
 
             DB::commit();
@@ -231,5 +218,4 @@ class EntreeController extends Controller
             ], 500);
         }
     }
-
 }
