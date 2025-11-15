@@ -558,8 +558,8 @@ class ReportController extends Controller
         $data = $rows->map(function ($row) use ($date_end) {
 
             $summary = [
-                'type'              => $row->type_transaction,
-                'reference'         => $row->reference,
+                'type'              => 'summary',
+                'reference'         => 'Résumé global',
                 'previous_quantity' => (float) $row->previous_quantity,
                 'entry'             => (float) $row->total_entry,
                 'exit'              => (float) $row->total_exit,
