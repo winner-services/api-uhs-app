@@ -3193,7 +3193,7 @@
         "/api/rapport.getAllData": {
             "get": {
                 "tags": [
-                    "Produits"
+                    "Rapports"
                 ],
                 "summary": "Liste des produits",
                 "operationId": "1daa9f090051c05ecb6034d0591efb5a",

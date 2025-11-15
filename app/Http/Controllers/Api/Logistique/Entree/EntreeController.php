@@ -149,13 +149,12 @@ class EntreeController extends Controller
                 ->first();
             $solde = $lastTransaction ? $lastTransaction->solde : 0;
 
-            // 1️⃣ Vérifier si montant payé <= 0
-            // if ($request->prix_unit_vente <= 0) {
-            //     return response()->json([
-            //         'message' => 'Le montant payé doit être supérieur à 0.',
-            //         'status'  => 422,
-            //     ], 422);
-            // }
+            if ($solde < $request->prix_unit_achat) {
+                return response()->json([
+                    'message' => 'Fonds insuffisants',
+                    'status'  => 422,
+                ], 422);
+            }
 
             // Création de l'entrée
             $entree = Entree::create([
