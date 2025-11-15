@@ -16,9 +16,7 @@ return new class extends Migration
             $table->string('motif')->nullable();
             $table->date('transaction_date');
             $table->foreignId('account_id')
-                ->nullable()
-                ->constrained('tresoreries')
-                ->onDelete('set null');
+                ->constrained('tresoreries');
             $table->decimal('amount', 8, 2);
             $table->string('transaction_type');
             $table->foreignId('facturation_id')->nullable()->constrained('facturations')->onDelete('set null');
