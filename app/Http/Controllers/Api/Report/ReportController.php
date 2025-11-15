@@ -462,7 +462,7 @@ class ReportController extends Controller
                 ) AS stock_before_start
             ")
             )
-            ->whereBetween('date_transaction', [$date_start, $date_end])
+            ->whereBetween(DB::raw('DATE(date_transaction)'), [$date_start, $date_end])
             ->groupBy('product_id');
 
         $lastInit = DB::table('logistiques')
