@@ -148,7 +148,7 @@ class AbonnementController extends Controller
             'telephone' => ['nullable', 'string', 'max:20'],
             'adresse' => ['nullable', 'string', 'max:255'],
             'genre' => ['nullable', 'string', 'max:255'],
-            'statut' => ['nullable', 'string', 'max:255'],
+            'status' => ['nullable', 'string', 'max:255'],
             'num_piece' => ['nullable', 'string', 'max:255'],
             'piece_identite' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ];
@@ -189,7 +189,7 @@ class AbonnementController extends Controller
                 'telephone' => $request->telephone,
                 'adresse' => $request->adresse,
                 'genre' => $request->genre,
-                'statut' => $request->statut,
+                'statut' => $request->status,
                 'num_piece' => $request->num_piece,
                 'piece_identite' => $piecePath,
                 'addedBy' => $user->id
@@ -221,72 +221,7 @@ class AbonnementController extends Controller
             ], 500);
         }
     }
-    // public function store(Request $request)
-    // {
-
-
-    //     $rules = [
-    //         'nom'          => ['required', 'string', 'max:255'],
-    //         'categorie_id' => ['required', 'integer', 'exists:abonnement_categories,id'],
-    //         'telephone'    => ['nullable', 'string', 'max:20'],
-    //         'adresse'      => ['nullable', 'string', 'max:255'],
-    //         'genre'      => ['nullable', 'string', 'max:255'],
-    //         'statut'      => ['nullable', 'string', 'max:255'],
-    //         'num_piece' => ['nullable'],
-    //         'piece_identite' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-    //     ];
-
-    //     $piecePath = null;
-
-    //     $validator = Validator::make($request->all(), $rules);
-
-    //     if ($validator->fails()) {
-    //         return response()->json([
-    //             'message' => 'Les données envoyées ne sont pas valides.',
-    //             'errors'  => $validator->errors()
-    //         ], 422);
-    //     }
-
-    //     if ($request->hasFile('piece_identite')) {
-    //         $piece = $request->file('piece_identite');
-    //         $pieceName = time() . '_' . uniqid() . '.' . $piece->getClientOriginalExtension();
-    //         $piecePath = $piece->storeAs('pieces_identite', $pieceName, 'public');
-    //     }
-
-    //     try {
-    //         DB::beginTransaction();
-
-    //         $user = Auth::user();
-
-    //         $abonne = Abonne::create([
-    //             'nom' => $request->nom,
-    //             'categorie_id' => $request->categorie_id,
-    //             'telephone' => $request->telephone,
-    //             'adresse' => $request->adresse,
-    //             'genre' => $request->genre,
-    //             'statut' => $request->statut,
-    //             'num_piece' => $request->num_piece,
-    //             'piece_identite' => $piecePath,
-    //             'addedBy' => $user->id
-    //         ]);
-
-    //         DB::commit();
-
-    //         return response()->json([
-    //             'message' => "Abonné ajouté avec succès",
-    //             'success' => true,
-    //             'status'  => 201,
-    //             'data'    => $abonne
-    //         ], 201);
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-    //         return response()->json([
-    //             'message' => 'Erreur lors de la création de l\'abonné.',
-    //             'error'   => $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
-
+    
     /**
      * @OA\Put(
      * path="/api/abonnes.update/{id}",
@@ -366,7 +301,7 @@ class AbonnementController extends Controller
             $abonne->telephone = $request->telephone;
             $abonne->adresse = $request->adresse;
             $abonne->genre = $request->genre;
-            $abonne->statut = $request->statut;
+            $abonne->statut = $request->status;
             $abonne->num_piece = $request->num_piece;
             $abonne->addedBy = $user->id;
 
