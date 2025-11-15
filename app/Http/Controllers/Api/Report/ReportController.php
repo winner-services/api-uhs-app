@@ -434,7 +434,7 @@ class ReportController extends Controller
     }
 
  /**
-     * @OA\Get(
+     * @OA\Post(
      * path="/api/rapport.fiche-stock",
      * summary="Liste des trasactionsReport",
      * tags={"Rapports"},
