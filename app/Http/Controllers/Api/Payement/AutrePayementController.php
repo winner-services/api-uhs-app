@@ -94,7 +94,7 @@ class AutrePayementController extends Controller
             'amount'           => ['required', 'numeric', 'min:0'],
             'paid_amount'      => ['required', 'numeric', 'min:0'],
             'taux'             => ['nullable', 'numeric', 'min:0', 'max:100'],
-            'account_id'       => ['nullable', 'exists:tresoreries,id'],
+            'account_id'       => ['required', 'exists:tresoreries,id'],
             'agent_id'         => ['nullable', 'exists:borniers,id']
         ]);
 
@@ -112,7 +112,7 @@ class AutrePayementController extends Controller
                 'paid_amount'      => $validated['paid_amount'],
                 'taux'             => $validated['taux'] ?? 30.00,
                 'reference'        => fake()->unique()->numerify('VERS-#####'),
-                'account_id'       => $validated['account_id'] ?? null,
+                'account_id'       => $validated['account_id'],
                 'agent_id'         => $validated['agent_id'] ?? null,
                 'addedBy'          => Auth::user()->id
             ]);
@@ -190,7 +190,7 @@ class AutrePayementController extends Controller
             'amount'           => ['required', 'numeric', 'min:0'],
             'paid_amount'      => ['required', 'numeric', 'min:0'],
             'taux'             => ['nullable', 'numeric', 'min:0', 'max:100'],
-            'account_id'       => ['nullable', 'exists:tresoreries,id'],
+            'account_id'       => ['required', 'exists:tresoreries,id'],
             'agent_id'         => ['nullable', 'exists:borniers,id']
         ]);
 

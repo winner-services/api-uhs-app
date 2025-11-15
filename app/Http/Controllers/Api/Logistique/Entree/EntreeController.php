@@ -150,12 +150,12 @@ class EntreeController extends Controller
             $solde = $lastTransaction ? $lastTransaction->solde : 0;
 
             // 1️⃣ Vérifier si montant payé <= 0
-            if ($request->prix_unit_vente <= 0) {
-                return response()->json([
-                    'message' => 'Le montant payé doit être supérieur à 0.',
-                    'status'  => 422,
-                ], 422);
-            }
+            // if ($request->prix_unit_vente <= 0) {
+            //     return response()->json([
+            //         'message' => 'Le montant payé doit être supérieur à 0.',
+            //         'status'  => 422,
+            //     ], 422);
+            // }
 
             // Création de l'entrée
             $entree = Entree::create([
@@ -200,6 +200,18 @@ class EntreeController extends Controller
                 'solde'            => $solde - $request->prix_unit_achat
             ]);
 
+            // Enregistrement dans la trésorerie
+            TrasactionTresorerie::create([
+                'motif'            => 'Paiement de la Vente Produits',
+                'transaction_type' => 'RECETTE',
+                'amount'           => $request->prix_unit_vente,
+                'account_id'       => $request->account_id,
+                'transaction_date' => now()->toDateString(),
+                'addedBy'          => $userId,
+                'reference'        => fake()->unique()->numerify('TRANS-#####'),
+                'solde'            => $solde + $request->prix_unit_vente
+            ]);
+
             DB::commit();
 
             return response()->json([
@@ -219,74 +231,5 @@ class EntreeController extends Controller
             ], 500);
         }
     }
-    // public function storeEntree(Request $request)
-    // {
-    //     // ✅ Validation des données entrantes
-    //     $validator = Validator::make($request->all(), [
-    //         'quantite'        => 'required|integer|min:1',
-    //         'prix_unit_achat' => 'nullable|numeric|min:0',
-    //         'product_id'      => 'required|exists:produits,id',
-    //     ], [
-    //         'quantite.required' => 'La quantité est obligatoire.',
-    //         'quantite.integer'  => 'La quantité doit être un nombre entier.',
-    //         'quantite.min'      => 'La quantité doit être supérieure à 0.',
-    //         'prix_unit_achat.numeric' => 'Le prix unitaire d\'achat doit être un nombre.',
-    //         'product_id.exists' => 'Le produit sélectionné est invalide.',
-    //     ]);
 
-    //     if ($validator->fails()) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Erreur de validation',
-    //             'errors'  => $validator->errors(),
-    //         ], 422);
-    //     }
-
-    //     // ✅ Vérification supplémentaire (sécurité côté logique)
-    //     if ($request->quantite <= 0) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'La quantité doit être supérieure à 0.',
-    //         ], 400);
-    //     }
-
-    //     try {
-
-    //         DB::beginTransaction();
-    //         $user = Auth::user();
-    //         $produit = Produit::findOrFail($request->product_id);
-    //         $entree = Entree::create([
-    //             'quantite'        => $request->quantite,
-    //             'prix_unit_achat' => $request->prix_unit_achat,
-    //             'product_id'      => $request->product_id,
-    //             'reference'            => fake()->unique()->numerify('ENT-#####'),
-    //             'addedBy'         => $user->id
-    //         ]);
-    //         Logistique::create([
-    //             'date_transaction' => date('Y-m-d'),
-    //             'previous_quantity' => $produit->quantite,
-    //             'new_quantity' => $request->quantite + $produit->quantite,
-    //             'motif' => 'Achat des produits',
-    //             'type_transaction' => 'Entrée',
-    //             'product_id' => $request->product_id,
-    //             'reference'            => fake()->unique()->numerify('ENT-#####'),
-    //             'addedBy' => $user ? $user->id : null
-    //         ]);
-    //         $produit->increment('quantite', $request->quantite);
-
-    //         DB::commit();
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'message' => 'Entrée ajoutée avec succès.',
-    //             'status' => 201,
-    //             'data'    => $entree,
-    //         ], 201);
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Erreur lors de l\'insertion : ' . $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
 }
