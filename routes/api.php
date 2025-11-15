@@ -201,7 +201,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::controller(SortieController::class)->group(function () {
         Route::post('/sortie.store', 'storeSortie');
-        Route::get('/sorties.getAllDatas', 'getallSortie');
+        Route::get('/sorties.getAllData', 'getallSortie');
     });
 
     Route::controller(CompteComptableController::class)->group(function () {
