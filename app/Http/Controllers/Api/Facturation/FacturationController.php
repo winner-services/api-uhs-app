@@ -241,24 +241,46 @@ class FacturationController extends Controller
     }
 
     public function getByStatusGrouped()
-{
-    // Statuts ciblés
-    $statuses = ['impayé', 'acompte', 'insoldée'];
+    {
+        // Statuts ciblés
+        $statuses = ['impayé', 'acompte', 'insoldée'];
 
-    // Récupération et groupement
-    $factures = Facturation::with('pointEauAbonne.abonne', 'user')
-        ->whereIn('status', $statuses)
-        ->orderBy('point_eau_abonnes_id')
-        ->orderBy('created_at', 'desc')
-        ->get()
-        ->groupBy('point_eau_abonnes_id');
+        // Récupération
+        $factures = Facturation::with('pointEauAbonne.abonne', 'user')
+            ->whereIn('status', $statuses)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->groupBy(function ($item) {
+                // On groupe par le nom de l'abonné
+                return $item->pointEauAbonne->abonne->nom ?? 'Inconnu';
+            });
 
-    return response()->json([
-        'message' => 'OK',
-        'success' => true,
-        'data' => $factures,
-        'status' => 200
-    ]);
-}
+        return response()->json([
+            'message' => 'OK',
+            'success' => true,
+            'data' => $factures,
+            'status' => 200
+        ]);
+    }
 
+    // public function getByStatusGrouped()
+    // {
+    //     // Statuts ciblés
+    //     $statuses = ['impayé', 'acompte', 'insoldée'];
+
+    //     // Récupération et groupement
+    //     $factures = Facturation::with('pointEauAbonne.abonne', 'user')
+    //         ->whereIn('status', $statuses)
+    //         ->orderBy('point_eau_abonnes_id')
+    //         ->orderBy('created_at', 'desc')
+    //         ->get()
+    //         ->groupBy('point_eau_abonnes_id');
+
+    //     return response()->json([
+    //         'message' => 'OK',
+    //         'success' => true,
+    //         'data' => $factures,
+    //         'status' => 200
+    //     ]);
+    // }
 }
