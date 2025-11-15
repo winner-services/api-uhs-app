@@ -462,7 +462,7 @@ class ReportController extends Controller
                 ) AS stock_before_start
             ")
             )
-            ->where('date_transaction', '<', $date_start)
+            ->whereDate('date_transaction', '<', $date_start)
             ->groupBy('product_id');
 
         $lastInit = DB::table('logistiques')
