@@ -462,7 +462,7 @@ class ReportController extends Controller
                 ) AS stock_before_start
             ")
             )
-            ->whereBetween(DB::raw('DATE(date_transaction)'), [$date_start, $date_end])
+            ->where('date_transaction', '<', $date_start)
             ->groupBy('product_id');
 
         $lastInit = DB::table('logistiques')
@@ -480,15 +480,13 @@ class ReportController extends Controller
         $achatsSummary = DB::table('entrees')
             ->select('product_id', DB::raw('SUM(quantite) as total_entry'))
             // ->where('deleted', 0)
-            ->whereDate('date_transaction', '>=', $date_start)
-            ->whereDate('date_transaction', '<=', $date_end)
+            ->whereBetween(DB::raw('DATE(date_transaction)'), [$date_start, $date_end])
             ->groupBy('product_id');
 
         $ventesSummary = DB::table('sorties')
             ->select('product_id', DB::raw('SUM(quantite) as total_exit'))
             // ->where('deleted', 0)
-            ->whereDate('date_transaction', '>=', $date_start)
-            ->whereDate('date_transaction', '<=', $date_end)
+            ->whereBetween(DB::raw('DATE(date_transaction)'), [$date_start, $date_end])
             ->groupBy('product_id');
 
         // --- Requête principale ---
