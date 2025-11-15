@@ -3190,6 +3190,20 @@
                 }
             }
         },
+        "/api/rapport.getAllData": {
+            "get": {
+                "tags": [
+                    "Produits"
+                ],
+                "summary": "Liste des produits",
+                "operationId": "1daa9f090051c05ecb6034d0591efb5a",
+                "responses": {
+                    "200": {
+                        "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
         "/api/role.store": {
             "post": {
                 "tags": [
