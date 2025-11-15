@@ -480,7 +480,7 @@ class ReportController extends Controller
 
         $achatsSummary = DB::table('entrees')
             ->select('product_id', DB::raw('SUM(quantite) as total_entry'))
-            ->where('deleted', 0)
+            // ->where('deleted', 0)
             ->whereBetween('date_transaction', [
                 $date_start . ' 00:00:00',
                 $date_end . ' 23:59:59'
@@ -489,7 +489,7 @@ class ReportController extends Controller
 
         $ventesSummary = DB::table('sorties')
             ->select('product_id', DB::raw('SUM(quantite) as total_exit'))
-            ->where('deleted', 0)
+            // ->where('deleted', 0)
             ->whereBetween('date_transaction', [
                 $date_start . ' 00:00:00',
                 $date_end . ' 23:59:59'
