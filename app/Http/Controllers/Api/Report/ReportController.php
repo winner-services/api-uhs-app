@@ -574,8 +574,6 @@ class ReportController extends Controller
                 // Résumé calculé + transactions réelles
                 'transactions'  => array_merge([
                     [
-                        'type'              => 'summary',
-                        'reference'         => 'Résumé global',
                         'previous_quantity' => (float) $row->previous_quantity,
                         'entry'             => (float) $row->total_entry,
                         'exit'              => (float) $row->total_exit,
