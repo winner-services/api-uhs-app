@@ -250,7 +250,7 @@ class AbonnementController extends Controller
 
         $rules = [
             'nom' => ['required', 'string', 'max:255'],
-            'categorie_id' => ['required', 'integer', 'exists:abonnement_categories,id'],
+            'categorie_id' => ['required'],
             'telephone' => ['nullable', 'string', 'max:20'],
             'adresse' => ['nullable', 'string', 'max:255'],
             'genre' => ['nullable', 'string', 'max:255'],
