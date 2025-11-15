@@ -240,6 +240,23 @@ class FacturationController extends Controller
         }
     }
 
+       /**
+     * @OA\Get(
+     *     path="/api/facturations.Proformat",
+     *     summary="Liste",
+     *     description="Récupérer toutes les facturations avec leurs abonnés",
+     *     tags={"Facturations"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des facturations",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Facturation"))
+     *         )
+     *     )
+     * )
+     */
     public function getByStatusGrouped()
     {
         // Statuts ciblés

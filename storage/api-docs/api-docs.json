@@ -1031,6 +1031,45 @@
                 ]
             }
         },
+        "/api/facturations.Proformat": {
+            "get": {
+                "tags": [
+                    "Facturations"
+                ],
+                "summary": "Liste",
+                "description": "Récupérer toutes les facturations avec leurs abonnés",
+                "operationId": "2ace8c9136c3508f59e1c05c396b5911",
+                "responses": {
+                    "200": {
+                        "description": "Liste des facturations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Facturation"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/rapport-interventions.getAllData": {
             "get": {
                 "tags": [
