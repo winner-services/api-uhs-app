@@ -433,7 +433,7 @@ class ReportController extends Controller
         return response()->json($result);
     }
 
- /**
+    /**
      * @OA\Post(
      * path="/api/rapport.fiche-stock",
      * summary="Liste des trasactionsReport",
@@ -456,23 +456,24 @@ class ReportController extends Controller
      * )
      */
     public function stockReportData(Request $request)
-{
-    $request->validate([
-        'date_start' => ['required', 'date'],
-        'date_end'   => ['required', 'date'],
-        'q'          => ['nullable', 'string'],
-    ]);
+    {
+        // Validation
+        $request->validate([
+            'date_start' => ['required', 'date'],
+            'date_end'   => ['required', 'date'],
+            'q'          => ['nullable', 'string'],
+        ]);
 
-    $date_start = $request->input('date_start');
-    $date_end   = $request->input('date_end');
-    $searchTerm = '%' . $request->query('q', '') . '%';
+        $date_start = $request->input('date_start');
+        $date_end   = $request->input('date_end');
+        $searchTerm = '%' . $request->query('q', '') . '%';
 
-    // --- Sous-requêtes ---
-    $stockBefore = DB::table('logistiques')
-        ->select(
-            'product_id',
-            DB::raw('COUNT(*) as tx_count'),
-            DB::raw("
+        // Sous-requêtes inchangées
+        $stockBefore = DB::table('logistiques')
+            ->select(
+                'product_id',
+                DB::raw('COUNT(*) as tx_count'),
+                DB::raw("
                 SUM(
                     CASE
                         WHEN type_transaction IN ('Entree','initial') THEN new_quantity
@@ -481,108 +482,116 @@ class ReportController extends Controller
                     END
                 ) AS stock_before_start
             ")
-        )
-        ->where('date_transaction', '<', $date_start)
-        ->groupBy('product_id');
+            )
+            ->where('date_transaction', '<', $date_start)
+            ->groupBy('product_id');
 
-    $lastInit = DB::table('logistiques')
-        ->select('product_id', DB::raw('MAX(date_transaction) as max_date'))
-        ->where('type_transaction', 'initial')
-        ->groupBy('product_id');
+        $lastInit = DB::table('logistiques')
+            ->select('product_id', DB::raw('MAX(date_transaction) as max_date'))
+            ->where('type_transaction', 'initial')
+            ->groupBy('product_id');
 
-    $fallbackInit = DB::table('logistiques as lg')
-        ->select('lg.product_id', 'lg.new_quantity as fallback_quantity')
-        ->joinSub($lastInit, 'latest_init', function ($join) {
-            $join->on('lg.product_id', '=', 'latest_init.product_id')
-                 ->on('lg.date_transaction', '=', 'latest_init.max_date');
-        })
-        ->where('lg.type_transaction', 'initial');
+        $fallbackInit = DB::table('logistiques as lg')
+            ->select('lg.product_id', 'lg.new_quantity as fallback_quantity')
+            ->joinSub($lastInit, 'latest_init', function ($join) {
+                $join->on('lg.product_id', '=', 'latest_init.product_id')
+                    ->on('lg.date_transaction', '=', 'latest_init.max_date');
+            })
+            ->where('lg.type_transaction', 'initial');
 
-    $achatsSummary = DB::table('entrees')
-        ->select('product_id', DB::raw('SUM(quantite) as total_entry'))
-        ->whereBetween(DB::raw('DATE(date_transaction)'), [$date_start, $date_end])
-        ->groupBy('product_id');
+        $achatsSummary = DB::table('entrees')
+            ->select('product_id', DB::raw('SUM(quantite) as total_entry'))
+            ->whereBetween(DB::raw('DATE(date_transaction)'), [$date_start, $date_end])
+            ->groupBy('product_id');
 
-    $ventesSummary = DB::table('sorties')
-        ->select('product_id', DB::raw('SUM(quantite) as total_exit'))
-        ->whereBetween(DB::raw('DATE(date_transaction)'), [$date_start, $date_end])
-        ->groupBy('product_id');
+        $ventesSummary = DB::table('sorties')
+            ->select('product_id', DB::raw('SUM(quantite) as total_exit'))
+            ->whereBetween(DB::raw('DATE(date_transaction)'), [$date_start, $date_end])
+            ->groupBy('product_id');
 
-    // --- Dernière transaction pour chaque produit dans logistiques ---
-    $lastTransaction = DB::table('logistiques as lg')
-        ->select('lg.product_id', 'lg.type_transaction', 'lg.reference')
-        ->whereBetween(DB::raw('DATE(lg.date_transaction)'), [$date_start, $date_end])
-        ->whereNotNull('lg.reference')
-        ->whereNotNull('lg.type_transaction')
-        ->orderBy('lg.date_transaction', 'desc')
-        ->orderBy('lg.id', 'desc');
-
-    $rows = DB::table('produits as p')
-        ->select(
-            'p.id as product_id',
-            'p.designation as product_name',
-            DB::raw("
+        // Requête principale
+        $rows = DB::table('produits as p')
+            ->select(
+                'p.id as product_id',
+                'p.designation as product_name',
+                DB::raw("
                 COALESCE(
                     CASE WHEN sb.tx_count > 0 THEN sb.stock_before_start ELSE NULL END,
                     fi.fallback_quantity,
                     p.quantite
                 ) AS previous_quantity
             "),
-            DB::raw("COALESCE(a.total_entry, 0) AS total_entry"),
-            DB::raw("COALESCE(v.total_exit, 0) AS total_exit")
-        )
-        ->leftJoinSub($stockBefore, 'sb', fn($j) => $j->on('sb.product_id', '=', 'p.id'))
-        ->leftJoinSub($fallbackInit, 'fi', fn($j) => $j->on('fi.product_id', '=', 'p.id'))
-        ->leftJoinSub($achatsSummary, 'a', fn($j) => $j->on('a.product_id', '=', 'p.id'))
-        ->leftJoinSub($ventesSummary, 'v', fn($j) => $j->on('v.product_id', '=', 'p.id'))
-        ->where('p.designation', 'like', $searchTerm)
-        ->whereRaw("
-            (
-                COALESCE(
-                    CASE WHEN sb.tx_count > 0 THEN sb.stock_before_start ELSE NULL END,
-                    fi.fallback_quantity,
-                    p.quantite
-                ) <> 0
-                OR COALESCE(a.total_entry, 0) <> 0
-                OR COALESCE(v.total_exit, 0) <> 0
+                DB::raw("COALESCE(a.total_entry, 0) AS total_entry"),
+                DB::raw("COALESCE(v.total_exit, 0) AS total_exit"),
+                DB::raw("
+                (
+                    COALESCE(
+                        CASE WHEN sb.tx_count > 0 THEN sb.stock_before_start ELSE NULL END,
+                        fi.fallback_quantity,
+                        p.quantite
+                    )
+                    + COALESCE(a.total_entry, 0)
+                    - COALESCE(v.total_exit, 0)
+                ) AS stock_remaining
+            ")
             )
-        ")
-        ->orderBy('p.designation', 'asc')
-        ->get();
+            ->leftJoinSub($stockBefore, 'sb', fn($j) => $j->on('sb.product_id', '=', 'p.id'))
+            ->leftJoinSub($fallbackInit, 'fi', fn($j) => $j->on('fi.product_id', '=', 'p.id'))
+            ->leftJoinSub($achatsSummary, 'a', fn($j) => $j->on('a.product_id', '=', 'p.id'))
+            ->leftJoinSub($ventesSummary, 'v', fn($j) => $j->on('v.product_id', '=', 'p.id'))
+            ->where('p.designation', 'like', $searchTerm)
+            ->orderBy('p.designation', 'asc')
+            ->get();
 
-    // --- Construire les transactions ---
-    $data = $rows->map(function ($row) use ($date_end) {
-        $lastTx = DB::table('logistiques')
-            ->where('product_id', $row->product_id)
-            ->whereNotNull('reference')
-            ->whereNotNull('type_transaction')
-            ->orderBy('date_transaction', 'desc')
-            ->orderBy('id', 'desc')
-            ->first();
+        // ------------------------------
+        // 🔥 AJOUT : Récupération des vraies transactions logistiques
+        // ------------------------------
 
-        $summary = [
-            'type'              => $lastTx->type_transaction ?? 'summary',
-            'reference'         => $lastTx->reference ?? 'Résumé global',
-            'previous_quantity' => (float) $row->previous_quantity,
-            'entry'             => (float) $row->total_entry,
-            'exit'              => (float) $row->total_exit,
-            'stock_remaining'   => (float) ($row->previous_quantity + $row->total_entry - $row->total_exit),
-            'date_transaction'  => $date_end,
-        ];
+        $data = $rows->map(function ($row) use ($date_start, $date_end) {
 
-        return [
-            'product_id'   => $row->product_id,
-            'product_name' => $row->product_name,
-            'transactions' => [$summary],
-        ];
-    })->toArray();
+            // Récupérer toutes les transactions logistiques dans l'intervalle
+            $transactions = DB::table('logistiques')
+                ->where('product_id', $row->product_id)
+                ->whereBetween('date_transaction', [$date_start, $date_end])
+                ->orderBy('date_transaction', 'asc')
+                ->get()
+                ->map(function ($tx) {
+                    return [
+                        'type'              => $tx->type_transaction,
+                        'reference'         => $tx->reference,
+                        'previous_quantity' => (float) $tx->previous_quantity,
+                        'new_quantity'      => (float) $tx->new_quantity,
+                        'motif'             => $tx->motif,
+                        'date_transaction'  => $tx->date_transaction,
+                    ];
+                })
+                ->toArray();
 
-    return response()->json([
-        'success' => true,
-        'data'    => $data,
-        'message' => 'Fiche de stock générée avec succès',
-    ]);
-}
+            return [
+                'product_id'    => $row->product_id,
+                'product_name'  => $row->product_name,
+
+                // Résumé calculé + transactions réelles
+                'transactions'  => array_merge([
+                    [
+                        'type'              => 'summary',
+                        'reference'         => 'Résumé global',
+                        'previous_quantity' => (float) $row->previous_quantity,
+                        'entry'             => (float) $row->total_entry,
+                        'exit'              => (float) $row->total_exit,
+                        'stock_remaining'   => (float) $row->stock_remaining,
+                        'date_transaction'  => $date_end,
+                    ]
+                ], $transactions),
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data'    => $data,
+            'message' => 'Fiche de stock générée avec succès',
+        ]);
+    }
 
     // public function stockReportData(Request $request)
     // {
