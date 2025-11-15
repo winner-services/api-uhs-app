@@ -477,7 +477,7 @@ class ReportController extends Controller
                     ->on('lg.date_transaction', '=', 'latest_init.max_date');
             })
             ->where('lg.type_transaction', 'initial');
-
+dd(DB::table('entrees')->whereBetween('date_transaction', [$date_start,$date_end])->get());
         $achatsSummary = DB::table('entrees')
             ->select('product_id', DB::raw('SUM(quantite) as total_entry'))
             // ->where('deleted', 0)
