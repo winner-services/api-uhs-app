@@ -3114,17 +3114,17 @@
             }
         },
         "/api/rapport.fiche-stock": {
-            "get": {
+            "post": {
                 "tags": [
                     "Rapports"
                 ],
                 "summary": "Liste des trasactionsReport",
-                "operationId": "6a501c64bd3ef569cb1a5f30d3158e66",
+                "operationId": "a206563877fe9eb8e1f819c822e268b8",
                 "parameters": [
                     {
                         "name": "date_start",
                         "in": "query",
-                        "description": "Date de début au format YYYY-MM-DD (inclus). Par défaut : début du mois courant.",
+                        "description": "Date de début au format YYYY-MM-DD",
                         "required": false,
                         "schema": {
                             "type": "string",
@@ -3135,7 +3135,7 @@
                     {
                         "name": "date_end",
                         "in": "query",
-                        "description": "Date de fin au format YYYY-MM-DD (inclus). Par défaut : date du jour.",
+                        "description": "Date de fin au format YYYY-MM-DD",
                         "required": false,
                         "schema": {
                             "type": "string",

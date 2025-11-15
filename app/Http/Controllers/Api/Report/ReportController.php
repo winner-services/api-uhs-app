@@ -442,14 +442,14 @@ class ReportController extends Controller
      *         name="date_start",
      *         in="query",
      *         required=false,
-     *         description="Date de début au format YYYY-MM-DD (inclus). Par défaut : début du mois courant.",
+     *         description="Date de début au format YYYY-MM-DD",
      *         @OA\Schema(type="string", format="date", example="2025-10-01")
      *     ),
      *     @OA\Parameter(
      *         name="date_end",
      *         in="query",
      *         required=false,
-     *         description="Date de fin au format YYYY-MM-DD (inclus). Par défaut : date du jour.",
+     *         description="Date de fin au format YYYY-MM-DD",
      *         @OA\Schema(type="string", format="date", example="2025-10-25")
      *     ),
      * @OA\Response(response=200, description="Liste récupérée avec succès"),
