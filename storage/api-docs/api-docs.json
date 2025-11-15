@@ -3190,13 +3190,13 @@
                 }
             }
         },
-        "/api/rapport.getAllData": {
+        "/api/rapport.getProductAllData": {
             "get": {
                 "tags": [
                     "Rapports"
                 ],
                 "summary": "Liste des produits",
-                "operationId": "1daa9f090051c05ecb6034d0591efb5a",
+                "operationId": "4439d56945b5be010603cbb3a4e9eb1d",
                 "responses": {
                     "200": {
                         "description": "Liste récupérée avec succès"

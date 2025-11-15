@@ -597,7 +597,7 @@ class ReportController extends Controller
     }
     /**
      * @OA\Get(
-     * path="/api/rapport.getAllData",
+     * path="/api/rapport.getProductAllData",
      * summary="Liste des produits",
      * tags={"Rapports"},
      * @OA\Response(response=200, description="Liste récupérée avec succès"),
