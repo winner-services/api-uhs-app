@@ -457,7 +457,7 @@ class ReportController extends Controller
      */
     public function stockReportData(Request $request)
     {
-        // 🔹 Validation minimale
+        // Validation
         $request->validate([
             'date_start' => ['required', 'date'],
             'date_end'   => ['required', 'date'],
@@ -468,7 +468,7 @@ class ReportController extends Controller
         $date_end   = $request->input('date_end');
         $searchTerm = '%' . $request->query('q', '') . '%';
 
-        // --- Sous-requêtes ---
+        // Sous-requêtes inchangées
         $stockBefore = DB::table('logistiques')
             ->select(
                 'product_id',
@@ -509,7 +509,7 @@ class ReportController extends Controller
             ->whereBetween(DB::raw('DATE(date_transaction)'), [$date_start, $date_end])
             ->groupBy('product_id');
 
-        // --- Requête principale ---
+        // Requête principale
         $rows = DB::table('produits as p')
             ->select(
                 'p.id as product_id',
@@ -540,39 +540,51 @@ class ReportController extends Controller
             ->leftJoinSub($achatsSummary, 'a', fn($j) => $j->on('a.product_id', '=', 'p.id'))
             ->leftJoinSub($ventesSummary, 'v', fn($j) => $j->on('v.product_id', '=', 'p.id'))
             ->where('p.designation', 'like', $searchTerm)
-            ->whereRaw("
-            (
-                COALESCE(
-                    CASE WHEN sb.tx_count > 0 THEN sb.stock_before_start ELSE NULL END,
-                    fi.fallback_quantity,
-                    p.quantite
-                ) <> 0
-                OR COALESCE(a.total_entry, 0) <> 0
-                OR COALESCE(v.total_exit, 0) <> 0
-            )
-        ")
             ->orderBy('p.designation', 'asc')
             ->get();
 
-        // 🔹 Construction format JSON final
-        $data = $rows->map(function ($row) use ($date_end) {
+        // ------------------------------
+        // 🔥 AJOUT : Récupération des vraies transactions logistiques
+        // ------------------------------
 
-            $summary = [
-                'type'              => 'summary',
-                'reference'         => 'Résumé global',
-                'previous_quantity' => (float) $row->previous_quantity,
-                'entry'             => (float) $row->total_entry,
-                'exit'              => (float) $row->total_exit,
-                'stock_remaining'   => (float) $row->stock_remaining,
-                'date_transaction'  => $date_end,
-            ];
+        $data = $rows->map(function ($row) use ($date_start, $date_end) {
+
+            // Récupérer toutes les transactions logistiques dans l'intervalle
+            $transactions = DB::table('logistiques')
+                ->where('product_id', $row->product_id)
+                ->whereBetween('date_transaction', [$date_start, $date_end])
+                ->orderBy('date_transaction', 'asc')
+                ->get()
+                ->map(function ($tx) {
+                    return [
+                        'type'              => $tx->type_transaction,
+                        'reference'         => $tx->reference,
+                        'previous_quantity' => (float) $tx->previous_quantity,
+                        'new_quantity'      => (float) $tx->new_quantity,
+                        'motif'             => $tx->motif,
+                        'date_transaction'  => $tx->date_transaction,
+                    ];
+                })
+                ->toArray();
 
             return [
-                'product_id'   => $row->product_id,
-                'product_name' => $row->product_name,
-                'transactions' => [$summary],
+                'product_id'    => $row->product_id,
+                'product_name'  => $row->product_name,
+
+                // Résumé calculé + transactions réelles
+                'transactions'  => array_merge([
+                    [
+                        'type'              => 'summary',
+                        'reference'         => 'Résumé global',
+                        'previous_quantity' => (float) $row->previous_quantity,
+                        'entry'             => (float) $row->total_entry,
+                        'exit'              => (float) $row->total_exit,
+                        'stock_remaining'   => (float) $row->stock_remaining,
+                        'date_transaction'  => $date_end,
+                    ]
+                ], $transactions),
             ];
-        })->toArray();
+        });
 
         return response()->json([
             'success' => true,
