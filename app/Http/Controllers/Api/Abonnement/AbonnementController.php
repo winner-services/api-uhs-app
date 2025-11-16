@@ -244,7 +244,7 @@ class AbonnementController extends Controller
      * @OA\Response(response=404, description="Abonné non trouvé")
      * )
      */
-    public function update(Request $request, $id)
+    public function updateAbonne(Request $request, $id)
     {
         $abonne = Abonne::findOrFail($id);
 

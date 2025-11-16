@@ -80,7 +80,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/abonnes.getOptionsData', 'getaAbonnellData');
         Route::post('/abonnes.store', 'store');
         Route::get('/rapport.abonne', 'getByCategorie');
-        Route::put('/abonnes.update/{id}', 'update');
+        Route::put('/abonnes.update/{id}', 'updateAbonne');
         Route::delete('/abonnes.delete/{id}', 'destroy');
     });
 
