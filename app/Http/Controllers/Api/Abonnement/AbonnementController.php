@@ -249,17 +249,17 @@ class AbonnementController extends Controller
         $abonne = Abonne::findOrFail($id);
 
         $rules = [
-            'nom' => ['required', 'string'],
-            'categorie_id' => ['required'],
+            'nom' => ['required', 'string', 'max:255'],
+            'categorie_id' => ['required', 'integer', 'exists:abonnement_categories,id'],
             'telephone' => ['nullable', 'string', 'max:20'],
             'adresse' => ['nullable', 'string', 'max:255'],
             'genre' => ['nullable', 'string', 'max:255'],
-            'statut' => ['nullable', 'string', 'max:255'],
+            'status' => ['nullable', 'string', 'max:255'],
             'num_piece_identite' => [
                 'nullable',
                 'string',
                 'max:255',
-                Rule::unique('abonnes', 'num_piece')->ignore($abonne->id),
+                Rule::unique('abonnes', 'num_piece_identite')->ignore($abonne->id),
             ],
             'piece_identite' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ];
@@ -301,8 +301,8 @@ class AbonnementController extends Controller
             $abonne->telephone = $request->telephone;
             $abonne->adresse = $request->adresse;
             $abonne->genre = $request->genre;
-            $abonne->statut = $request->status;
-            $abonne->num_piece_identite = $request->num_piece;
+            $abonne->status = $request->status;
+            $abonne->num_piece_identite = $request->num_piece_identite;
             $abonne->addedBy = $user->id;
 
             if ($newPiecePath) {
