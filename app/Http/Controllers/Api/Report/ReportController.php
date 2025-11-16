@@ -521,7 +521,7 @@ class ReportController extends Controller
         //     ->groupBy('product_id');
         
         $achatsSummary = DB::table('logistiques')
-            ->select('product_id', DB::raw('SUM(quantite) as total_exit'))
+            ->select('product_id', DB::raw('SUM(quantite) as total_entry'))
             ->where('type_transaction', 'Entrée')
             ->whereDate('date_transaction', '>=', $date_start)
             ->whereDate('date_transaction', '<=', $date_end)
