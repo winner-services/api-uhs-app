@@ -16,6 +16,7 @@ return new class extends Migration
             $table->date('date_transaction');
             $table->decimal('previous_quantity');
             $table->decimal('new_quantity');
+            $table->decimal('quantite');
             $table->text('motif')->nullable();
             $table->string('type_transaction');
             $table->foreignId('product_id')->nullable()->constrained('produits')->nullOnDelete();

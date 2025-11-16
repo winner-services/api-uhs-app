@@ -180,12 +180,14 @@ class EntreeController extends Controller
                 'product_id'        => $request->product_id,
                 'reference'         => fake()->unique()->numerify('ENTR-#####'),
                 'addedBy'           => $userId,
+                'quantite' => $request->quantite
             ]);
 
             // Mise à jour atomique du stock : incrémenter la quantité en base
             $produit->increment('quantite', $request->quantite);
             $produit->refresh();
 
+            // $prix_achat = $request->prix_unit_achat * $request->quantite;
             // Enregistrement dans la trésorerie
             TrasactionTresorerie::create([
                 'motif'            => 'Paiement Approvisionnement',

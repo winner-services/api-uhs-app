@@ -14,6 +14,7 @@ class Logistique extends Model
         'type_transaction',
         'product_id',
         'addedBy',
-        'reference'
+        'reference',
+        'quantite'
     ];
 }

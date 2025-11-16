@@ -191,23 +191,24 @@ class SortieController extends Controller
                 'product_id'         => $request->product_id,
                 'reference'          => fake()->unique()->numerify('SORT-#####'),
                 'addedBy'            => $userId,
+                'quantite' => $request->quantite
             ]);
 
             $produit->decrement('quantite', $request->quantite);
 
             $produit->refresh();
 
-
+            $prix_vente = $request->prix_unit_vente * $request->quantite;
             // Enregistrement dans la trésorerie
             TrasactionTresorerie::create([
                 'motif'            => 'Paiement de la Vente Produits',
                 'transaction_type' => 'RECETTE',
-                'amount'           => $request->prix_unit_vente,
+                'amount'           => $prix_vente,
                 'account_id'       => $request->account_id,
                 'transaction_date' => now()->toDateString(),
                 'addedBy'          => $userId,
                 'reference'        => fake()->unique()->numerify('TRANS-#####'),
-                'solde'            => $solde + $request->prix_unit_vente
+                'solde'            => $solde + $prix_vente
             ]);
 
             DB::commit();
