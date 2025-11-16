@@ -553,7 +553,9 @@ class ReportController extends Controller
                 'p.designation as product_name',
                 DB::raw("
     COALESCE(
-        fq.first_new_quantity, 
+        CASE WHEN sb.tx_count > 0 THEN sb.stock_before_start ELSE NULL END,
+        fi.fallback_quantity,
+        fq.first_new_quantity,
         p.quantite
     ) AS previous_quantity
 "),
