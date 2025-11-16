@@ -24,10 +24,11 @@ class TransactionTresorerieController extends Controller
      */
     public function getTransactionData()
     {
-        $caisse = Tresorerie::where('designation', 'Caisse')->first();
+        // $caisse = Tresorerie::where('designation', 'Caisse')->first();
+        $caisse = Tresorerie::first();
         if (is_null($caisse)) {
             return response()->json([
-                'message' => "Compte 'CAISSE' introuvable",
+                'message' => "Compte introuvable",
                 'success' => false,
                 'status' => 404
             ]);
