@@ -515,29 +515,21 @@ class ReportController extends Controller
             })
             ->where('lg.type_transaction', 'initial');
 
-        // $achatsSummary = DB::table('entrees')
-        //     ->select('product_id', DB::raw('SUM(quantite) as total_entry'))
-        //     ->whereBetween(DB::raw('DATE(date_transaction)'), [$date_start, $date_end])
-        //     ->groupBy('product_id');
+
 
         $firstOp = DB::table('logistiques')
-    ->select('product_id', DB::raw('MIN(date_transaction) as first_date'))
-    ->groupBy('product_id');
-$firstQuantity = DB::table('logistiques as lg')
-    ->joinSub($firstOp, 'fo', function ($join) {
-        $join->on('lg.product_id', '=', 'fo.product_id')
-             ->on('lg.date_transaction', '=', 'fo.first_date');
-    })
-    ->select('lg.product_id', 'lg.new_quantity as first_new_quantity');
-
-        
-        $achatsSummary = DB::table('logistiques')
-            ->select('product_id', DB::raw('SUM(quantite) as total_entry'))
-            ->where('type_transaction', 'Entrée')
-            ->whereDate('date_transaction', '>=', $date_start)
-            ->whereDate('date_transaction', '<=', $date_end)
+            ->select('product_id', DB::raw('MIN(date_transaction) as first_date'))
             ->groupBy('product_id');
-
+        $firstQuantity = DB::table('logistiques as lg')
+            ->joinSub($firstOp, 'fo', function ($join) {
+                $join->on('lg.product_id', '=', 'fo.product_id')
+                    ->on('lg.date_transaction', '=', 'fo.first_date');
+            })
+            ->select('lg.product_id', 'lg.new_quantity as first_new_quantity');
+        $achatsSummary = DB::table('entrees')
+            ->select('product_id', DB::raw('SUM(quantite) as total_entry'))
+            ->whereBetween(DB::raw('DATE(date_transaction)'), [$date_start, $date_end])
+            ->groupBy('product_id');
         $ventesSummary = DB::table('logistiques')
             ->select('product_id', DB::raw('SUM(quantite) as total_exit'))
             ->where('type_transaction', 'Sortie')
@@ -558,8 +550,7 @@ $firstQuantity = DB::table('logistiques as lg')
         fq.first_new_quantity,
         p.quantite
     ) AS previous_quantity
-")
-,
+"),
                 DB::raw("COALESCE(a.total_entry, 0) AS total_entry"),
                 DB::raw("COALESCE(v.total_exit, 0) AS total_exit"),
                 DB::raw("
