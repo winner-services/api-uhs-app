@@ -19,11 +19,11 @@ return new class extends Migration
                 ->constrained('abonnement_categories')
                 ->nullOnDelete();
             $table->string('telephone')->nullable();
-            $table->string('statut')->nullable();
+            $table->string('status')->nullable();
             $table->string('genre')->nullable();
             $table->string('adresse')->nullable();
             $table->string('piece_identite')->nullable();
-            $table->string('num_piece')->nullable();
+            $table->string('num_piece_identite')->nullable();
             $table->foreignId('addedBy')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });

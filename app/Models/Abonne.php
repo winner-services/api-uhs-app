@@ -13,9 +13,9 @@ class Abonne extends Model
         'adresse',
         'addedBy',
         'genre',
-        'statut',
+        'status',
         'piece_identite',
-        'num_piece'
+        'num_piece_identite'
     ];
 
     public function categorie()

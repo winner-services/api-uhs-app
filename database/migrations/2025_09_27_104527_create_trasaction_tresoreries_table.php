@@ -17,10 +17,10 @@ return new class extends Migration
             $table->date('transaction_date');
             $table->foreignId('account_id')
                 ->constrained('tresoreries');
-            $table->decimal('amount', 8, 2);
+            $table->decimal('amount', 10, 2);
             $table->string('transaction_type');
             $table->foreignId('facturation_id')->nullable()->constrained('facturations')->onDelete('set null');
-            $table->float('solde');
+            $table->decimal('solde', 10, 2);
             $table->boolean('status')->default(true);
             $table->string('reference')->nullable();
             $table->foreignId('addedBy')->constrained('users');

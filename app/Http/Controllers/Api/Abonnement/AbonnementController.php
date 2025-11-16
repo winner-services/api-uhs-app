@@ -149,7 +149,7 @@ class AbonnementController extends Controller
             'adresse' => ['nullable', 'string', 'max:255'],
             'genre' => ['nullable', 'string', 'max:255'],
             'status' => ['nullable', 'string', 'max:255'],
-            'num_piece' => ['nullable', 'string', 'max:255'],
+            'num_piece_identite' => ['nullable', 'string', 'max:255'],
             'piece_identite' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ];
 
@@ -189,8 +189,8 @@ class AbonnementController extends Controller
                 'telephone' => $request->telephone,
                 'adresse' => $request->adresse,
                 'genre' => $request->genre,
-                'statut' => $request->status,
-                'num_piece' => $request->num_piece,
+                'status' => $request->status,
+                'num_piece_identite' => $request->num_piece_identite,
                 'piece_identite' => $piecePath,
                 'addedBy' => $user->id
             ]);
@@ -255,7 +255,7 @@ class AbonnementController extends Controller
             'adresse' => ['nullable', 'string', 'max:255'],
             'genre' => ['nullable', 'string', 'max:255'],
             'statut' => ['nullable', 'string', 'max:255'],
-            'num_piece' => [
+            'num_piece_identite' => [
                 'nullable',
                 'string',
                 'max:255',
@@ -302,7 +302,7 @@ class AbonnementController extends Controller
             $abonne->adresse = $request->adresse;
             $abonne->genre = $request->genre;
             $abonne->statut = $request->status;
-            $abonne->num_piece = $request->num_piece;
+            $abonne->num_piece_identite = $request->num_piece;
             $abonne->addedBy = $user->id;
 
             if ($newPiecePath) {
