@@ -519,18 +519,7 @@ class ReportController extends Controller
         //     ->select('product_id', DB::raw('SUM(quantite) as total_entry'))
         //     ->whereBetween(DB::raw('DATE(date_transaction)'), [$date_start, $date_end])
         //     ->groupBy('product_id');
-        $firstOp = DB::table('logistiques')
-    ->select('product_id', DB::raw('MIN(date_transaction) as first_date'))
-    ->groupBy('product_id');
-
-$firstQuantity = DB::table('logistiques as lg')
-    ->joinSub($firstOp, 'fo', function ($join) {
-        $join->on('lg.product_id', '=', 'fo.product_id')
-             ->on('lg.date_transaction', '=', 'fo.first_date');
-    })
-    ->select('lg.product_id', 'lg.new_quantity as first_new_quantity');
-
-
+        
         $achatsSummary = DB::table('logistiques')
             ->select('product_id', DB::raw('SUM(quantite) as total_exit'))
             ->where('type_transaction', 'Entrée')
@@ -576,7 +565,6 @@ $firstQuantity = DB::table('logistiques as lg')
             ->leftJoinSub($fallbackInit, 'fi', fn($j) => $j->on('fi.product_id', '=', 'p.id'))
             ->leftJoinSub($achatsSummary, 'a', fn($j) => $j->on('a.product_id', '=', 'p.id'))
             ->leftJoinSub($ventesSummary, 'v', fn($j) => $j->on('v.product_id', '=', 'p.id'))
-            ->leftJoinSub($firstQuantity, 'fq', fn($j) => $j->on('fq.product_id', '=', 'p.id'))
             ->where('p.designation', 'like', $searchTerm)
             ->whereRaw("
             (
