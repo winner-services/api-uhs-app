@@ -249,8 +249,8 @@ class AbonnementController extends Controller
         $abonne = Abonne::findOrFail($id);
 
         $rules = [
-            'nom' => ['required', 'string', 'max:255'],
-            'categorie_id' => ['required', 'integer', 'exists:abonnement_categories,id'],
+            // 'nom' => ['required', 'string', 'max:255'],
+            // 'categorie_id' => ['required', 'integer', 'exists:abonnement_categories,id'],
             'telephone' => ['nullable', 'string', 'max:20'],
             'adresse' => ['nullable', 'string', 'max:255'],
             'genre' => ['nullable', 'string', 'max:255'],
@@ -296,8 +296,8 @@ class AbonnementController extends Controller
             $user = Auth::user();
 
             // 🔸 Mise à jour des informations
-            $abonne->nom = $request->nom;
-            $abonne->categorie_id = $request->categorie_id;
+            // $abonne->nom = $request->nom;
+            // $abonne->categorie_id = $request->categorie_id;
             $abonne->telephone = $request->telephone;
             $abonne->adresse = $request->adresse;
             $abonne->genre = $request->genre;
