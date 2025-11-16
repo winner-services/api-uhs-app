@@ -522,7 +522,9 @@ class ReportController extends Controller
 
         $ventesSummary = DB::table('sorties')
             ->select('product_id', DB::raw('SUM(quantite) as total_exit'))
-            ->whereBetween(DB::raw('DATE(date_transaction)'), [$date_start, $date_end])
+            // utiliser whereDate pour être sûr que la comparaison de date fonctionne
+            ->whereDate('date_transaction', '>=', $date_start)
+            ->whereDate('date_transaction', '<=', $date_end)
             ->groupBy('product_id');
 
         // --- Requête principale ---
