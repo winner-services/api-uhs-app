@@ -519,6 +519,17 @@ class ReportController extends Controller
         //     ->select('product_id', DB::raw('SUM(quantite) as total_entry'))
         //     ->whereBetween(DB::raw('DATE(date_transaction)'), [$date_start, $date_end])
         //     ->groupBy('product_id');
+
+        $firstOp = DB::table('logistiques')
+    ->select('product_id', DB::raw('MIN(date_transaction) as first_date'))
+    ->groupBy('product_id');
+$firstQuantity = DB::table('logistiques as lg')
+    ->joinSub($firstOp, 'fo', function ($join) {
+        $join->on('lg.product_id', '=', 'fo.product_id')
+             ->on('lg.date_transaction', '=', 'fo.first_date');
+    })
+    ->select('lg.product_id', 'lg.new_quantity as first_new_quantity');
+
         
         $achatsSummary = DB::table('logistiques')
             ->select('product_id', DB::raw('SUM(quantite) as total_entry'))
@@ -541,12 +552,14 @@ class ReportController extends Controller
                 'p.id as product_id',
                 'p.designation as product_name',
                 DB::raw("
-                COALESCE(
-                    CASE WHEN sb.tx_count > 0 THEN sb.stock_before_start ELSE NULL END,
-                    fi.fallback_quantity,
-                    p.quantite
-                ) AS previous_quantity
-            "),
+    COALESCE(
+        CASE WHEN sb.tx_count > 0 THEN sb.stock_before_start ELSE NULL END,
+        fi.fallback_quantity,
+        fq.first_new_quantity,
+        p.quantite
+    ) AS previous_quantity
+")
+,
                 DB::raw("COALESCE(a.total_entry, 0) AS total_entry"),
                 DB::raw("COALESCE(v.total_exit, 0) AS total_exit"),
                 DB::raw("
@@ -565,6 +578,7 @@ class ReportController extends Controller
             ->leftJoinSub($fallbackInit, 'fi', fn($j) => $j->on('fi.product_id', '=', 'p.id'))
             ->leftJoinSub($achatsSummary, 'a', fn($j) => $j->on('a.product_id', '=', 'p.id'))
             ->leftJoinSub($ventesSummary, 'v', fn($j) => $j->on('v.product_id', '=', 'p.id'))
+            ->leftJoinSub($firstQuantity, 'fq', fn($j) => $j->on('fq.product_id', '=', 'p.id'))
             ->where('p.designation', 'like', $searchTerm)
             ->whereRaw("
             (
