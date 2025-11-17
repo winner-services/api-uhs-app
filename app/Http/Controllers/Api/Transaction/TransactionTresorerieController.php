@@ -355,9 +355,9 @@ class TransactionTresorerieController extends Controller
             'date_transaction' => ['nullable', 'date'],
             'description'     => ['nullable', 'string']
         ];
-
+dd('winne');
         $validated = $request->validate($rules);
-        dd('winne');
+        
         DB::beginTransaction();
         $user = Auth::user();
 
