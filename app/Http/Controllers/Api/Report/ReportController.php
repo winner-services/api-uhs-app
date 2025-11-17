@@ -704,7 +704,7 @@ class ReportController extends Controller
                 'id' => $f->id,
                 'mois' => $f->mois,
                 'montant' => number_format($f->montant, 2, '.', ''),
-                'dette' => number_format($f->dette_en_cours, 2, '.', ''),
+                'dette' => number_format($f->dete_en_cours, 2, '.', ''),
                 'deja_paye' => number_format($f->deja_paye, 2, '.', ''),
                 'status' => $f->status,
                 'date_emission' => $f->date_emission ? Carbon::parse($f->date_emission)->toDateString() : null,
@@ -713,27 +713,24 @@ class ReportController extends Controller
 
         // Construire la réponse (mimique de votre exemple)
         $response = [
-            'abonne' => [
-                'nom' => $abonne->nom ?? null,
-                'gender' => $abonne->gender ?? null,
-                'telephone' => $abonne->telephone ?? null,
-                'adresse' => $abonne->adresse ?? null,
-                'categorie' => $categorie->designation ?? null,
-                'prix_mensuel' => $categorie && $categorie->prix_mensuel !== null ? number_format($categorie->prix_mensuel, 2, '.', '') : null,
-                'reference_borne' => $pointEau->matricule ?? null,
-                'status' => $pointEau->status ?? null,
-                'village_borne' => $pointEau->village ?? null,
-                'quartier_borne' => $pointEau->quartier ?? null,
-            ],
+            'nom' => $abonne->nom ?? null,
+            'gender' => $abonne->gender ?? null,
+            'telephone' => $abonne->telephone ?? null,
+            'adresse' => $abonne->adresse ?? null,
+            'categorie' => $categorie->designation ?? null,
+            'prix_mensuel' => $categorie && $categorie->prix_mensuel !== null ? number_format($categorie->prix_mensuel, 2, '.', '') : null,
+            'reference_borne' => $pointEau->matricule ?? null,
+            'status' => $pointEau->status ?? null,
+            'village_borne' => $pointEau->village ?? null,
+            'quartier_borne' => $pointEau->quartier ?? null,
             'facturations' => $facturations,
         ];
 
         return response()->json([
             'success' => true,
-            'data' => [
-                 $response,
-                'company_info' => $about,
-            ]
+            'status' => 200,
+            'data' => $response,
+            'company_info' => $about,
         ]);
     }
 }
