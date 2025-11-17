@@ -134,8 +134,14 @@ class FacturationController extends Controller
              * 1️⃣ Récupérer tous les abonnements actifs (point_eau_abonnes)
              *    + abonné + catégorie
              */
+            // $abonnements = PointEauAbonne::with(['abonne.categorie'])
+            //     ->whereHas('abonne') 
+            //     ->get();
             $abonnements = PointEauAbonne::with(['abonne.categorie'])
-                ->whereHas('abonne') // sécurité : exclure les abonnements sans abonné
+                ->whereHas('abonne')
+                ->whereHas('pointEau', function ($q) {
+                    $q->where('status', '!=', 'Inactif');
+                })
                 ->get();
 
             if ($abonnements->isEmpty()) {
@@ -241,7 +247,7 @@ class FacturationController extends Controller
         }
     }
 
-       /**
+    /**
      * @OA\Get(
      *     path="/api/facturations.Proformat",
      *     summary="Liste",
@@ -260,7 +266,7 @@ class FacturationController extends Controller
      */
     public function getByStatusGrouped()
     {
-                $about = About::first();
+        $about = About::first();
 
         if ($about && $about->logo) {
             $path = storage_path('app/public/' . $about->logo);
