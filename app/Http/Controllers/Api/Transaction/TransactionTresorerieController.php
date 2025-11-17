@@ -345,7 +345,7 @@ class TransactionTresorerieController extends Controller
      */
 
     public function transferFunds(Request $request)
-    { 
+    {
         // Validation
         $rules = [
             'account_from_id' => ['required', 'integer', 'exists:tresoreries,id'],
@@ -355,20 +355,27 @@ class TransactionTresorerieController extends Controller
             'date_transaction' => ['nullable', 'date'],
             'description'     => ['nullable', 'string']
         ];
-dd('winne');
-        $validated = $request->validate($rules);
-        
+
+        $validator = Validator::make($request->all(), $rules);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Données invalides.',
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
         DB::beginTransaction();
         $user = Auth::user();
 
         try {
-            
+
             // Récupérer les dernières transactions (pour obtenir le solde courant)
-            $from = TrasactionTresorerie::where('account_id', $validated['account_from_id'])
+            $from = TrasactionTresorerie::where('account_id', $request->account_from_id)
                 ->latest('id')
                 ->first();
 
-            $to = TrasactionTresorerie::where('account_id', $validated['account_to_id'])
+            $to = TrasactionTresorerie::where('account_id', $request->account_to_id)
                 ->latest('id')
                 ->first();
 
@@ -376,7 +383,7 @@ dd('winne');
             $solde_to   = $to ? $to->solde : 0;
 
             // Vérification du solde suffisant
-            if ($solde_from < $validated['montant']) {
+            if ($solde_from < $request->montant) {
                 // On peut retourner 422 pour une erreur de logique métier, ou garder 500 si tu préfères.
                 DB::rollBack();
                 return response()->json([
@@ -387,13 +394,13 @@ dd('winne');
 
             // Historique global du transfert
             $transaction = HistoriqueTransactions::create([
-                'account_from_id' => $validated['account_from_id'],
-                'account_to_id'   => $validated['account_to_id'],
-                'montant'         => $validated['montant'],
-                'type_transaction' => $validated['type_transaction'],
-                'description'     => $validated['description'] ?? null,
+                'account_from_id' => $request->account_from_id,
+                'account_to_id'   => $request->account_to_id,
+                'montant'         => $request->montant,
+                'type_transaction' => $request->type_transaction,
+                'description'     => $request->description ?? null,
                 'created_by'      => $user->id,
-                'date_transaction' => $validated['date_transaction'] ?? now()
+                'date_transaction' => $request->date_transaction ?? now()
             ]);
 
             // Référence unique (production-safe)
@@ -401,26 +408,26 @@ dd('winne');
 
             // Entrée pour le compte débité (DEPENSE)
             $debitEntry = TrasactionTresorerie::create([
-                'motif'            => $validated['type_transaction'],
+                'motif'            => $request->type_transaction,
                 'transaction_type' => 'DEPENSE',
-                'amount'           => $validated['montant'],
-                'account_id'       => $validated['account_from_id'],
-                'transaction_date' => $validated['date_transaction'] ?? now(),
+                'amount'           => $request->montant,
+                'account_id'       => $request->account_from_id,
+                'transaction_date' => $request->date_transaction ?? now(),
                 'addedBy'          => $user->id,
                 'reference'        => $reference . '-D',
-                'solde'            => $solde_from - $validated['montant'],
+                'solde'            => $solde_from - $request->montant,
             ]);
 
             // Entrée pour le compte crédité (RECETTE)
             $creditEntry = TrasactionTresorerie::create([
-                'motif'            => $validated['type_transaction'],
+                'motif'            => $request->type_transaction,
                 'transaction_type' => 'RECETTE',
-                'amount'           => $validated['montant'],
-                'account_id'       => $validated['account_to_id'],
-                'transaction_date' => $validated['date_transaction'] ?? now(),
+                'amount'           => $request->montant,
+                'account_id'       => $request->account_to_id,
+                'transaction_date' => $request->date_transaction ?? now(),
                 'addedBy'          => $user->id,
                 'reference'        => $reference . '-C',
-                'solde'            => $solde_to + $validated['montant'],
+                'solde'            => $solde_to + $request->montant,
             ]);
 
             DB::commit();
