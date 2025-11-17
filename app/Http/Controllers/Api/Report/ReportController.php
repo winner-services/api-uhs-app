@@ -612,14 +612,13 @@ public function stockReportData(Request $request)
             COUNT(*) AS tx_count,
             SUM(
                 CASE
-                    WHEN type_transaction IN ('Entree', 'initial') THEN new_quantity
+                    WHEN type_transaction IN ('Entrée', 'initial') THEN new_quantity
                     WHEN type_transaction = 'Sortie' THEN -new_quantity
                     ELSE 0
                 END
             ) AS stock_before_start
         FROM logistiques
         WHERE date_transaction < ?
-          AND deleted = false
         GROUP BY product_id
     ),
     fallback_initial AS (
@@ -628,18 +627,17 @@ public function stockReportData(Request $request)
         INNER JOIN (
             SELECT product_id, MAX(date_transaction) AS max_date
             FROM logistiques
-            WHERE type_transaction = 'initial' AND deleted = false
+            WHERE type_transaction = 'initial'
             GROUP BY product_id
         ) latest_init ON latest_init.product_id = pl.product_id AND latest_init.max_date = pl.date_transaction
-        WHERE pl.type_transaction = 'initial' AND pl.deleted = false
+        WHERE pl.type_transaction = 'initial'
     ),
     achats_summary AS (
         SELECT 
             ad.product_id,
             SUM(ad.quantite) AS total_entry
         FROM entrees ad
-        WHERE ad.deleted = false
-          AND ad.date_transaction BETWEEN ? AND ?
+        WHERE ad.date_transaction BETWEEN ? AND ?
         GROUP BY ad.product_id
     ),
     ventes_summary AS (
@@ -647,8 +645,7 @@ public function stockReportData(Request $request)
             vd.product_id,
             SUM(vd.quantite) AS total_exit
         FROM sorties vd
-        WHERE vd.deleted = false
-          AND vd.date_transaction BETWEEN ? AND ?
+        WHERE vd.date_transaction BETWEEN ? AND ?
         GROUP BY vd.product_id
     )
     SELECT
