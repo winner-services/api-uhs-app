@@ -78,6 +78,15 @@ class User extends Authenticatable
         'permissions_list',
     ];
 
+    public function entree()
+    {
+        return $this->hasMany(Entree::class, 'addedBy');
+    }
+    public function sortie()
+    {
+        return $this->hasMany(Entree::class, 'addedBy');
+    }
+
     public function scopeSearh($query, string $term): void
     {
         $term = "%$term%";

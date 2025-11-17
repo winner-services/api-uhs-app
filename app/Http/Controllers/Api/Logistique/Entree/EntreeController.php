@@ -26,12 +26,13 @@ class EntreeController extends Controller
     public function getallEntree()
     {
         $page = request("paginate", 10);
-        // $q = request("q", "");
+        $q = request("q", "");
         $sort_direction = request('sort_direction', 'desc');
         $sort_field = request('sort_field', 'id');
         $data = Entree::join('produits', 'entrees.product_id', '=', 'produits.id')
             ->join('users', 'entrees.addedBy', '=', 'users.id')
             ->select('entrees.*', 'users.name as addedBy', 'produits.designation as produit')
+            ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
             ->paginate($page);
         $result = [

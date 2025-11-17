@@ -26,12 +26,13 @@ class SortieController extends Controller
     public function getallSortie()
     {
         $page = request("paginate", 10);
-        // $q = request("q", "");
+        $q = request("q", "");
         $sort_direction = request('sort_direction', 'desc');
         $sort_field = request('sort_field', 'id');
         $data = Sortie::join('produits', 'sorties.product_id', '=', 'produits.id')
             ->join('users', 'sorties.addedBy', '=', 'users.id')
             ->select('sorties.*', 'users.name as addedBy', 'produits.designation as produit')
+            ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
             ->paginate($page);
         $result = [

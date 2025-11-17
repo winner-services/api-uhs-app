@@ -14,6 +14,15 @@ class Produit extends Model
         'addedBy'
     ];
 
+    public function entree()
+    {
+        return $this->hasMany(Entree::class, 'product_id');
+    }
+    public function sortie()
+    {
+        return $this->hasMany(Entree::class, 'product_id');
+    }
+
     public function scopeSearh($query, $term)
     {
         $term = "%$term%";

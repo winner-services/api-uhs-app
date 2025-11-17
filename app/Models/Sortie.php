@@ -16,4 +16,28 @@ class Sortie extends Model
         'date_transaction',
         'deleted'
     ];
+
+    public function ptoduit()
+    {
+        return $this->belongsTo(Produit::class, 'product_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'addedBy');
+    }
+
+    public function scopeSearh($query, $term)
+    {
+        $term = "%$term%";
+        $query->where(function ($query) use ($term) {
+            $query->where('entrees.reference', 'like', $term)
+            ->orWhereHas('user', function ($q2) use ($term) {
+                    $q2->where('users.name', 'like', $term);
+                })
+                ->orWhereHas('ptoduit', function ($q2) use ($term) {
+                    $q2->where('produits.designation', 'like', $term);
+                });
+        });
+    }
 }
