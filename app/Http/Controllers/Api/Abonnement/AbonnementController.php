@@ -219,7 +219,7 @@ class AbonnementController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * @OA\Put(
      * path="/api/abonnes.update/{id}",
@@ -242,121 +242,24 @@ class AbonnementController extends Controller
      * @OA\Response(response=404, description="Abonné non trouvé")
      * )
      */
-    // public function updateAbonne(Request $request, $id)
-    // {
-    //     $abonne = Abonne::findOrFail($id);
-
-    //     $rules = [
-    //         'nom' => ['required'],
-    //         'categorie_id' => ['required'],
-    //         'telephone' => ['nullable', 'string', 'max:20'],
-    //         'adresse' => ['nullable', 'string', 'max:255'],
-    //         'genre' => ['nullable', 'string', 'max:255'],
-    //         'status' => ['nullable', 'string', 'max:255'],
-    //         'num_piece_identite' => [
-    //             'nullable',
-    //             'string',
-    //             'max:255',
-    //             Rule::unique('abonnes', 'num_piece_identite')->ignore($abonne->id),
-    //         ],
-    //         'piece_identite' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
-    //     ];
-
-    //     $validator = Validator::make($request->all(), $rules);
-
-    //     if ($validator->fails()) {
-    //         return response()->json([
-    //             'message' => 'Les données envoyées ne sont pas valides.',
-    //             'errors' => $validator->errors()
-    //         ], 422);
-    //     }
-
-    //     $newPiecePath = null;
-    //     $oldPiecePath = $abonne->piece_identite;
-
-    //     // 🔹 Si un nouveau fichier est uploadé, on le stocke avant la transaction
-    //     if ($request->hasFile('piece_identite')) {
-    //         $file = $request->file('piece_identite');
-
-    //         if (!$file->isValid()) {
-    //             return response()->json([
-    //                 'message' => 'Le fichier uploadé est invalide.'
-    //             ], 400);
-    //         }
-
-    //         $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-    //         $newPiecePath = $file->storeAs('pieces_identite', $fileName, 'public');
-    //     }
-
-    //     try {
-    //         DB::beginTransaction();
-
-    //         $user = Auth::user();
-
-    //         // 🔸 Mise à jour des informations
-    //         $abonne->nom = $request->nom;
-    //         $abonne->categorie_id = $request->categorie_id;
-    //         $abonne->telephone = $request->telephone;
-    //         $abonne->adresse = $request->adresse;
-    //         $abonne->genre = $request->genre;
-    //         $abonne->status = $request->status;
-    //         $abonne->num_piece_identite = $request->num_piece_identite;
-    //         $abonne->addedBy = $user->id;
-
-    //         if ($newPiecePath) {
-    //             $abonne->piece_identite = $newPiecePath;
-    //         }
-
-    //         $abonne->save();
-
-    //         DB::commit();
-
-    //         // 🔹 Après commit : si nouveau fichier, supprimer l’ancien
-    //         if ($newPiecePath && $oldPiecePath && Storage::disk('public')->exists($oldPiecePath)) {
-    //             try {
-    //                 Storage::disk('public')->delete($oldPiecePath);
-    //             } catch (\Exception $e) {
-    //                 // Optionnel : journaliser l'erreur
-    //             }
-    //         }
-
-    //         return response()->json([
-    //             'message' => 'Abonné mis à jour avec succès.',
-    //             'success' => true,
-    //             'status' => 200,
-    //             'data' => $abonne
-    //         ], 200);
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-
-    //         // 🔸 Si la transaction échoue, supprimer le nouveau fichier uploadé
-    //         if ($newPiecePath && Storage::disk('public')->exists($newPiecePath)) {
-    //             Storage::disk('public')->delete($newPiecePath);
-    //         }
-
-    //         return response()->json([
-    //             'message' => 'Erreur lors de la mise à jour de l\'abonné.',
-    //             'error' => $e->getMessage()
-    //         ], 500);
-    //     }
-    // }
-    public function update(Request $request, $id)
+    public function updateAbonne(Request $request, $id)
     {
-        $abonne = Abonne::find($id);
-        if (!$abonne) {
-            return response()->json([
-                'message' => 'Abonné non trouvé'
-            ], 404);
-        }
+        $abonne = Abonne::findOrFail($id);
 
         $rules = [
-            'nom'          => ['nullable', 'string', 'max:255'],
-            'categorie_id' => ['nullable', 'integer', 'exists:abonnement_categories,id'],
-            'telephone'    => ['nullable', 'string', 'max:20'],
-            'adresse'      => ['nullable', 'string', 'max:255'],
-            'genre' => ['nullable'],
-            'statut' => ['nullable'],
-            'num_piece' => ['nullable']
+            'nom' => ['required', 'string', 'max:255'],
+            'categorie_id' => ['required', 'integer', 'exists:categories,id'],
+            'telephone' => ['nullable', 'string', 'max:20'],
+            'adresse' => ['nullable', 'string', 'max:255'],
+            'genre' => ['nullable', 'string', 'max:50'],
+            'status' => ['nullable', 'string', 'max:50'],
+            'num_piece_identite' => [
+                'nullable',
+                'string',
+                'max:255',
+                Rule::unique('abonnes', 'num_piece_identite')->ignore($abonne->id),
+            ],
+            'piece_identite' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -364,37 +267,100 @@ class AbonnementController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Les données envoyées ne sont pas valides.',
-                'errors'  => $validator->errors()
+                'errors' => $validator->errors()
             ], 422);
+        }
+
+        $newPiecePath = null;
+        $oldPiecePath = $abonne->piece_identite;
+
+        // Stocke le fichier (si présent) et capture toute erreur d'upload
+        if ($request->hasFile('piece_identite')) {
+            $file = $request->file('piece_identite');
+
+            if (!$file->isValid()) {
+                return response()->json(['message' => 'Le fichier uploadé est invalide.'], 400);
+            }
+
+            $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+            try {
+                $newPiecePath = $file->storeAs('pieces_identite', $fileName, 'public'); // ex: "pieces_identite/123.jpg"
+                if (!$newPiecePath) {
+                    throw new \Exception('Échec du stockage du fichier.');
+                }
+            } catch (\Exception $e) {
+                return response()->json(['message' => 'Erreur lors de l\'upload du fichier.', 'error' => $e->getMessage()], 500);
+            }
         }
 
         try {
             DB::beginTransaction();
+
             $user = Auth::user();
-            $abonne->update([
-                'nom' => $request->nom,
-                'categorie_id' => $request->categorie_id,
-                'telephone' => $request->telephone,
-                'adresse' => $request->adresse,
-                'genre' => $request->genre,
-                'statut' => $request->statut,
-                'num_piece' => $request->num_piece,
-                'addedBy' => $user->id
-            ]);
+
+            // NE PAS écraser addedBy si tu veux garder l'auteur — utilise plutôt updated_by si besoin
+            $abonne->nom = $request->nom;
+            $abonne->categorie_id = $request->categorie_id;
+            $abonne->telephone = $request->telephone;
+            $abonne->adresse = $request->adresse;
+            $abonne->genre = $request->genre;
+            $abonne->status = $request->status;
+            $abonne->num_piece_identite = $request->num_piece_identite;
+
+            // exemple : conserve addedBy, mets updated_by
+            if (property_exists($abonne, 'updated_by')) {
+                $abonne->updated_by = $user->id;
+            }
+
+            if ($newPiecePath) {
+                $abonne->piece_identite = $newPiecePath;
+            }
+
+            $abonne->save();
 
             DB::commit();
 
+            // Après commit : supprimer l'ancien fichier si besoin
+            if ($newPiecePath && $oldPiecePath) {
+                // Si l'ancien contient l'URL complète, extraire le chemin relatif
+                $possibleOld = $oldPiecePath;
+                // Parfois on enregistre "storage/..." ou une URL complète, on normalise :
+                if (str_contains($possibleOld, '/storage/')) {
+                    $possibleOld = substr($possibleOld, strpos($possibleOld, '/storage/') + 9);
+                } elseif (parse_url($possibleOld, PHP_URL_PATH)) {
+                    $pathOnly = parse_url($possibleOld, PHP_URL_PATH);
+                    if (str_starts_with($pathOnly, '/storage/')) {
+                        $possibleOld = substr($pathOnly, 9);
+                    }
+                }
+
+                if (Storage::disk('public')->exists($possibleOld)) {
+                    try {
+                        Storage::disk('public')->delete($possibleOld);
+                    } catch (\Exception $e) {
+                        // journaliser si nécessaire
+                    }
+                }
+            }
+
             return response()->json([
-                'message' => "Abonné mis à jour avec succès",
+                'message' => 'Abonné mis à jour avec succès.',
                 'success' => true,
-                'status'  => 200,
-                'data'    => $abonne
+                'status' => 200,
+                'data' => $abonne
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
+
+            // supprimer le nouveau fichier si la transaction échoue
+            if ($newPiecePath && Storage::disk('public')->exists($newPiecePath)) {
+                Storage::disk('public')->delete($newPiecePath);
+            }
+
             return response()->json([
-                'message' => 'Erreur lors de la mise à jour.',
-                'error'   => $e->getMessage()
+                'message' => 'Erreur lors de la mise à jour de l\'abonné.',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
