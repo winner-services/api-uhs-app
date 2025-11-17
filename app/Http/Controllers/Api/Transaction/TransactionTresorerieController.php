@@ -416,6 +416,7 @@ class TransactionTresorerieController extends Controller
                 'addedBy'          => $user->id,
                 'reference'        => $reference . '-D',
                 'solde'            => $solde_from - $request->montant,
+                'beneficiaire' => $request->beneficiaire
             ]);
 
             // Entrée pour le compte crédité (RECETTE)
@@ -428,6 +429,7 @@ class TransactionTresorerieController extends Controller
                 'addedBy'          => $user->id,
                 'reference'        => $reference . '-C',
                 'solde'            => $solde_to + $request->montant,
+                'beneficiaire' => $request->beneficiaire
             ]);
 
             DB::commit();
