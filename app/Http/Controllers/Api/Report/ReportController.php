@@ -648,7 +648,7 @@ class ReportController extends Controller
                 SUM(vd.quantite) AS total_exit
             FROM sorties vd
             vd.deleted = false
-            AND vd.date_transaction BETWEEN ? AND ?
+            WHERE vd.date_transaction BETWEEN ? AND ?
             GROUP BY vd.product_id
         )
         SELECT
