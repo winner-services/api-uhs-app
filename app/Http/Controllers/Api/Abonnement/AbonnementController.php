@@ -259,7 +259,7 @@ class AbonnementController extends Controller
                 'max:255',
                 Rule::unique('abonnes', 'num_piece_identite')->ignore($abonne->id),
             ],
-            'piece_identite' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
+            'piece_identite' => 'nullable',
         ];
 
         $validator = Validator::make($request->all(), $rules);

@@ -152,7 +152,7 @@ class EntreeController extends Controller
 
             if ($solde < $request->prix_unit_achat) {
                 return response()->json([
-                    'message' => 'Fonds insuffisants',
+                    'message' => 'Solde insuffisant',
                     'status'  => 422,
                 ], 422);
             }
@@ -188,17 +188,17 @@ class EntreeController extends Controller
             $produit->increment('quantite', $request->quantite);
             $produit->refresh();
 
-            // $prix_achat = $request->prix_unit_achat * $request->quantite;
+            $prix_achat = $request->prix_unit_achat * $request->quantite;
             // Enregistrement dans la trésorerie
             TrasactionTresorerie::create([
                 'motif'            => 'Paiement Approvisionnement',
                 'transaction_type' => 'DEPENSE',
-                'amount'           => $request->prix_unit_achat,
+                'amount'           => $prix_achat,
                 'account_id'       => $request->account_id,
                 'transaction_date' => now()->toDateString(),
                 'addedBy'          => $userId,
                 'reference'        => fake()->unique()->numerify('TRANS-#####'),
-                'solde'            => $solde - $request->prix_unit_achat
+                'solde'            => $solde - $prix_achat
             ]);
 
             DB::commit();
