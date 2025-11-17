@@ -351,7 +351,6 @@ class TransactionTresorerieController extends Controller
             'account_from_id' => ['required', 'integer', 'exists:tresoreries,id'],
             'account_to_id'   => ['required', 'integer', 'exists:tresoreries,id', 'different:account_from_id'],
             'amount'         => ['required', 'numeric', 'min:0.01'],
-            'type_transaction' => ['required', 'string'],
             'date_transaction' => ['nullable', 'date'],
             'description'     => ['nullable', 'string']
         ];
