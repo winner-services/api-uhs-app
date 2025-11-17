@@ -261,6 +261,7 @@ class AbonnementController extends Controller
             ],
             'piece_identite' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ];
+dd($request->all(), $request->files->all());
 
         $validator = Validator::make($request->all(), $rules);
 
