@@ -345,7 +345,7 @@ class TransactionTresorerieController extends Controller
      */
 
     public function transferFunds(Request $request)
-    {
+    { dd('winne');
         // Validation
         $rules = [
             'account_from_id' => ['required', 'integer', 'exists:tresoreries,id'],
@@ -360,7 +360,7 @@ class TransactionTresorerieController extends Controller
 
         DB::beginTransaction();
         $user = Auth::user();
-dd($validated);
+
         try {
             
             // Récupérer les dernières transactions (pour obtenir le solde courant)
