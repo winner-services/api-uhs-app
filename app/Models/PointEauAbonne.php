@@ -20,4 +20,8 @@ class PointEauAbonne extends Model
     {
         return $this->belongsTo(PointEau::class, 'point_eau_id');
     }
+    public function facturations()
+    {
+        return $this->hasMany(Facturation::class, 'point_eau_abonnes_id');
+    }
 }

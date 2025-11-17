@@ -13,6 +13,7 @@ use App\Models\Ticket;
 use App\Models\TrasactionTresorerie;
 use App\Models\Versement;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
@@ -629,5 +630,92 @@ class ReportController extends Controller
             'status' => 200
         ];
         return response()->json($result);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/report.facturation/{id}",
+     *     tags={"Rapports"},
+     *     summary="Rapport complet d’un point_eau_abonnes",
+     *     description="Retourne les informations de l’abonné, sa catégorie, le point d’eau et ses facturations.",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="ID du point_eau_abonnes",
+     *         @OA\Schema(type="integer", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Rapport généré avec succès",
+     *         @OA\JsonContent(type="object")
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="PointEauAbonne introuvable ou point d’eau inactif"
+     *     )
+     * )
+     */
+
+    public function reportFacturation($id)
+    {
+        // Récupérer l'abonnement (avec contrainte : le point_eau doit être Actif)
+        $peAbonne = PointEauAbonne::with([
+            'abonne.categorie',
+            'pointEau',
+            'facturations' => function ($q) {
+                $q->orderBy('date_emission', 'desc');
+            }
+        ])
+            ->where('id', $id)
+            ->whereHas('pointEau', function ($q) {
+                $q->where('status', '!=', 'Inactif'); // exclure point_eau Inactif
+            })
+            ->first();
+
+        if (! $peAbonne) {
+            return response()->json([
+                'message' => 'Abonnement non trouvé ou point d\'eau inactif.'
+            ], 404);
+        }
+
+        $abonne = $peAbonne->abonne;
+        $categorie = $abonne ? $abonne->categorie : null;
+        $pointEau = $peAbonne->pointEau;
+
+        // Formater les facturations
+        $facturations = $peAbonne->facturations->map(function ($f) {
+            return [
+                'id' => $f->id,
+                'mois' => $f->mois,
+                'montant' => number_format($f->montant, 2, '.', ''),
+                'dette' => number_format($f->dette, 2, '.', ''),
+                'deja_paye' => number_format($f->deja_paye, 2, '.', ''),
+                'status' => $f->status,
+                'date_emission' => $f->date_emission ? Carbon::parse($f->date_emission)->toDateString() : null,
+            ];
+        })->values(); // valeurs ré-indexées
+
+        // Construire la réponse (mimique de votre exemple)
+        $response = [
+            'abonne' => [
+                'nom' => $abonne->nom ?? null,
+                'telephone' => $abonne->telephone ?? null,
+                'status' => $abonne->status ?? null,
+                'adresse' => $abonne->adresse ?? null,
+                'categorie' => $categorie->designation ?? null,
+                'prix_mensuel' => $categorie && $categorie->prix_mensuel !== null ? number_format($categorie->prix_mensuel, 2, '.', '') : null,
+            ],
+            'point_eau' => [
+                'id' => $pointEau->id ?? null,
+                'village' => $pointEau->village ?? null,
+                'quartier' => $pointEau->quartier ?? null,
+                'numero_compteur' => $pointEau->numero_compteur ?? null,
+                'status' => $pointEau->status ?? null,
+            ],
+            'facturations' => $facturations,
+        ];
+
+        return response()->json($response);
     }
 }

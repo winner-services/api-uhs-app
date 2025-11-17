@@ -46,4 +46,9 @@ class Abonne extends Model
     {
         return $this->belongsToMany(PointEau::class, 'point_eau_abonnes', 'abonne_id', 'point_eau_id');
     }
+
+    public function pointEauAbonnes()
+    {
+        return $this->hasMany(PointEauAbonne::class, 'abonne_id');
+    }
 }

@@ -171,6 +171,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/rapport.depenseReport', 'depenseReport');
         Route::post('/rapport.fiche-stock', 'stockReportData');
         Route::get('/rapport.getProductAllData', 'getRapportProduitData');
+        Route::get('/report.facturation/{id}','reportFacturation');
     });
 
     Route::controller(MaintenanceController::class)->group(function () {

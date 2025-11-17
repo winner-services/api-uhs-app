@@ -233,7 +233,7 @@
                                         "type": "string",
                                         "example": "Goma, RDC"
                                     },
-                                    "genre": {
+                                    "gender": {
                                         "type": "string",
                                         "example": "Masculin"
                                     },
@@ -266,12 +266,12 @@
             }
         },
         "/api/abonnes.update/{id}": {
-            "put": {
+            "post": {
                 "tags": [
                     "Abonnés"
                 ],
                 "summary": "Mettre à jour un abonné",
-                "operationId": "e9646e83cb52e70c074980b8c33e676f",
+                "operationId": "77219e6086861df61bd0902ced850599",
                 "parameters": [
                     {
                         "name": "id",
@@ -302,7 +302,7 @@
                                         "type": "string",
                                         "example": "Kinshasa, RDC"
                                     },
-                                    "genre": {
+                                    "gender": {
                                         "type": "string",
                                         "example": "Masculin"
                                     },
@@ -3200,6 +3200,43 @@
                 "responses": {
                     "200": {
                         "description": "Liste récupérée avec succès"
+                    }
+                }
+            }
+        },
+        "/api/report.facturation/{id}": {
+            "get": {
+                "tags": [
+                    "Rapports"
+                ],
+                "summary": "Rapport complet d’un point_eau_abonnes",
+                "description": "Retourne les informations de l’abonné, sa catégorie, le point d’eau et ses facturations.",
+                "operationId": "f2e0ef209b60360789d5d0c68ecce973",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID du point_eau_abonnes",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rapport généré avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "PointEauAbonne introuvable ou point d’eau inactif"
                     }
                 }
             }
