@@ -345,7 +345,7 @@ class TransactionTresorerieController extends Controller
      */
 
     public function transferFunds(Request $request)
-    { dd('winne');
+    { 
         // Validation
         $rules = [
             'account_from_id' => ['required', 'integer', 'exists:tresoreries,id'],
@@ -357,7 +357,7 @@ class TransactionTresorerieController extends Controller
         ];
 
         $validated = $request->validate($rules);
-
+        dd('winne');
         DB::beginTransaction();
         $user = Auth::user();
 
