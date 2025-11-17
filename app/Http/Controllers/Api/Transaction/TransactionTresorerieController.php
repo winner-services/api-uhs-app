@@ -121,6 +121,16 @@ class TransactionTresorerieController extends Controller
                 ->first();
             $solde = $lastTransaction ? $lastTransaction->solde : 0;
 
+            if ($request->input('transaction_type') === 'DEPENSE') {
+                if ($solde < $request->input('amount')) {
+                    DB::rollBack();
+                    return response()->json([
+                        'message' => 'solde insuffisant.',
+                        'success' => false,
+                        'status' => 400
+                    ]);
+                }
+            }
             $transaction = [
                 'transaction_date' => $request->input('transaction_date'),
                 'account_id'       => $request->input('account_id'),
