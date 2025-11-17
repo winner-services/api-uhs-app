@@ -25,8 +25,9 @@ class TrasactionTresorerie extends Model
         $term = "%$term%";
         $query->where(function ($query) use ($term) {
             $query->where('trasaction_tresoreries.transaction_type', 'like', $term)
-                ->orWhere('transaction_date', 'like', $term)
-                ->orWhere('motif', 'like', $term)
+                ->orWhere('trasaction_tresoreries.transaction_date', 'like', $term)
+                ->orWhere('trasaction_tresoreries.motif', 'like', $term)
+                ->orWhere('trasaction_tresoreries.reference', 'like', $term)
                 ->orWhere('tresoreries.designation', 'like', $term);
         });
     }
