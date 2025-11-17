@@ -659,6 +659,7 @@ class ReportController extends Controller
 
     public function reportFacturation($id)
     {
+
         $about = About::first();
 
         if ($about && $about->logo) {
@@ -729,10 +730,9 @@ class ReportController extends Controller
 
         return response()->json([
             'success' => true,
-            'status' => 200,
             'data' => [
-                'facturations'     => $facturations,
-                'company_info' => $about
+                'facturations'     => $response,
+                'company_info' => $about,
             ]
         ]);
     }
