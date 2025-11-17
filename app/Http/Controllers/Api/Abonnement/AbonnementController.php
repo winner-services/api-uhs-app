@@ -128,7 +128,7 @@ class AbonnementController extends Controller
      *       @OA\Property(property="categorie_id", type="integer", example=1),
      *       @OA\Property(property="telephone", type="string", example="+243900000000"),
      *       @OA\Property(property="adresse", type="string", example="Goma, RDC"),
-     *       @OA\Property(property="genre", type="string", example="Masculin"),
+     *       @OA\Property(property="gender", type="string", example="Masculin"),
      *       @OA\Property(property="statut", type="string", example="propriétaire"),
      *       @OA\Property(property="num_piece", type="string", example="33305869789"),
      *       @OA\Property(property="addedBy", type="integer", example=2)
@@ -145,7 +145,7 @@ class AbonnementController extends Controller
             'categorie_id' => ['required', 'integer', 'exists:abonnement_categories,id'],
             'telephone' => ['nullable', 'string', 'max:20'],
             'adresse' => ['nullable', 'string', 'max:255'],
-            'genre' => ['nullable', 'string', 'max:255'],
+            'gender' => ['nullable', 'string', 'max:255'],
             'status' => ['nullable', 'string', 'max:255'],
             'num_piece_identite' => ['nullable', 'string', 'max:255'],
             'piece_identite' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
@@ -186,7 +186,7 @@ class AbonnementController extends Controller
                 'categorie_id' => $request->categorie_id,
                 'telephone' => $request->telephone,
                 'adresse' => $request->adresse,
-                'genre' => $request->genre,
+                'gender' => $request->gender,
                 'status' => $request->status,
                 'num_piece_identite' => $request->num_piece_identite,
                 'piece_identite' => $piecePath,
@@ -233,7 +233,7 @@ class AbonnementController extends Controller
      *       @OA\Property(property="categorie_id", type="integer", example=2),
      *       @OA\Property(property="telephone", type="string", example="+243991234567"),
      *       @OA\Property(property="adresse", type="string", example="Kinshasa, RDC"),
-     *       @OA\Property(property="genre", type="string", example="Masculin"),
+     *       @OA\Property(property="gender", type="string", example="Masculin"),
      *       @OA\Property(property="statut", type="string", example="propriétaire"),
      *       @OA\Property(property="num_piece", type="string", example="33305869789"),
      *    )
@@ -251,7 +251,7 @@ class AbonnementController extends Controller
             'categorie_id' => ['required'],
             'telephone' => ['nullable', 'string', 'max:20'],
             'adresse' => ['nullable', 'string', 'max:255'],
-            'genre' => ['nullable', 'string', 'max:255'],
+            'gender' => ['nullable', 'string', 'max:255'],
             'status' => ['nullable', 'string', 'max:255'],
             'num_piece_identite' => [
                 'nullable',
@@ -298,7 +298,7 @@ class AbonnementController extends Controller
             $abonne->categorie_id = $request->categorie_id;
             $abonne->telephone = $request->telephone;
             $abonne->adresse = $request->adresse;
-            $abonne->genre = $request->genre;
+            $abonne->gender = $request->gender;
             $abonne->status = $request->status;
             $abonne->num_piece_identite = $request->num_piece_identite;
             $abonne->addedBy = $user->id;

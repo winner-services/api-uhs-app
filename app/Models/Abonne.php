@@ -12,7 +12,7 @@ class Abonne extends Model
         'telephone',
         'adresse',
         'addedBy',
-        'genre',
+        'gender',
         'status',
         'piece_identite',
         'num_piece_identite'

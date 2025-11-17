@@ -20,7 +20,7 @@ return new class extends Migration
                 ->nullOnDelete();
             $table->string('telephone')->nullable();
             $table->string('status')->nullable();
-            $table->string('genre')->nullable();
+            $table->string('gender')->nullable();
             $table->string('adresse')->nullable();
             $table->string('piece_identite')->nullable();
             $table->string('num_piece_identite')->nullable();

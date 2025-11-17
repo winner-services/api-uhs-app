@@ -388,7 +388,8 @@ class TransactionTresorerieController extends Controller
                 DB::rollBack();
                 return response()->json([
                     'message' => 'Solde insuffisant.',
-                    'success' => false
+                    'success' => false,
+                    'status' => 422
                 ], 422);
             }
 
