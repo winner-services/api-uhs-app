@@ -31,7 +31,7 @@ class Sortie extends Model
     {
         $term = "%$term%";
         $query->where(function ($query) use ($term) {
-            $query->where('entrees.reference', 'like', $term)
+            $query->where('sorties.reference', 'like', $term)
             ->orWhereHas('user', function ($q2) use ($term) {
                     $q2->where('users.name', 'like', $term);
                 })
