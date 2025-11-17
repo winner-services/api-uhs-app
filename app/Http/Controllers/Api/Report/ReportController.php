@@ -729,9 +729,10 @@ class ReportController extends Controller
 
         return response()->json([
             'success' => true,
+            'status' => 200,
             'data' => [
-                'company_info' => $about,
-                'facturations'     => $facturations
+                'facturations'     => $facturations,
+                'company_info' => $about
             ]
         ]);
     }
