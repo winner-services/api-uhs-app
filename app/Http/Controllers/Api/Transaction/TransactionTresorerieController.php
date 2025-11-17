@@ -350,7 +350,7 @@ class TransactionTresorerieController extends Controller
         $rules = [
             'account_from_id' => ['required', 'integer', 'exists:tresoreries,id'],
             'account_to_id'   => ['required', 'integer', 'exists:tresoreries,id', 'different:account_from_id'],
-            'montant'         => ['required', 'numeric', 'min:0.01'],
+            'amount'         => ['required', 'numeric', 'min:0.01'],
             'type_transaction' => ['required', 'string'],
             'date_transaction' => ['nullable', 'date'],
             'description'     => ['nullable', 'string']
@@ -383,7 +383,7 @@ class TransactionTresorerieController extends Controller
             $solde_to   = $to ? $to->solde : 0;
 
             // Vérification du solde suffisant
-            if ($solde_from < $request->montant) {
+            if ($solde_from < $request->amount) {
                 // On peut retourner 422 pour une erreur de logique métier, ou garder 500 si tu préfères.
                 DB::rollBack();
                 return response()->json([
@@ -397,7 +397,7 @@ class TransactionTresorerieController extends Controller
             $transaction = HistoriqueTransactions::create([
                 'account_from_id' => $request->account_from_id,
                 'account_to_id'   => $request->account_to_id,
-                'montant'         => $request->montant,
+                'montant'         => $request->amount,
                 'type_transaction' => $request->type_transaction,
                 'description'     => $request->description ?? null,
                 'created_by'      => $user->id,
@@ -411,12 +411,12 @@ class TransactionTresorerieController extends Controller
             $debitEntry = TrasactionTresorerie::create([
                 'motif'            => $request->type_transaction,
                 'transaction_type' => 'DEPENSE',
-                'amount'           => $request->montant,
+                'amount'           => $request->amount,
                 'account_id'       => $request->account_from_id,
                 'transaction_date' => $request->date_transaction ?? now(),
                 'addedBy'          => $user->id,
                 'reference'        => $reference . '-D',
-                'solde'            => $solde_from - $request->montant,
+                'solde'            => $solde_from - $request->amount,
                 'beneficiaire' => $request->beneficiaire
             ]);
 
@@ -424,12 +424,12 @@ class TransactionTresorerieController extends Controller
             $creditEntry = TrasactionTresorerie::create([
                 'motif'            => $request->type_transaction,
                 'transaction_type' => 'RECETTE',
-                'amount'           => $request->montant,
+                'amount'           => $request->amount,
                 'account_id'       => $request->account_to_id,
                 'transaction_date' => $request->date_transaction ?? now(),
                 'addedBy'          => $user->id,
                 'reference'        => $reference . '-C',
-                'solde'            => $solde_to + $request->montant,
+                'solde'            => $solde_to + $request->amount,
                 'beneficiaire' => $request->beneficiaire
             ]);
 
