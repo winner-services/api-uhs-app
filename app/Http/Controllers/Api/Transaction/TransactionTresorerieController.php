@@ -7,7 +7,6 @@ use App\Models\HistoriqueTransactions;
 use App\Models\TrasactionTresorerie;
 use App\Models\Tresorerie;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -349,41 +348,36 @@ class TransactionTresorerieController extends Controller
     {
         // Validation
         $rules = [
-            'account_from_id'  => ['required', 'integer', 'exists:tresoreries,id'],
-            'account_to_id'    => ['required', 'integer', 'exists:tresoreries,id', 'different:account_from_id'],
-            'montant'          => ['required', 'numeric', 'min:0.01'],
+            'account_from_id' => ['required', 'integer', 'exists:tresoreries,id'],
+            'account_to_id'   => ['required', 'integer', 'exists:tresoreries,id', 'different:account_from_id'],
+            'montant'         => ['required', 'numeric', 'min:0.01'],
             'type_transaction' => ['required', 'string'],
             'date_transaction' => ['nullable', 'date'],
-            'description'      => ['nullable', 'string']
+            'description'     => ['nullable', 'string']
         ];
 
         $validated = $request->validate($rules);
-
-        // Normaliser la date
-        $dateTransaction = isset($validated['date_transaction'])
-            ? Carbon::parse($validated['date_transaction'])
-            : Carbon::now();
 
         DB::beginTransaction();
         $user = Auth::user();
 
         try {
-            // Verrouiller les lignes de transactions pour éviter les conditions de course
-            $fromLast = TrasactionTresorerie::where('account_id', $validated['account_from_id'])
-                ->lockForUpdate()
+            dd($validated);
+            // Récupérer les dernières transactions (pour obtenir le solde courant)
+            $from = TrasactionTresorerie::where('account_id', $validated['account_from_id'])
                 ->latest('id')
                 ->first();
 
-            $toLast = TrasactionTresorerie::where('account_id', $validated['account_to_id'])
-                ->lockForUpdate()
+            $to = TrasactionTresorerie::where('account_id', $validated['account_to_id'])
                 ->latest('id')
                 ->first();
 
-            $solde_from = $fromLast ? $fromLast->solde : 0;
-            $solde_to   = $toLast ? $toLast->solde : 0;
+            $solde_from = $from ? $from->solde : 0;
+            $solde_to   = $to ? $to->solde : 0;
 
-            // Vérification du solde
+            // Vérification du solde suffisant
             if ($solde_from < $validated['montant']) {
+                // On peut retourner 422 pour une erreur de logique métier, ou garder 500 si tu préfères.
                 DB::rollBack();
                 return response()->json([
                     'message' => 'Solde insuffisant.',
@@ -391,27 +385,27 @@ class TransactionTresorerieController extends Controller
                 ], 422);
             }
 
-            // Historique global du transfert (si ton modèle attend ces champs)
+            // Historique global du transfert
             $transaction = HistoriqueTransactions::create([
-                'account_from_id'  => $validated['account_from_id'],
-                'account_to_id'    => $validated['account_to_id'],
-                'montant'          => $validated['montant'],
+                'account_from_id' => $validated['account_from_id'],
+                'account_to_id'   => $validated['account_to_id'],
+                'montant'         => $validated['montant'],
                 'type_transaction' => $validated['type_transaction'],
-                'description'      => $validated['description'] ?? null,
-                'created_by'       => $user->id,
-                'date_transaction' => $dateTransaction,
+                'description'     => $validated['description'] ?? null,
+                'created_by'      => $user->id,
+                'date_transaction' => $validated['date_transaction'] ?? now()
             ]);
 
-            // Référence unique
-            $reference = 'TRANS-' . Str::upper(Str::random(8));
+            // Référence unique (production-safe)
+            $reference = 'TRANS-' . Str::upper(Str::random(5));
 
-            // Entrée pour le compte débité (DEPENSE) — ATTENTION : j'utilise 'montant' comme champ
+            // Entrée pour le compte débité (DEPENSE)
             $debitEntry = TrasactionTresorerie::create([
                 'motif'            => $validated['type_transaction'],
                 'transaction_type' => 'DEPENSE',
-                'montant'          => $validated['montant'],
+                'amount'           => $validated['montant'],
                 'account_id'       => $validated['account_from_id'],
-                'transaction_date' => $dateTransaction,
+                'transaction_date' => $validated['date_transaction'] ?? now(),
                 'addedBy'          => $user->id,
                 'reference'        => $reference . '-D',
                 'solde'            => $solde_from - $validated['montant'],
@@ -421,9 +415,9 @@ class TransactionTresorerieController extends Controller
             $creditEntry = TrasactionTresorerie::create([
                 'motif'            => $validated['type_transaction'],
                 'transaction_type' => 'RECETTE',
-                'montant'          => $validated['montant'],
+                'amount'           => $validated['montant'],
                 'account_id'       => $validated['account_to_id'],
-                'transaction_date' => $dateTransaction,
+                'transaction_date' => $validated['date_transaction'] ?? now(),
                 'addedBy'          => $user->id,
                 'reference'        => $reference . '-C',
                 'solde'            => $solde_to + $validated['montant'],
@@ -434,13 +428,7 @@ class TransactionTresorerieController extends Controller
             return response()->json([
                 'message' => 'Transfert effectué avec succès.',
                 'success' => true,
-                'status'  => 201,
-                'data'    => [
-                    'historique_id' => $transaction->id ?? null,
-                    'debit_id'      => $debitEntry->id ?? null,
-                    'credit_id'     => $creditEntry->id ?? null,
-                    'reference'     => $reference,
-                ]
+                'status'    => 201
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
