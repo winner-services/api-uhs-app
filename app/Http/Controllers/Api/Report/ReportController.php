@@ -634,7 +634,7 @@ class ReportController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/report.facturation/{id}",
+     *     path="/api/raport.facturation/{id}",
      *     tags={"Rapports"},
      *     summary="Rapport complet d’un point_eau_abonnes",
      *     description="Retourne les informations de l’abonné, sa catégorie, le point d’eau et ses facturations.",

@@ -3204,14 +3204,14 @@
                 }
             }
         },
-        "/api/report.facturation/{id}": {
+        "/api/raport.facturation/{id}": {
             "get": {
                 "tags": [
                     "Rapports"
                 ],
                 "summary": "Rapport complet d’un point_eau_abonnes",
                 "description": "Retourne les informations de l’abonné, sa catégorie, le point d’eau et ses facturations.",
-                "operationId": "f2e0ef209b60360789d5d0c68ecce973",
+                "operationId": "c023a4b584e279dcfee5f5250dabbc46",
                 "parameters": [
                     {
                         "name": "id",
