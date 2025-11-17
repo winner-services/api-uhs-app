@@ -689,7 +689,7 @@ class ReportController extends Controller
                 'id' => $f->id,
                 'mois' => $f->mois,
                 'montant' => number_format($f->montant, 2, '.', ''),
-                'dette' => number_format($f->dette, 2, '.', ''),
+                'dette' => number_format($f->dette_en_cours, 2, '.', ''),
                 'deja_paye' => number_format($f->deja_paye, 2, '.', ''),
                 'status' => $f->status,
                 'date_emission' => $f->date_emission ? Carbon::parse($f->date_emission)->toDateString() : null,
@@ -700,18 +700,15 @@ class ReportController extends Controller
         $response = [
             'abonne' => [
                 'nom' => $abonne->nom ?? null,
+                'gender' => $abonne->gender ?? null,
                 'telephone' => $abonne->telephone ?? null,
-                'status' => $abonne->status ?? null,
                 'adresse' => $abonne->adresse ?? null,
                 'categorie' => $categorie->designation ?? null,
                 'prix_mensuel' => $categorie && $categorie->prix_mensuel !== null ? number_format($categorie->prix_mensuel, 2, '.', '') : null,
-            ],
-            'point_eau' => [
-                'id' => $pointEau->id ?? null,
-                'village' => $pointEau->village ?? null,
-                'quartier' => $pointEau->quartier ?? null,
-                'numero_compteur' => $pointEau->numero_compteur ?? null,
+                'reference_borne' => $pointEau->matricule ?? null,
                 'status' => $pointEau->status ?? null,
+                'village_borne' => $pointEau->village ?? null,
+                'quartier_borne' => $pointEau->quartier ?? null,
             ],
             'facturations' => $facturations,
         ];
