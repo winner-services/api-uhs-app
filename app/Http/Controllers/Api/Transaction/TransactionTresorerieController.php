@@ -360,9 +360,9 @@ class TransactionTresorerieController extends Controller
 
         DB::beginTransaction();
         $user = Auth::user();
-
+dd($validated);
         try {
-            dd($validated);
+            
             // Récupérer les dernières transactions (pour obtenir le solde courant)
             $from = TrasactionTresorerie::where('account_id', $validated['account_from_id'])
                 ->latest('id')
