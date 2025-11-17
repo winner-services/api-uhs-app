@@ -248,7 +248,7 @@ class AbonnementController extends Controller
 
         $rules = [
             'nom' => ['required', 'string', 'max:255'],
-            'categorie_id' => ['required', 'integer', 'exists:categories,id'],
+            'categorie_id' => ['required', 'integer', 'exists:abonnement_categories,id'],
             'telephone' => ['nullable', 'string', 'max:20'],
             'adresse' => ['nullable', 'string', 'max:255'],
             'genre' => ['nullable', 'string', 'max:50'],
@@ -261,8 +261,6 @@ class AbonnementController extends Controller
             ],
             'piece_identite' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ];
-dd($request->all(), $request->files->all());
-
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
