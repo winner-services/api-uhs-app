@@ -20,7 +20,7 @@ class Produit extends Model
     }
     public function sortie()
     {
-        return $this->hasMany(Entree::class, 'product_id');
+        return $this->hasMany(Sortie::class, 'product_id');
     }
 
     public function scopeSearh($query, $term)

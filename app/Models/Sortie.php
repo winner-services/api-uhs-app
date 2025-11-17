@@ -17,7 +17,7 @@ class Sortie extends Model
         'deleted'
     ];
 
-    public function ptoduit()
+    public function produit()
     {
         return $this->belongsTo(Produit::class, 'product_id');
     }
@@ -35,7 +35,7 @@ class Sortie extends Model
             ->orWhereHas('user', function ($q2) use ($term) {
                     $q2->where('users.name', 'like', $term);
                 })
-                ->orWhereHas('ptoduit', function ($q2) use ($term) {
+                ->orWhereHas('produit', function ($q2) use ($term) {
                     $q2->where('produits.designation', 'like', $term);
                 });
         });
