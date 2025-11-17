@@ -659,6 +659,20 @@ class ReportController extends Controller
 
     public function reportFacturation($id)
     {
+        $about = About::first();
+
+        if ($about && $about->logo) {
+            $path = storage_path('app/public/' . $about->logo);
+
+            if (file_exists($path)) {
+                $mime = mime_content_type($path);
+                $data = base64_encode(file_get_contents($path));
+                $about->logo = "data:$mime;base64,$data";
+            } else {
+                // Si fichier manquant, on peut utiliser une image par défaut
+                $about->logo = asset('images/default-logo.png');
+            }
+        }
         // Récupérer l'abonnement (avec contrainte : le point_eau doit être Actif)
         $peAbonne = PointEauAbonne::with([
             'abonne.categorie',
@@ -713,6 +727,12 @@ class ReportController extends Controller
             'facturations' => $facturations,
         ];
 
-        return response()->json($response);
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'company_info' => $about,
+                'facturations'     => $facturations
+            ]
+        ]);
     }
 }
