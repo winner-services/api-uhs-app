@@ -459,6 +459,22 @@ class ReportController extends Controller
 
     public function stockReportData(Request $request)
     {
+        $about = About::first();
+
+        // 🔧 Vérifier si le logo existe et générer base64
+        if ($about && $about->logo) {
+            $path = storage_path('app/public/' . $about->logo);
+
+            if (file_exists($path)) {
+                $mime = mime_content_type($path);
+                $data = base64_encode(file_get_contents($path));
+                $about->logo = "data:$mime;base64,$data";
+            } else {
+                // Si fichier manquant, on peut utiliser une image par défaut
+                $about->logo = asset('images/default-logo.png');
+            }
+        }
+
         $date_start = $request->date_start;
         $date_end   = $request->date_end;
         $searchTerm = '%' . ($request->q ?? '') . '%';
@@ -574,7 +590,8 @@ class ReportController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $result
+            'data' => $result,
+            'company_info' => $about
         ]);
     }
 
