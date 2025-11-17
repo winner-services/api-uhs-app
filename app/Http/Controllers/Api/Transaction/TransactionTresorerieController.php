@@ -398,7 +398,7 @@ class TransactionTresorerieController extends Controller
                 'account_from_id' => $request->account_from_id,
                 'account_to_id'   => $request->account_to_id,
                 'montant'         => $request->amount,
-                'type_transaction' => $request->type_transaction,
+                'type_transaction' => 'Transerf de fonds',
                 'description'     => $request->description ?? null,
                 'created_by'      => $user->id,
                 'date_transaction' => $request->date_transaction ?? now()
@@ -409,7 +409,7 @@ class TransactionTresorerieController extends Controller
 
             // Entrée pour le compte débité (DEPENSE)
             $debitEntry = TrasactionTresorerie::create([
-                'motif'            => $request->type_transaction,
+                'motif'            => 'Transerf de fonds',
                 'transaction_type' => 'DEPENSE',
                 'amount'           => $request->amount,
                 'account_id'       => $request->account_from_id,
@@ -422,7 +422,7 @@ class TransactionTresorerieController extends Controller
 
             // Entrée pour le compte crédité (RECETTE)
             $creditEntry = TrasactionTresorerie::create([
-                'motif'            => $request->type_transaction,
+                'motif'            => 'Transerf de fonds',
                 'transaction_type' => 'RECETTE',
                 'amount'           => $request->amount,
                 'account_id'       => $request->account_to_id,
