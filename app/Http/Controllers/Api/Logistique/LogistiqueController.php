@@ -118,12 +118,13 @@ class LogistiqueController extends Controller
             $productJournal = [
                 'date_transaction' => date('Y-m-d'),
                 'previous_quantity' => 0,
-                'new_quantity' => $request->input('quantite'),
-                'motif' => 'Initialisation du stock',
+                'new_quantity' => $request->quantite,
+                'motif' => 'initial',
                 'type_transaction' => 'Entrée',
                 'product_id' => $produit->id,
                 'reference'            => fake()->unique()->numerify('ENT-#####'),
-                'addedBy' => $user ? $user->id : null
+                'addedBy' => $user ? $user->id : null,
+                'quantite' => $request->quantite
             ];
 
             Logistique::create($productJournal);
