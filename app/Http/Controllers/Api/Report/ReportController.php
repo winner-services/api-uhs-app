@@ -459,7 +459,7 @@ class ReportController extends Controller
      * )
      */
 
-    public function ficheStockGlobal(Request $request)
+    public function stockReportData(Request $request)
     {
         // Optional period filter
         $dateStart = $request->date_start ? Carbon::parse($request->date_start)->startOfDay() : null;
