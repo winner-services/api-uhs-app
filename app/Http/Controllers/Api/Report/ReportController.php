@@ -487,7 +487,7 @@ class ReportController extends Controller
             COUNT(*) AS tx_count,
             SUM(
                 CASE
-                    WHEN type_transaction = 'initial' THEN new_quantity
+                    WHEN type_transaction IN ('Entrée', 'initial') THEN new_quantity
                     WHEN type_transaction = 'Sortie' THEN -new_quantity
                     ELSE 0
                 END
