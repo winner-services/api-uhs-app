@@ -18,24 +18,24 @@ class RoleSeeder extends Seeder
         $rolesPermissions = [
             'admin' => [
                 'abonnement',
-                'categorie_abonne',
+                'categorie-abonne',
                 'abonne',
                 'raccordement',
-                'borne_fontaine',
-                'bornier_regulier',
+                'borne-fontaine',
+                'bornier-regulier',
                 'facturation',
                 'finance',
                 'tresorerie',
-                'transaction_tresorerie',
-                'paiement_mantenance',
+                'transaction-tresorerie',
+                'paiement-mantenance',
                 'logistique',
                 'mantenance',
-                'rapport_mantenance',
+                'rapport-mantenance',
                 'paramettre',
                 'agent',
-                'role_agent',
-                'technicien_dashboard',
-                'technicien_ticket'
+                'role-agent',
+                'technicien-dashboard',
+                'technicien-ticket'
             ],
             'technicien' => [
                 'technicien-dashboard',
