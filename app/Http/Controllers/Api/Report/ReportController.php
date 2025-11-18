@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\Report;
 use App\Http\Controllers\Controller;
 use App\Models\About;
 use App\Models\Facturation;
-use App\Models\Logistique;
 use App\Models\PointEau;
 use App\Models\PointEauAbonne;
 use App\Models\Produit;
@@ -461,234 +460,141 @@ class ReportController extends Controller
 
     public function stockReportData(Request $request)
     {
-        // Optional period filter
-        $dateStart = $request->date_start ? Carbon::parse($request->date_start)->startOfDay() : null;
-        $dateEnd   = $request->date_end ? Carbon::parse($request->date_end)->endOfDay() : null;
+        $about = About::first();
 
-        // Load all products (adjust fields as needed)
-        $products = Produit::select('id', 'nom', 'reference', 'quantite')->get();
+        // 🔧 Vérifier si le logo existe et générer base64
+        if ($about && $about->logo) {
+            $path = storage_path('app/public/' . $about->logo);
 
-        $result = [];
-
-        foreach ($products as $product) {
-
-            // 1) Determine opening balance
-            $openingBalance = $product->quantite ?? 0;
-
-            if ($dateStart) {
-                $lastBefore = Logistique::where('product_id', $product->id)
-                    ->where('date_transaction', '<', $dateStart->toDateString())
-                    ->orderBy('date_transaction', 'desc')
-                    ->orderBy('id', 'desc')
-                    ->first();
-
-                if ($lastBefore) {
-                    $openingBalance = (float) $lastBefore->new_quantity;
-                }
+            if (file_exists($path)) {
+                $mime = mime_content_type($path);
+                $data = base64_encode(file_get_contents($path));
+                $about->logo = "data:$mime;base64,$data";
+            } else {
+                // Si fichier manquant, on peut utiliser une image par défaut
+                $about->logo = asset('images/default-logo.png');
             }
-
-            // 2) Get movements inside the period
-            $txQuery = Logistique::where('product_id', $product->id)
-                ->orderBy('date_transaction')
-                ->orderBy('id');
-
-            if ($dateStart) $txQuery->where('date_transaction', '>=', $dateStart->toDateString());
-            if ($dateEnd)   $txQuery->where('date_transaction', '<=', $dateEnd->toDateString());
-
-            $transactions = $txQuery->get()->map(function ($t) {
-                $type = strtolower($t->type_transaction);
-
-                $isEntry = str_contains($type, 'entr') || str_contains($type, 'in');
-                $isExit  = str_contains($type, 'sort') || str_contains($type, 'out');
-
-                return [
-                    'id' => $t->id,
-                    'date' => $t->date_transaction,
-                    'reference' => $t->reference,
-                    'motif' => $t->motif,
-                    'type_transaction' => $t->type_transaction,
-                    'previous_quantity' => (float) $t->previous_quantity,
-                    'new_quantity' => (float) $t->new_quantity,
-                    'quantite' => (float) $t->quantite,
-                    'is_entry' => $isEntry,
-                    'is_exit' => $isExit,
-                ];
-            });
-
-            // 3) Totals
-            $totalEntries = 0;
-            $totalExits = 0;
-
-            foreach ($transactions as $tx) {
-                if ($tx['is_entry']) {
-                    $totalEntries += $tx['quantite'];
-                } elseif ($tx['is_exit']) {
-                    $totalExits += $tx['quantite'];
-                }
-            }
-
-            // 4) Closing balance
-            $closingBalance = $openingBalance + $totalEntries - $totalExits;
-
-            // 5) Push into result
-            $result[] = [
-                'product' => [
-                    'id' => $product->id,
-                    'nom' => $product->nom,
-                    'reference' => $product->reference,
-                ],
-                'opening_balance' => $openingBalance,
-                'total_entries' => $totalEntries,
-                'total_exits' => $totalExits,
-                'closing_balance' => $closingBalance,
-                'transactions' => $transactions,
-            ];
         }
 
+        $date_start = $request->date_start;
+        $date_end   = $request->date_end;
+        $searchTerm = '%' . ($request->q ?? '') . '%';
+
+        $query = "
+    WITH transactions_before AS (
+        SELECT
+            product_id,
+            COUNT(*) AS tx_count,
+            SUM(
+                CASE
+                    WHEN type_transaction IN ('Entrée', 'initial') THEN new_quantity
+                    WHEN type_transaction = 'Sortie' THEN -new_quantity
+                    ELSE 0
+                END
+            ) AS stock_before_start
+        FROM logistiques
+        WHERE date_transaction < ?
+        GROUP BY product_id
+    ),
+    fallback_initial AS (
+        SELECT pl.product_id, pl.new_quantity AS fallback_quantity
+        FROM logistiques pl
+        INNER JOIN (
+            SELECT product_id, MAX(date_transaction) AS max_date
+            FROM logistiques
+            WHERE type_transaction = 'initial'
+            GROUP BY product_id
+        ) latest_init ON latest_init.product_id = pl.product_id AND latest_init.max_date = pl.date_transaction
+        WHERE pl.type_transaction = 'initial'
+    ),
+    achats_summary AS (
+        SELECT 
+            ad.product_id,
+            SUM(ad.quantite) AS total_entry
+        FROM entrees ad
+        WHERE ad.date_transaction BETWEEN ? AND ?
+        GROUP BY ad.product_id
+    ),
+    ventes_summary AS (
+        SELECT 
+            vd.product_id,
+            SUM(vd.quantite) AS total_exit
+        FROM sorties vd
+        WHERE vd.date_transaction BETWEEN ? AND ?
+        GROUP BY vd.product_id
+    )
+    SELECT
+        p.id AS product_id,
+        p.designation AS product_name,
+        COALESCE(
+            CASE 
+                WHEN tb.tx_count > 0 THEN tb.stock_before_start
+                ELSE NULL
+            END,
+            fi.fallback_quantity,
+            p.quantite
+        ) AS previous_quantity,
+
+        COALESCE(a.total_entry, 0) AS entry,
+        COALESCE(v.total_exit, 0) AS exit_qty,
+
+        COALESCE(
+            CASE 
+                WHEN tb.tx_count > 0 THEN tb.stock_before_start
+                ELSE NULL
+            END,
+            fi.fallback_quantity,
+            p.quantite
+        ) + COALESCE(a.total_entry, 0) - COALESCE(v.total_exit, 0) AS stock_remaining
+
+    FROM produits p
+    LEFT JOIN transactions_before tb ON tb.product_id = p.id
+    LEFT JOIN fallback_initial fi ON fi.product_id = p.id
+    LEFT JOIN achats_summary a ON a.product_id = p.id
+    LEFT JOIN ventes_summary v ON v.product_id = p.id
+
+    WHERE (
+        COALESCE(
+            CASE WHEN tb.tx_count > 0 THEN tb.stock_before_start ELSE NULL END,
+            fi.fallback_quantity,
+            p.quantite
+        ) <> 0
+        OR COALESCE(a.total_entry, 0) <> 0
+        OR COALESCE(v.total_exit, 0) <> 0
+    )
+    AND p.designation LIKE ?
+    ORDER BY p.designation ASC;
+    ";
+
+        $rows = DB::select($query, [
+            $date_start,   // pour transactions_before.date_transaction < ?
+            $date_start,   // achats_summary BETWEEN ? (start)
+            $date_end,     // achats_summary BETWEEN ? (end)
+            $date_start,   // ventes_summary BETWEEN ? (start)
+            $date_end,     // ventes_summary BETWEEN ? (end)
+            $searchTerm    // p.designation LIKE ?
+        ]);
+
+        $result = collect($rows)->map(fn($row) => [
+            'product_id' => $row->product_id,
+            'product_name' => $row->product_name,
+            'transactions' => [[
+                'type' => "summary",
+                'reference' => "Résumé global",
+                'previous_quantity' => $row->previous_quantity,
+                'entry' => $row->entry,
+                'exit' => $row->exit_qty,
+                'stock_remaining' => $row->stock_remaining,
+                'date_transaction' => $date_start
+            ]]
+        ]);
+
         return response()->json([
-            'date_start' => $dateStart ? $dateStart->toDateString() : null,
-            'date_end' => $dateEnd ? $dateEnd->toDateString() : null,
+            'success' => true,
             'data' => $result,
+            'company_info' => $about
         ]);
     }
-
-    // public function stockReportData(Request $request)
-    // {
-    //     $about = About::first();
-
-    //     // 🔧 Vérifier si le logo existe et générer base64
-    //     if ($about && $about->logo) {
-    //         $path = storage_path('app/public/' . $about->logo);
-
-    //         if (file_exists($path)) {
-    //             $mime = mime_content_type($path);
-    //             $data = base64_encode(file_get_contents($path));
-    //             $about->logo = "data:$mime;base64,$data";
-    //         } else {
-    //             // Si fichier manquant, on peut utiliser une image par défaut
-    //             $about->logo = asset('images/default-logo.png');
-    //         }
-    //     }
-
-    //     $date_start = $request->date_start;
-    //     $date_end   = $request->date_end;
-    //     $searchTerm = '%' . ($request->q ?? '') . '%';
-
-    //     $query = "
-    // WITH transactions_before AS (
-    //     SELECT
-    //         product_id,
-    //         COUNT(*) AS tx_count,
-    //         SUM(
-    //             CASE
-    //                 WHEN type_transaction IN ('Entrée', 'initial') THEN new_quantity
-    //                 WHEN type_transaction = 'Sortie' THEN -new_quantity
-    //                 ELSE 0
-    //             END
-    //         ) AS stock_before_start
-    //     FROM logistiques
-    //     WHERE date_transaction < ?
-    //     GROUP BY product_id
-    // ),
-    // fallback_initial AS (
-    //     SELECT pl.product_id, pl.new_quantity AS fallback_quantity
-    //     FROM logistiques pl
-    //     INNER JOIN (
-    //         SELECT product_id, MAX(date_transaction) AS max_date
-    //         FROM logistiques
-    //         WHERE type_transaction = 'initial'
-    //         GROUP BY product_id
-    //     ) latest_init ON latest_init.product_id = pl.product_id AND latest_init.max_date = pl.date_transaction
-    //     WHERE pl.type_transaction = 'initial'
-    // ),
-    // achats_summary AS (
-    //     SELECT 
-    //         ad.product_id,
-    //         SUM(ad.quantite) AS total_entry
-    //     FROM entrees ad
-    //     WHERE ad.date_transaction BETWEEN ? AND ?
-    //     GROUP BY ad.product_id
-    // ),
-    // ventes_summary AS (
-    //     SELECT 
-    //         vd.product_id,
-    //         SUM(vd.quantite) AS total_exit
-    //     FROM sorties vd
-    //     WHERE vd.date_transaction BETWEEN ? AND ?
-    //     GROUP BY vd.product_id
-    // )
-    // SELECT
-    //     p.id AS product_id,
-    //     p.designation AS product_name,
-    //     COALESCE(
-    //         CASE 
-    //             WHEN tb.tx_count > 0 THEN tb.stock_before_start
-    //             ELSE NULL
-    //         END,
-    //         fi.fallback_quantity,
-    //         p.quantite
-    //     ) AS previous_quantity,
-
-    //     COALESCE(a.total_entry, 0) AS entry,
-    //     COALESCE(v.total_exit, 0) AS exit_qty,
-
-    //     COALESCE(
-    //         CASE 
-    //             WHEN tb.tx_count > 0 THEN tb.stock_before_start
-    //             ELSE NULL
-    //         END,
-    //         fi.fallback_quantity,
-    //         p.quantite
-    //     ) + COALESCE(a.total_entry, 0) - COALESCE(v.total_exit, 0) AS stock_remaining
-
-    // FROM produits p
-    // LEFT JOIN transactions_before tb ON tb.product_id = p.id
-    // LEFT JOIN fallback_initial fi ON fi.product_id = p.id
-    // LEFT JOIN achats_summary a ON a.product_id = p.id
-    // LEFT JOIN ventes_summary v ON v.product_id = p.id
-
-    // WHERE (
-    //     COALESCE(
-    //         CASE WHEN tb.tx_count > 0 THEN tb.stock_before_start ELSE NULL END,
-    //         fi.fallback_quantity,
-    //         p.quantite
-    //     ) <> 0
-    //     OR COALESCE(a.total_entry, 0) <> 0
-    //     OR COALESCE(v.total_exit, 0) <> 0
-    // )
-    // AND p.designation LIKE ?
-    // ORDER BY p.designation ASC;
-    // ";
-
-    //     $rows = DB::select($query, [
-    //         $date_start,   // pour transactions_before.date_transaction < ?
-    //         $date_start,   // achats_summary BETWEEN ? (start)
-    //         $date_end,     // achats_summary BETWEEN ? (end)
-    //         $date_start,   // ventes_summary BETWEEN ? (start)
-    //         $date_end,     // ventes_summary BETWEEN ? (end)
-    //         $searchTerm    // p.designation LIKE ?
-    //     ]);
-
-    //     $result = collect($rows)->map(fn($row) => [
-    //         'product_id' => $row->product_id,
-    //         'product_name' => $row->product_name,
-    //         'transactions' => [[
-    //             'type' => "summary",
-    //             'reference' => "Résumé global",
-    //             'previous_quantity' => $row->previous_quantity,
-    //             'entry' => $row->entry,
-    //             'exit' => $row->exit_qty,
-    //             'stock_remaining' => $row->stock_remaining,
-    //             'date_transaction' => $date_start
-    //         ]]
-    //     ]);
-
-    //     return response()->json([
-    //         'success' => true,
-    //         'data' => $result,
-    //         'company_info' => $about
-    //     ]);
-    // }
 
     /**
      * @OA\Get(
