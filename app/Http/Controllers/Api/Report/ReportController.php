@@ -493,7 +493,7 @@ class ReportController extends Controller
                 END
             ) AS stock_before_start
         FROM logistiques
-        WHERE date_transaction >= ?
+        WHERE date_transaction < ?
         GROUP BY product_id
     ),
     fallback_initial AS (
