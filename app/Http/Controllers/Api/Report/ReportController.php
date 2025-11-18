@@ -599,7 +599,6 @@ class ReportController extends Controller
     {
         $about = About::first();
 
-        // logo -> base64 fallback
         if ($about && $about->logo) {
             $path = storage_path('app/public/' . $about->logo);
             if (file_exists($path)) {
@@ -616,82 +615,86 @@ class ReportController extends Controller
         $searchTerm = '%' . ($request->q ?? '') . '%';
 
         $query = "
-    WITH transactions_before AS (
+    WITH
+    -- 1) dernière transaction avant la date_start (la plus fiable si new_quantity est rempli)
+    last_before AS (
+        SELECT l.product_id, l.new_quantity
+        FROM logistiques l
+        JOIN (
+            SELECT product_id, MAX(date_transaction) AS maxd
+            FROM logistiques
+            WHERE date_transaction < ?
+            GROUP BY product_id
+        ) m ON m.product_id = l.product_id AND m.maxd = l.date_transaction
+    ),
+
+    -- 2) si new_quantity n'existe pas (ou est NULL), calcul par somme des deltas avant date_start
+    sum_before AS (
         SELECT
             product_id,
-            COUNT(*) AS tx_count,
-            -- Variante A : si 'quantite' contient le delta (entrée positive / sortie positive)
             SUM(
                 CASE
-                    WHEN type_transaction IN ('Entrée','initial') THEN quantite
+                    WHEN type_transaction IN ('Entrée', 'initial') THEN quantite
                     WHEN type_transaction = 'Sortie' THEN -quantite
                     ELSE 0
                 END
-            ) AS net_before
-
-            /* Variante B (décommentez & remplacez la variante A si votre schéma a old_quantity/new_quantity) :
-            SUM(
-                CASE
-                    WHEN old_quantity IS NOT NULL AND new_quantity IS NOT NULL
-                        THEN (new_quantity - old_quantity)
-                    WHEN type_transaction IN ('Entrée','initial') THEN new_quantity
-                    WHEN type_transaction = 'Sortie' THEN -new_quantity
-                    ELSE 0
-                END
-            ) AS net_before
-            */
-
+            ) AS delta_before
         FROM logistiques
         WHERE date_transaction < ?
         GROUP BY product_id
     ),
-    fallback_initial AS (
-        -- la dernière transaction 'initial' (valeur de référence si pas d'autres tx avant la date_start)
-        SELECT pl.product_id, pl.new_quantity AS fallback_quantity
+
+    -- 3) fallback : dernière transaction 'initial' <= date_start (valeur de référence)
+    latest_initial AS (
+        SELECT pl.product_id, pl.new_quantity AS initial_quantity
         FROM logistiques pl
-        INNER JOIN (
-            SELECT product_id, MAX(date_transaction) AS max_date
+        JOIN (
+            SELECT product_id, MAX(date_transaction) AS maxd
             FROM logistiques
             WHERE type_transaction = 'initial' AND date_transaction <= ?
             GROUP BY product_id
-        ) latest_init ON latest_init.product_id = pl.product_id AND latest_init.max_date = pl.date_transaction
+        ) mi ON mi.product_id = pl.product_id AND mi.maxd = pl.date_transaction
         WHERE pl.type_transaction = 'initial'
     ),
+
+    -- 4) entrées et sorties pendant la période demandée
     achats_summary AS (
-        SELECT 
-            ad.product_id,
-            SUM(ad.quantite) AS total_entry
+        SELECT ad.product_id, SUM(ad.quantite) AS total_entry
         FROM entrees ad
         WHERE ad.date_transaction BETWEEN ? AND ?
         GROUP BY ad.product_id
     ),
     ventes_summary AS (
-        SELECT 
-            vd.product_id,
-            SUM(vd.quantite) AS total_exit
+        SELECT vd.product_id, SUM(vd.quantite) AS total_exit
         FROM sorties vd
         WHERE vd.date_transaction BETWEEN ? AND ?
         GROUP BY vd.product_id
     )
+
     SELECT
         p.id AS product_id,
         p.designation AS product_name,
-        -- previous_quantity : priorité net_before (mouvements antérieurs),
-        -- sinon fallback_initial (dernier 'initial' <= date_start), sinon p.quantite (valeur produit)
-        COALESCE(tb.net_before, fi.fallback_quantity, p.quantite) AS previous_quantity,
+
+        -- priorité : last_before.new_quantity (stock réel enregistré juste avant),
+        -- sinon sum_before.delta_before, sinon latest_initial.initial_quantity, sinon p.quantite
+        COALESCE(lb.new_quantity, sb.delta_before, li.initial_quantity, p.quantite) AS previous_quantity,
 
         COALESCE(a.total_entry, 0) AS entry,
         COALESCE(v.total_exit, 0) AS exit_qty,
 
-        COALESCE(tb.net_before, fi.fallback_quantity, p.quantite) + COALESCE(a.total_entry, 0) - COALESCE(v.total_exit, 0) AS stock_remaining
+        COALESCE(lb.new_quantity, sb.delta_before, li.initial_quantity, p.quantite)
+          + COALESCE(a.total_entry, 0)
+          - COALESCE(v.total_exit, 0) AS stock_remaining
 
     FROM produits p
-    LEFT JOIN transactions_before tb ON tb.product_id = p.id
-    LEFT JOIN fallback_initial fi ON fi.product_id = p.id
+    LEFT JOIN last_before lb ON lb.product_id = p.id
+    LEFT JOIN sum_before sb ON sb.product_id = p.id
+    LEFT JOIN latest_initial li ON li.product_id = p.id
     LEFT JOIN achats_summary a ON a.product_id = p.id
     LEFT JOIN ventes_summary v ON v.product_id = p.id
+
     WHERE (
-        COALESCE(tb.net_before, fi.fallback_quantity, p.quantite) <> 0
+        COALESCE(lb.new_quantity, sb.delta_before, li.initial_quantity, p.quantite) <> 0
         OR COALESCE(a.total_entry, 0) <> 0
         OR COALESCE(v.total_exit, 0) <> 0
     )
@@ -700,13 +703,14 @@ class ReportController extends Controller
     ";
 
         $rows = DB::select($query, [
-            $date_start,   // transactions_before.date_transaction < ?
-            $date_start,   // fallback_initial: MAX(date_transaction) <= ?
+            $date_start,   // last_before : MAX(date_transaction) < ?
+            $date_start,   // sum_before : WHERE date_transaction < ?
+            $date_start,   // latest_initial : MAX(date_transaction) <= ?
             $date_start,   // achats_summary BETWEEN ? (start)
             $date_end,     // achats_summary BETWEEN ? (end)
             $date_start,   // ventes_summary BETWEEN ? (start)
             $date_end,     // ventes_summary BETWEEN ? (end)
-            $searchTerm    // p.designation LIKE ?
+            $searchTerm
         ]);
 
         $result = collect($rows)->map(fn($row) => [
