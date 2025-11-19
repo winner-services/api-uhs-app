@@ -40,18 +40,29 @@ Route::prefix('auth')->group(function () {
     });
 });
 
+Route::controller(UserController::class)->group(function () {
+    Route::get('/technicien.Options', 'getTechnicienOptions');
+    Route::get('/users.getData', 'index');
+    Route::get('/user.Options', 'getAllUsersOptions');
+    Route::post('/user.store', 'store');
+    Route::put('/user.update/{id}', 'update');
+    Route::delete('/user.delete/{id}', 'destroy');
+    Route::put('/user.activate/{id}', 'activateUser');
+    Route::put('/user.disable/{id}', 'disableUser');
+});
+
 Route::middleware('auth:sanctum')->group(function () {
 
-    Route::controller(UserController::class)->group(function () {
-        Route::get('/technicien.Options', 'getTechnicienOptions');
-        Route::get('/users.getData', 'index');
-        Route::get('/user.Options', 'getAllUsersOptions');
-        Route::post('/user.store', 'store');
-        Route::put('/user.update/{id}', 'update');
-        Route::delete('/user.delete/{id}', 'destroy');
-        Route::put('/user.activate/{id}', 'activateUser');
-        Route::put('/user.disable/{id}', 'disableUser');
-    });
+    // Route::controller(UserController::class)->group(function () {
+    //     Route::get('/technicien.Options', 'getTechnicienOptions');
+    //     Route::get('/users.getData', 'index');
+    //     Route::get('/user.Options', 'getAllUsersOptions');
+    //     Route::post('/user.store', 'store');
+    //     Route::put('/user.update/{id}', 'update');
+    //     Route::delete('/user.delete/{id}', 'destroy');
+    //     Route::put('/user.activate/{id}', 'activateUser');
+    //     Route::put('/user.disable/{id}', 'disableUser');
+    // });
 
     Route::controller(RoleController::class)->group(function () {
         Route::post('/role.store', 'storeRole');
@@ -171,7 +182,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/rapport.depenseReport', 'depenseReport');
         Route::post('/rapport.fiche-stock', 'stockReportData');
         Route::get('/rapport.getProductAllData', 'getRapportProduitData');
-        Route::get('/raport.facturation/{id}','reportFacturation');
+        Route::get('/raport.facturation/{id}', 'reportFacturation');
     });
 
     Route::controller(MaintenanceController::class)->group(function () {
