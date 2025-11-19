@@ -40,11 +40,22 @@ class AbonnementController extends Controller
             }
         }
         $categorie_id = request('categorie_id');
-        // On récupère tous les abonnés qui appartiennent à la catégorie donnée
-        $abonnes = Abonne::join('abonnement_categories', 'abonnes.categorie_id', '=', 'abonnement_categories.id')
+
+        $query = Abonne::join('abonnement_categories', 'abonnes.categorie_id', '=', 'abonnement_categories.id')
             ->join('users', 'abonnes.addedBy', '=', 'users.id')
-            ->select('abonnes.*', 'abonnement_categories.designation as category', 'users.name as addedBy')
-            ->where('abonnes.categorie_id', $categorie_id)->get();
+            ->select(
+                'abonnes.*',
+                'abonnement_categories.designation as category',
+                'users.name as addedBy'
+            );
+
+        // Si categorie_id n'est pas ALL, on filtre
+        if ($categorie_id !== 'ALL') {
+            $query->where('abonnes.categorie_id', $categorie_id);
+        }
+
+        $abonnes = $query->get();
+
         // Si aucun abonné trouvé
         if ($abonnes->isEmpty()) {
             return response()->json([
@@ -219,7 +230,7 @@ class AbonnementController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * @OA\Post(
      * path="/api/abonnes.update/{id}",
@@ -340,7 +351,7 @@ class AbonnementController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * @OA\Delete(
      * path="/api/abonnes.delete/{id}",
