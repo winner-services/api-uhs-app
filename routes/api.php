@@ -50,6 +50,11 @@ Route::controller(UserController::class)->group(function () {
     Route::put('/user.activate/{id}', 'activateUser');
     Route::put('/user.disable/{id}', 'disableUser');
 });
+Route::controller(AboutController::class)->group(function () {
+        Route::get('/about.index', 'getData');
+        Route::post('/about.store', 'store');
+        Route::post('/about.update/{id}', 'update');
+    });
 
 Route::middleware('auth:sanctum')->group(function () {
 
@@ -72,11 +77,11 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::get('/permission.index', [PermissionController::class, 'getPemissionData']);
 
-    Route::controller(AboutController::class)->group(function () {
-        Route::get('/about.index', 'getData');
-        Route::post('/about.store', 'store');
-        Route::post('/about.update/{id}', 'update');
-    });
+    // Route::controller(AboutController::class)->group(function () {
+    //     Route::get('/about.index', 'getData');
+    //     Route::post('/about.store', 'store');
+    //     Route::post('/about.update/{id}', 'update');
+    // });
 
     Route::controller(AbonnementCategoryController::class)->group(function () {
         Route::get('/category_abonne.getOptionsData', 'getallData');
