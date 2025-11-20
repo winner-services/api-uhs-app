@@ -481,10 +481,7 @@ class ReportController extends Controller
             ->orderBy('date_transaction', 'desc')
             ->value('date_transaction');
 
-            dd($previousDate);
-
-
-        $date_start = $request->date_start;
+        $date_start = $previousDate;
         $date_end   = $request->date_end;
         $searchTerm = '%' . ($request->q ?? '') . '%';
 
