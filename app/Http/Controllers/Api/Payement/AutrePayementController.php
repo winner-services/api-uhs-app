@@ -114,7 +114,7 @@ class AutrePayementController extends Controller
                 'amount'           => $validated['amount'],
                 'paid_amount'      => $validated['paid_amount'],
                 'taux'             => $validated['taux'] ?? 30.00,
-                'reference'        => fake()->unique()->numerify('VERS-#####').'-'.$bornier->nom,
+                'reference'        => fake()->unique()->numerify('VERS-#####'),
                 'account_id'       => $validated['account_id'],
                 'agent_id'         => $validated['agent_id'] ?? null,
                 'addedBy'          => Auth::user()->id
@@ -127,7 +127,7 @@ class AutrePayementController extends Controller
                 'account_id'       => $validated['account_id'],
                 'transaction_date' => $validated['transaction_date'],
                 'addedBy'          => Auth::user()->id,
-                'reference'        => fake()->unique()->numerify('TRANS-#####'),
+                'reference'        => fake()->unique()->numerify('TRANS-#####') . '-' . $bornier->nom,
                 'solde'            => $solde + $totalAmount
             ]);
 
