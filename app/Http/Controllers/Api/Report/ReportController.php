@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Report;
 use App\Http\Controllers\Controller;
 use App\Models\About;
 use App\Models\Facturation;
+use App\Models\Logistique;
 use App\Models\PointEau;
 use App\Models\PointEauAbonne;
 use App\Models\Produit;
@@ -475,6 +476,13 @@ class ReportController extends Controller
                 $about->logo = asset('images/default-logo.png');
             }
         }
+        $firstDate = Logistique::oldest()->value('date_transaction');
+        $previousDate = Logistique::where('date_transaction', '<', $firstDate)
+            ->orderBy('date_transaction', 'desc')
+            ->value('date_transaction');
+
+            dd($firstDate);
+
 
         $date_start = $request->date_start;
         $date_end   = $request->date_end;
