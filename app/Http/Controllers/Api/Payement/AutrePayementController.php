@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Payement;
 
 use App\Http\Controllers\Controller;
+use App\Models\Bornier;
 use App\Models\TrasactionTresorerie;
 use App\Models\Versement;
 use Illuminate\Http\Request;
@@ -106,12 +107,14 @@ class AutrePayementController extends Controller
                 ->first();
             $solde = $lastTransaction ? $lastTransaction->solde : 0;
 
+            $bornier = Bornier::find($validated['agent_id']);
+
             $versement = Versement::create([
                 'transaction_date' => $validated['transaction_date'],
                 'amount'           => $validated['amount'],
                 'paid_amount'      => $validated['paid_amount'],
                 'taux'             => $validated['taux'] ?? 30.00,
-                'reference'        => fake()->unique()->numerify('VERS-#####'),
+                'reference'        => fake()->unique()->numerify('VERS-#####').'-'.$bornier->nom,
                 'account_id'       => $validated['account_id'],
                 'agent_id'         => $validated['agent_id'] ?? null,
                 'addedBy'          => Auth::user()->id
@@ -164,7 +167,7 @@ class AutrePayementController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *         response=200,
+     *         response=200,montantFacture
      *         description="Versement mis à jour avec succès",
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string", example="Versement mis à jour avec succès."),
