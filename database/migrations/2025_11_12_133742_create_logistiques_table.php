@@ -19,8 +19,8 @@ return new class extends Migration
             $table->decimal('quantite');
             $table->text('motif')->nullable();
             $table->string('type_transaction');
-            $table->foreignId('product_id')->nullable()->constrained('produits')->nullOnDelete();
-            $table->foreignId('addedBy')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('product_id')->constrained('produits');
+            $table->foreignId('addedBy')->constrained('users');
             $table->string('reference')->unique();
             $table->timestamps();
         });
