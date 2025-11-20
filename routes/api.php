@@ -40,34 +40,18 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-Route::controller(UserController::class)->group(function () {
-    Route::get('/technicien.Options', 'getTechnicienOptions');
-    Route::get('/users.getData', 'index');
-    Route::get('/user.Options', 'getAllUsersOptions');
-    Route::post('/user.store', 'store');
-    Route::put('/user.update/{id}', 'update');
-    Route::delete('/user.delete/{id}', 'destroy');
-    Route::put('/user.activate/{id}', 'activateUser');
-    Route::put('/user.disable/{id}', 'disableUser');
-});
-Route::controller(AboutController::class)->group(function () {
-        Route::get('/about.index', 'getData');
-        Route::post('/about.store', 'store');
-        Route::post('/about.update/{id}', 'update');
-    });
-
 Route::middleware('auth:sanctum')->group(function () {
 
-    // Route::controller(UserController::class)->group(function () {
-    //     Route::get('/technicien.Options', 'getTechnicienOptions');
-    //     Route::get('/users.getData', 'index');
-    //     Route::get('/user.Options', 'getAllUsersOptions');
-    //     Route::post('/user.store', 'store');
-    //     Route::put('/user.update/{id}', 'update');
-    //     Route::delete('/user.delete/{id}', 'destroy');
-    //     Route::put('/user.activate/{id}', 'activateUser');
-    //     Route::put('/user.disable/{id}', 'disableUser');
-    // });
+    Route::controller(UserController::class)->group(function () {
+        Route::get('/technicien.Options', 'getTechnicienOptions');
+        Route::get('/users.getData', 'index');
+        Route::get('/user.Options', 'getAllUsersOptions');
+        Route::post('/user.store', 'store');
+        Route::put('/user.update/{id}', 'update');
+        Route::delete('/user.delete/{id}', 'destroy');
+        Route::put('/user.activate/{id}', 'activateUser');
+        Route::put('/user.disable/{id}', 'disableUser');
+    });
 
     Route::controller(RoleController::class)->group(function () {
         Route::post('/role.store', 'storeRole');
@@ -77,11 +61,11 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::get('/permission.index', [PermissionController::class, 'getPemissionData']);
 
-    // Route::controller(AboutController::class)->group(function () {
-    //     Route::get('/about.index', 'getData');
-    //     Route::post('/about.store', 'store');
-    //     Route::post('/about.update/{id}', 'update');
-    // });
+    Route::controller(AboutController::class)->group(function () {
+        Route::get('/about.index', 'getData');
+        Route::post('/about.store', 'store');
+        Route::post('/about.update/{id}', 'update');
+    });
 
     Route::controller(AbonnementCategoryController::class)->group(function () {
         Route::get('/category_abonne.getOptionsData', 'getallData');
@@ -187,7 +171,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/rapport.depenseReport', 'depenseReport');
         Route::post('/rapport.fiche-stock', 'stockReportData');
         Route::get('/rapport.getProductAllData', 'getRapportProduitData');
-        Route::get('/raport.facturation/{id}', 'reportFacturation');
+        Route::get('/raport.facturation/{id}','reportFacturation');
     });
 
     Route::controller(MaintenanceController::class)->group(function () {
