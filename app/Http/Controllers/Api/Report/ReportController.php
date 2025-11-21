@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\About;
 use App\Models\Facturation;
 use App\Models\Logistique;
+use App\Models\Payement;
 use App\Models\PointEau;
 use App\Models\PointEauAbonne;
 use App\Models\Produit;
@@ -482,7 +483,7 @@ class ReportController extends Controller
             ->value('date_transaction');
 
         $date_start = '2025-11-01';
-        $date_end   = $request->date_end;
+        $date_end   = date('Y-m-d');
         $searchTerm = '%' . ($request->q ?? '') . '%';
 
         $query = "
@@ -737,5 +738,65 @@ class ReportController extends Controller
             'data' => $response,
             'company_info' => $about,
         ]);
+    }
+
+    /**
+     * @OA\Post(
+     * path="/api/historique.payements",
+     * summary="Liste",
+     * tags={"Rapports"},
+     *     @OA\Parameter(
+     *         name="date_start",
+     *         in="query",
+     *         required=false,
+     *         description="Date de début au format YYYY-MM-DD",
+     *         @OA\Schema(type="string", format="date", example="2025-10-01")
+     *     ),
+     *     @OA\Parameter(
+     *         name="date_end",
+     *         in="query",
+     *         required=false,
+     *         description="Date de fin au format YYYY-MM-DD",
+     *         @OA\Schema(type="string", format="date", example="2025-10-25")
+     *     ),
+     * @OA\Response(response=200, description="Liste récupérée avec succès"),
+     * )
+     */
+
+    public function getPayemenHistorique()
+    {
+        $about = About::first();
+
+        if ($about && $about->logo) {
+            $path = storage_path('app/public/' . $about->logo);
+
+            if (file_exists($path)) {
+                $mime = mime_content_type($path);
+                $data = base64_encode(file_get_contents($path));
+                $about->logo = "data:$mime;base64,$data";
+            } else {
+                // Si fichier manquant, on peut utiliser une image par défaut
+                $about->logo = asset('images/default-logo.png');
+            }
+        }
+
+        $date_start = request('date_start');
+        $date_end   = request('date_end');
+        $data = Payement::join('tresoreries', 'payements.account_id', '=', 'tresoreries.id')
+            ->join('facturations', 'payements.facture_id', '=', 'facturations.id')
+            ->join('users', 'payements.addedBy', '=', 'users.id')
+            ->join('point_eau_abonnes', 'facturations.point_eau_abonnes_id', '=', 'point_eau_abonnes.id')
+            ->join('abonnes', 'point_eau_abonnes.abonne_id', '=', 'abonnes.id')
+            ->select('payements.*', 'abonnes.nom as abonne', 'users.name as addedBy', 'tresoreries.designation as tresorerie')
+            ->latest()
+            ->whereBetween('transaction_date', [$date_start, $date_end])->get();
+        $result = [
+            'message' => "OK",
+            'success' => true,
+            'data' => $data,
+            'company_info' => $about,
+            'status' => 200
+        ];
+        return response()->json($result);
     }
 }
