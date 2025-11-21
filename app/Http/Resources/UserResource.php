@@ -21,6 +21,7 @@ class UserResource extends JsonResource
             'phone'     => $this->phone,
             'status'    => $this->active ? 'active' : 'disabled',
             'roles'     => $this->roles->pluck('name'),
+            'role_id'    => $this->roles->pluck('id'),
             'permissions' => $this->permissions_list,
             'created_at' => $this->created_at?->toDateTimeString(),
         ];
