@@ -172,6 +172,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/rapport.fiche-stock', 'stockReportData');
         Route::get('/rapport.getProductAllData', 'getRapportProduitData');
         Route::get('/raport.facturation/{id}','reportFacturation');
+        Route::get('/historique.payements','getPayemenHistorique');
     });
 
     Route::controller(MaintenanceController::class)->group(function () {

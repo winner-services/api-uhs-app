@@ -167,7 +167,7 @@ class AutrePayementController extends Controller
      *         )
      *     ),
      *     @OA\Response(
-     *         response=200,montantFacture
+     *         response=200,
      *         description="Versement mis à jour avec succès",
      *         @OA\JsonContent(
      *             @OA\Property(property="message", type="string", example="Versement mis à jour avec succès."),

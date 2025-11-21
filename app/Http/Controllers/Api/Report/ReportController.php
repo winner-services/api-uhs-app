@@ -741,7 +741,7 @@ class ReportController extends Controller
     }
 
     /**
-     * @OA\Post(
+     * @OA\Get(
      * path="/api/historique.payements",
      * summary="Liste",
      * tags={"Rapports"},
