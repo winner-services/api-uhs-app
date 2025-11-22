@@ -39,7 +39,7 @@ class UserController extends Controller
     {
         $users = User::query()
             ->search($request->get('search', ''))
-            ->paginate(10);
+            ->paginate(100);
 
         return UserResource::collection($users);
     }
