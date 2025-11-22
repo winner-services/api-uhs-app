@@ -2522,6 +2522,10 @@
                                         "type": "string",
                                         "example": "COMP-001"
                                     },
+                                    "entite": {
+                                        "type": "string",
+                                        "example": "rwenzori"
+                                    },
                                     "status": {
                                         "type": "string",
                                         "example": "Actif"
