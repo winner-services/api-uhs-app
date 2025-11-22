@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('numero_compteur')->nullable();
             $table->string('status')->default('Actif');
             $table->string('matricule')->nullable();
+            $table->text('entite')->nullable();
             $table->timestamps();
         });
     }
