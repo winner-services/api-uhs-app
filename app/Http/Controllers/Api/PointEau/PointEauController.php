@@ -104,7 +104,7 @@ class PointEauController extends Controller
      *       @OA\Property(property="num_parcelle", type="string", example="COMP-001"),
      *       @OA\Property(property="nom_chef", type="string", example="COMP-001"),
      *       @OA\Property(property="contact", type="string", example="COMP-001"),
-     *       @OA\Property(property="entite", type="string", example="rwenzori"),
+     *       @OA\Property(property="entity", type="string", example="rwenzori"),
      *       @OA\Property(property="status", type="string", example="Actif")
      *    )
      * ),
@@ -125,7 +125,7 @@ class PointEauController extends Controller
             'num_parcelle'          => ['nullable'],
             'nom_chef'          => ['nullable'],
             'contact'          => ['nullable'],
-            'entite' => 'nullable'
+            'entity' => 'nullable'
         ];
 
         $messages = [
@@ -155,7 +155,7 @@ class PointEauController extends Controller
                 'num_parcelle'          => $request->input('num_parcelle'),
                 'nom_chef'          => $request->input('nom_chef'),
                 'contact'          => $request->input('contact'),
-                'entite' => $request->input('entite'),
+                'entity' => $request->input('entity'),
                 'matricule'       => fake()->unique()->numerify('BRN-#####')
             ]);
 
@@ -215,7 +215,7 @@ class PointEauController extends Controller
             'num_parcelle'          => ['nullable'],
             'nom_chef'          => ['nullable'],
             'contact'          => ['nullable'],
-            'entite' => ['nullable']
+            'entity' => ['nullable']
         ];
 
         $validator = Validator::make($request->all(), $rules);

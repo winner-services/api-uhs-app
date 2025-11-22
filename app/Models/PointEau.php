@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PointEau extends Model
 {
-    protected $fillable = ['lat', 'long', 'numero_compteur', 'status', 'matricule', 'village', 'quartier', 'num_avenue', 'num_parcelle', 'nom_chef', 'contact','entite'];
+    protected $fillable = ['lat', 'long', 'numero_compteur', 'status', 'matricule', 'village', 'quartier', 'num_avenue', 'num_parcelle', 'nom_chef', 'contact','entity'];
 
     public function scopeSearh($query, $term)
     {
@@ -21,7 +21,7 @@ class PointEau extends Model
                 ->orWhere('quartier', 'like', $term)
                 ->orWhere('num_parcelle', 'like', $term)
                 ->orWhere('nom_chef', 'like', $term)
-                ->orWhere('entite', 'like', $term)
+                ->orWhere('entity', 'like', $term)
                 ->orWhere('contact', 'like', $term)
                 ->orWhere('num_avenue', 'like', $term);
         });
