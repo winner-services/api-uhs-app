@@ -100,7 +100,7 @@ class BornierController extends Controller
                 'nom'       => 'required|string|max:255|unique:borniers,nom',
                 'phone'     => 'nullable|string|max:20',
                 'adresse'   => 'nullable|string|max:255',
-                'borne_id'  => 'nullable|exists:point_eaus,id',
+                'borne_id'  => 'required|exists:point_eaus,id',
             ], [
                 'nom.required' => 'Le nom du bornier est obligatoire.',
                 'nom.unique'   => 'Ce nom de bornier existe déjà.',
