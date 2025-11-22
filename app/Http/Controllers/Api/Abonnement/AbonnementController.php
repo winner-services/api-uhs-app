@@ -171,6 +171,14 @@ class AbonnementController extends Controller
             ], 422);
         }
 
+        $exists = Abonne::where('nom', $request->nom)->first();
+        if ($exists) {
+            return response()->json([
+                'message' => 'Un abonné avec ce nom existe déjà.',
+                'status' => 409
+            ]);
+        }
+
         $piecePath = null;
 
         // Si fichier présent et valide, on le stocke
