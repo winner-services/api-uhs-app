@@ -72,8 +72,8 @@ class RoleSeeder extends Seeder
                         // 🔥 Pour un technicien, seulement "voir" et "modifier"
                         'voir'      => true,
                         'ajouter'   => $roleName === 'admin',
-                        // 'modifier'  => in_array($roleName, ['admin', 'technicien']),
-                        'modifier' => $roleName === 'admin',
+                        'modifier'  => in_array($roleName, ['admin', 'technicien']),
+                        // 'modifier' => $roleName === 'admin',
                         'supprimer' => $roleName === 'admin',
                         'created_at' => now(),
                         'updated_at' => now(),
