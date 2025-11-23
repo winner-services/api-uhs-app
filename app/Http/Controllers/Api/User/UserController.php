@@ -35,14 +35,45 @@ class UserController extends Controller
      *     )
      * )
      */
-    public function index(Request $request)
-    {
-        $users = User::query()
-            ->search($request->get('search', ''))
-            ->paginate(100);
+    // public function index(Request $request)
+    // {
+    //     $users = User::query()
+    //         ->search($request->get('search', ''))
+    //         ->paginate(100);
 
-        return UserResource::collection($users);
-    }
+    //     return UserResource::collection($users);
+    // }
+    public function index(Request $request)
+{
+    $page = $request->get('paginate', 10);
+    $q = $request->get('q', '');
+    $sort_direction = $request->get('sort_direction', 'desc');
+    $sort_field = $request->get('sort_field', 'id');
+
+    $query = User::query()
+        ->search(trim($q))           // scope search() sur le modèle User
+        ->orderBy($sort_field, $sort_direction);
+
+    $users = $query->paginate($page);
+
+    $result = [
+        'message' => "OK",
+        'success' => true,
+        // Utilise la resource pour formater chaque utilisateur
+        'data' => UserResource::collection($users),
+        // infos de pagination (optionnel mais souvent utile côté client)
+        'meta' => [
+            'current_page' => $users->currentPage(),
+            'per_page'     => $users->perPage(),
+            'total'        => $users->total(),
+            'last_page'    => $users->lastPage(),
+        ],
+        'status' => 200
+    ];
+
+    return response()->json($result);
+}
+
 
     /**
      * @OA\Get(
