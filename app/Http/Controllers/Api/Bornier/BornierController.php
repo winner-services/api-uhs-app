@@ -48,7 +48,7 @@ class BornierController extends Controller
         $sort_field = request('sort_field', 'id');
         $data = Bornier::join('point_eaus', 'borniers.borne_id', '=', 'point_eaus.id')
             ->join('users', 'borniers.addedBy', '=', 'users.id')
-            ->select('borniers.*', 'point_eaus.matricule', 'point_eaus.lat', 'point_eaus.long', 'users.name as addedBy')
+            ->select('borniers.*', 'point_eaus.matricule','point_eaus.matricule','point_eaus.lat', 'point_eaus.long', 'users.name as addedBy')
             ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
             ->paginate($page);
