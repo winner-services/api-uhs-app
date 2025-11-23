@@ -37,55 +37,26 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $page = (int) $request->query('paginate', 10);
-        $q = trim($request->query('q', ''));
-        $sort_direction = $request->query('sort_direction', 'desc');
-        $sort_field = $request->query('sort_field', 'id');
+        // $users = User::query()
+        //     ->search($request->get('search', ''))
+        //     ->paginate(100);
 
-        // Construire la requête (n'appelle pas get() ici)
-        $query = User::query()->orderBy($sort_field, $sort_direction);
-
-        // Appliquer la recherche si le scope existe
-        // Si ton scope s'appelle `searh()` (typo), change ->search($q) en ->searh($q)
-        if ($q !== '') {
-            $query = $query->search($q); // <-- assure-toi que scopeSearch retourne un Builder
-        }
-
-        // Pagination et conservation des paramètres de requête dans les liens
-        $data = $query->paginate($page)->appends($request->query());
-
+        $page = request("paginate", 10);
+        $q = request("q", "");
+        $sort_direction = request('sort_direction', 'desc');
+        $sort_field = request('sort_field', 'id');
+        $data = User::latest()
+            ->searh(trim($q))
+            ->orderBy($sort_field, $sort_direction)
+            ->paginate($page);
         $result = [
             'message' => "OK",
             'success' => true,
-            'data' => $data,
-            'status' => 200
+            'status' => 200,
+            'data' => $data
         ];
-
         return response()->json($result);
     }
-
-    // public function index(Request $request)
-    // {
-    //     // $users = User::query()
-    //     //     ->search($request->get('search', ''))
-    //     //     ->paginate(100);
-
-    //     $page = request("paginate", 10);
-    //     $q = request("q", "");
-    //     $sort_direction = request('sort_direction', 'desc');
-    //     $sort_field = request('sort_field', 'id');
-    //     $data = User::latest()
-    //         ->searh(trim($q))
-    //         ->orderBy($sort_field, $sort_direction)
-    //         ->paginate($page);
-    //     $result = [
-    //         'message' => "OK",
-    //         'success' => true,
-    //         'status' => 200,
-    //         'data' => $data
-    //     ];
-    //     return response()->json($result);
-    // }
 
     /**
      * @OA\Get(
