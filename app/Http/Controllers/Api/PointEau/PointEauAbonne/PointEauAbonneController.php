@@ -22,7 +22,7 @@ class PointEauAbonneController extends Controller
      */
     public function indexPointAbonne()
     {
-        $page = request("paginate", 10);
+        $page = request("paginate", 100);
         $q = request("q", "");
         $sort_direction = request('sort_direction', 'desc');
         $sort_field = request('sort_field', 'id');

@@ -42,7 +42,7 @@ class BornierController extends Controller
     public function indexBornier()
     {
 
-        $page = request("paginate", 15);
+        $page = request("paginate", 100);
         $q = request("q", "");
         $sort_direction = request('sort_direction', 'desc');
         $sort_field = request('sort_field', 'id');
