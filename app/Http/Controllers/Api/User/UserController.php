@@ -38,35 +38,57 @@ class UserController extends Controller
     public function index(Request $request)
 {
     try {
+        // --- 1. Récupération des paramètres ---
         $page = $request->get('paginate', 10);
         $q = trim($request->get('q', ''));
         $sort_field = $request->get('sort_field', 'id');
         $sort_direction = $request->get('sort_direction', 'desc');
 
+        // --- 2. Construction de la requête Eloquent ---
         $users = User::query()
+            // Assurez-vous que la méthode 'search' existe et fonctionne
+            // correctement sur votre modèle User.
             ->search($q)
+            
+            // Appliquer le tri
             ->orderBy($sort_field, $sort_direction)
+            
+            // Appliquer la pagination
             ->paginate($page);
         
-        $data = UserResource::collection($users);
-        
+        // --- 3. Formatage de la réponse (Utilisation de la Resource pour encapsuler) ---
+        $data = UserResource::collection($users)->response()->getData(true);
+
+        // --- 4. Retour de la réponse de succès ---
         $result = [
-            'message' => "OK",
+            'message' => "Liste des utilisateurs récupérée avec succès.",
             'success' => true,
             'status' => 200,
+            // Le frontend doit lire les données de pagination directement ici.
+            // Si le frontend s'attend à ce que 'data' soit un tableau d'utilisateurs,
+            // il devra regarder $data['data'] qui est le tableau des utilisateurs.
             'data' => $data
         ];
 
-        return response()->json($result);
+        return response()->json($result, 200);
 
-    } catch (\Exception $e) {
-        // En cas d'erreur du serveur (DB, logique, etc.)
+    } catch (QueryException $e) {
+        // Gère spécifiquement les erreurs de base de données (ex: champ de tri invalide)
         return response()->json([
-            'message' => "Erreur lors de la récupération des utilisateurs.",
+            'message' => "Erreur de base de données. Vérifiez la requête ou le champ de tri.",
             'success' => false,
             'status' => 500,
-            'data' => [] // Retourner un tableau vide ici est crucial pour le frontend !
-        ], 500); // Code HTTP 500
+            'data' => [] // CRUCIAL : Retourne un tableau vide
+        ], 500);
+
+    } catch (\Exception $e) {
+        // Gère toute autre erreur inattendue (ex: erreur de code, méthode 'search' manquante)
+        return response()->json([
+            'message' => "Erreur interne du serveur : " . $e->getMessage(),
+            'success' => false,
+            'status' => 500,
+            'data' => [] // CRUCIAL : Retourne un tableau vide
+        ], 500);
     }
 }
     // public function index(Request $request)
