@@ -122,20 +122,6 @@ class User extends Authenticatable
         return $roles->first() ?? [];
     }
 
-    public function getRoles(): array
-    {
-        $role = [];
-
-        foreach ($this->roles as $role) {
-            $role = [
-                'id' => $role->id,
-                'name' => $role->name
-            ];
-        }
-
-        return $role;
-    }
-
     public function getRoleIdAttribute(): ?int
     {
         return $this->getRoleData()['id'] ?? null;
