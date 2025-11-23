@@ -36,84 +36,13 @@ class UserController extends Controller
      * )
      */
     public function index(Request $request)
-{
-    try {
-        // paramètres : page, recherche, tri, etc.
-        $perPage = (int) $request->get('paginate', 100);
-        $q = (string) $request->get('q', $request->get('search', ''));
-        $sortField = $request->get('sort_field', 'id');
-        $sortDirection = strtolower($request->get('sort_direction', 'desc')) === 'asc' ? 'asc' : 'desc';
+    {
+        $users = User::query()
+            ->search($request->get('search', ''))
+            ->paginate(100);
 
-        // Construire la query (adaptez la scope search si nécessaire)
-        $query = User::query();
-        if (!empty(trim($q))) {
-            // suppose que vous avez un scope `search` sur le modèle User
-            if (method_exists(User::class, 'scopeSearch')) {
-                $query->search(trim($q));
-            } else {
-                // fallback : simple where sur name/email (modifiez selon vos champs)
-                $query->where(function ($sub) use ($q) {
-                    $sub->where('name', 'like', "%{$q}%")
-                        ->orWhere('email', 'like', "%{$q}%");
-                });
-            }
-        }
-
-        // Appliquer tri sécurisé
-        // (optionnel: valider que $sortField est autorisé pour éviter SQL injection)
-        $allowedSorts = ['id', 'name', 'email', 'created_at', 'updated_at'];
-        if (!in_array($sortField, $allowedSorts)) {
-            $sortField = 'id';
-        }
-
-        $users = $query->orderBy($sortField, $sortDirection)->paginate($perPage);
-
-        // Transformer via Resource et récupérer le tableau résolu
-        $resolved = UserResource::collection($users)->resolve();
-        $items = $resolved['data'] ?? [];
-
-        // Réponse stable : toujours { data: [...], meta: {...} }
-        return response()->json([
-            'data' => $items,
-            'meta' => [
-                'current_page' => $users->currentPage(),
-                'from' => $users->firstItem(),
-                'to' => $users->lastItem(),
-                'per_page' => $users->perPage(),
-                'last_page' => $users->lastPage(),
-                'total' => $users->total(),
-            ],
-        ], 200);
-    } catch (\Throwable $e) {
-        // log l'erreur pour debug côté serveur
-            // \Log::error('API /users index error: '.$e->getMessage(), [
-            //     'trace' => $e->getTraceAsString()
-        // ]);
-
-        // Réponse stable en cas d'erreur (front recevra toujours response.data)
-        return response()->json([
-            'data' => [],
-            'meta' => [
-                'current_page' => 1,
-                'from' => null,
-                'to' => null,
-                'per_page' => 0,
-                'last_page' => 0,
-                'total' => 0,
-            ],
-            'error' => 'Internal server error'
-        ], 500);
+        return UserResource::collection($users);
     }
-}
-
-    // public function index(Request $request)
-    // {
-    //     $users = User::query()
-    //         ->search($request->get('search', ''))
-    //         ->paginate(100);
-
-    //     return UserResource::collection($users);
-    // }
 
     /**
      * @OA\Get(
