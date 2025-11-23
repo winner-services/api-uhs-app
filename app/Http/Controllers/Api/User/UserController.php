@@ -37,32 +37,29 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        // 1. Définir la taille de la page (par défaut 10)
         $page = $request->get('paginate', 10);
-
-        // 2. Récupérer le terme de recherche (par défaut chaîne vide)
         $q = trim($request->get('q', ''));
-
-        // 3. Définir le champ de tri (par défaut 'id')
         $sort_field = $request->get('sort_field', 'id');
-
-        // 4. Définir la direction du tri (par défaut 'desc')
         $sort_direction = $request->get('sort_direction', 'desc');
 
         $users = User::query()
-            // Utiliser 'search' si vous voulez conserver la logique existante
-            // Sinon, vous pouvez utiliser la méthode 'where' ou une méthode customisée comme 'searh' dans votre autre fonction
-            // Ici, j'utilise 'search' de votre fonction originale, en lui passant $q.
             ->search($q)
-
-            // Appliquer l'ordre de tri
             ->orderBy($sort_field, $sort_direction)
-
-            // Appliquer la pagination avec la taille de page spécifiée
             ->paginate($page);
 
-        // Retourner la collection de ressources User (comme dans votre fonction originale)
-        return UserResource::collection($users);
+        // Assurer que le frontend reçoit une structure cohérente.
+        // Le UserResource::collection($users) gère déjà l'encapsulation de la pagination.
+        $data = UserResource::collection($users);
+
+        $result = [
+            'message' => "OK",
+            'success' => true,
+            'status' => 200,
+            'data' => $data // Le $data contiendra la structure de pagination, y compris le tableau des items.
+        ];
+
+        // Utiliser response()->json() pour retourner la structure complète.
+        return response()->json($result);
     }
     // public function index(Request $request)
     // {
