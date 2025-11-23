@@ -37,12 +37,38 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::query()
-            ->search($request->get('search', ''))
-            ->paginate(100);
+        $page = (int) $request->query('paginate', 10);
+        $q = trim($request->query('q', ''));
+        $sort_direction = $request->query('sort_direction', 'desc');
+        $sort_field = $request->query('sort_field', 'id');
 
-        return UserResource::collection($users);
+        // Construction de la requête
+        $query = User::query()->orderBy($sort_field, $sort_direction);
+
+        // Appliquer la recherche si paramètre présent
+        if ($q !== '') {
+            $query = $query->search($q);  // Assure-toi que scopeSearch existe
+        }
+
+        // Pagination + conserver les paramètres dans les liens
+        $users = $query->paginate($page)->appends($request->query());
+
+        // Retour en UserResource + block meta personnalisé
+        return UserResource::collection($users)->additional([
+            'message' => 'OK',
+            'success' => true,
+            'status' => 200,
+        ]);
     }
+
+    // public function index(Request $request)
+    // {
+    //     $users = User::query()
+    //         ->search($request->get('search', ''))
+    //         ->paginate(100);
+
+    //     return UserResource::collection($users);
+    // }
 
     /**
      * @OA\Get(
