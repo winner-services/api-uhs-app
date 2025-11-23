@@ -24,4 +24,18 @@ class PointEauAbonne extends Model
     {
         return $this->hasMany(Facturation::class, 'point_eau_abonnes_id');
     }
+
+    public function scopeSearh($query, $term)
+    {
+        $term = "%$term%";
+        $query->where(function ($query) use ($term) {
+            $query->where('point_eau_abonnes.date_operation', 'like', $term)
+                ->orWhereHas('pointEauAbonne.pointEau', function ($q1) use ($term) {
+                    $q1->where('point_eaus.matricule', 'like', $term);
+                })
+                ->orWhereHas('pointEauAbonne.abonne', function ($q2) use ($term) {
+                    $q2->where('abonnes.nom', 'like', $term);
+                });
+        });
+    }
 }

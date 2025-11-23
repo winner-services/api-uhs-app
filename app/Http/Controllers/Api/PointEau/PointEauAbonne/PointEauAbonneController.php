@@ -31,7 +31,7 @@ class PointEauAbonneController extends Controller
             ->join('point_eaus', 'point_eau_abonnes.point_eau_id', '=', 'point_eaus.id')
             ->select('point_eau_abonnes.*', 'point_eaus.numero_compteur', 'point_eaus.matricule', 'abonnes.nom as abonne', 'users.name as addedBy')
             ->latest()
-            // ->searh(trim($q))
+            ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
             ->paginate($page);
         $result = [
