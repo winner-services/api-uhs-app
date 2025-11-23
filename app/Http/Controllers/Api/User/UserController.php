@@ -37,11 +37,26 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $users = User::query()
-            ->search($request->get('search', ''))
-            ->paginate(100);
+        // $users = User::query()
+        //     ->search($request->get('search', ''))
+        //     ->paginate(100);
 
-        return UserResource::collection($users);
+        $page = request("paginate", 10);
+        $q = request("q", "");
+        $sort_direction = request('sort_direction', 'desc');
+        $sort_field = request('sort_field', 'id');
+        $data = User::latest()
+            ->searh(trim($q))
+            ->orderBy($sort_field, $sort_direction)
+            ->paginate($page);
+        $result = [
+            'message' => "OK",
+            'success' => true,
+            'status' => 200,
+            'data' => $data
+        ];
+
+        return response()->json($result);
     }
 
     /**
