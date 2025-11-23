@@ -36,7 +36,8 @@ class UserController extends Controller
      * )
      */
     public function index(Request $request)
-    {
+{
+    try {
         $page = $request->get('paginate', 10);
         $q = trim($request->get('q', ''));
         $sort_field = $request->get('sort_field', 'id');
@@ -46,21 +47,28 @@ class UserController extends Controller
             ->search($q)
             ->orderBy($sort_field, $sort_direction)
             ->paginate($page);
-
-        // Assurer que le frontend reçoit une structure cohérente.
-        // Le UserResource::collection($users) gère déjà l'encapsulation de la pagination.
+        
         $data = UserResource::collection($users);
-
+        
         $result = [
             'message' => "OK",
             'success' => true,
             'status' => 200,
-            'data' => $data // Le $data contiendra la structure de pagination, y compris le tableau des items.
+            'data' => $data
         ];
 
-        // Utiliser response()->json() pour retourner la structure complète.
         return response()->json($result);
+
+    } catch (\Exception $e) {
+        // En cas d'erreur du serveur (DB, logique, etc.)
+        return response()->json([
+            'message' => "Erreur lors de la récupération des utilisateurs.",
+            'success' => false,
+            'status' => 500,
+            'data' => [] // Retourner un tableau vide ici est crucial pour le frontend !
+        ], 500); // Code HTTP 500
     }
+}
     // public function index(Request $request)
     // {
     //     $users = User::query()
