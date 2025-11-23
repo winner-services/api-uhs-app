@@ -48,7 +48,7 @@ class BornierController extends Controller
         $sort_field = request('sort_field', 'id');
         $data = Bornier::join('point_eaus', 'borniers.borne_id', '=', 'point_eaus.id')
             ->join('users', 'borniers.addedBy', '=', 'users.id')
-            ->select('borniers.*', 'point_eaus.matricule','point_eaus.numero_compteur','point_eaus.lat', 'point_eaus.long', 'users.name as addedBy')
+            ->select('borniers.*', 'point_eaus.matricule', 'point_eaus.numero_compteur', 'point_eaus.lat', 'point_eaus.long', 'users.name as addedBy')
             ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
             ->paginate($page);
@@ -113,6 +113,26 @@ class BornierController extends Controller
                     'errors'  => $validator->errors(),
                     'status' => 422
                 ], 422);
+            }
+
+            // Vérifier si ce point d’eau est déjà attribué à un autre abonné
+            $alreadyLinked = PointEauAbonne::where('point_eau_id', $request->borne_id)->first();
+
+            if ($alreadyLinked) {
+                return response()->json([
+                    'message' => 'Ce point d’eau est déjà attribué à un autre abonné.',
+                    'success' => false,
+                    'status'  => 409
+                ], 409);
+            }
+
+            $exist = Bornier::where('borne_id', $request->borne_id)->first();
+            if ($exist) {
+                return response()->json([
+                    'message' => 'Ce borne est déjà attribué à un autre.',
+                    'success' => false,
+                    'status'  => 409
+                ], 409);
             }
 
             // Création du bornier

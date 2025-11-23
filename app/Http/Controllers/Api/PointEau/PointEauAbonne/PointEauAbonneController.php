@@ -113,6 +113,15 @@ class PointEauAbonneController extends Controller
                 ], 409);
             }
 
+            // Vérification si le borne_id existe déjà dans la table bornier
+            if ($request->has('borne_id') && Bornier::where('borne_id', $request->borne_id)->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Borne ID déjà attribuée à un bornier.',
+                    'status' => 400
+                ], 400);
+            }
+
             $pointEauAbonne = PointEauAbonne::create([
                 'abonne_id'    => $request->abonne_id,
                 'point_eau_id' => $request->point_eau_id,
@@ -168,7 +177,7 @@ class PointEauAbonneController extends Controller
         $rules = [
             'abonne_id'    => ['required', 'exists:abonnes,id'],
             'point_eau_id' => ['required', 'exists:point_eaus,id'],
-            'date_operation' => 'required'
+            'date_operation' => 'nullable'
         ];
 
         $messages = [
@@ -225,7 +234,7 @@ class PointEauAbonneController extends Controller
 
             $pointEauAbonne->update([
                 'abonne_id'    => $request->abonne_id,
-                'point_eau_id' => $request->point_eau_id,
+                'point_eau_id' => $request->point_eau_id ?? $pointEauAbonne->point_eau_id,
                 'date_operation' => $request->date_operation,
                 'addedBy'      => $user->id ?? $pointEauAbonne->addedBy
             ]);
