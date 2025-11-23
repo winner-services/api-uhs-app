@@ -30,9 +30,6 @@ class ReportController extends Controller
      */
     public function rapportBorne()
     {
-        $date_start = request('date_start', date('Y-m-01'));
-        $date_end = request('date_end', date('Y-m-d'));
-
         $about = About::first();
 
         // 🔧 Vérifier si le logo existe et générer base64
@@ -49,8 +46,10 @@ class ReportController extends Controller
             }
         }
 
-        $data = PointEau::where('status', 'Actif')
-            ->latest()
+        // $data = PointEau::where('status', 'Actif')
+        //     ->latest()
+        //     ->get();
+        $data = PointEau::latest()
             ->get();
 
         return response()->json([
