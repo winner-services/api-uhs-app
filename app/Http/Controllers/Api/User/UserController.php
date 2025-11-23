@@ -41,7 +41,10 @@ class UserController extends Controller
         ->search($request->get('search', ''))
         ->paginate(100);
 
-    return UserResource::collection($users);
+    $resolved = UserResource::collection($users)->resolve(); // donne ['data' => [..]]
+    $items = $resolved['data'] ?? [];
+
+    return response()->json($items);
 }
 
     // public function index(Request $request)
