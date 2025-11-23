@@ -39,7 +39,7 @@ class UserController extends Controller
     public function index(Request $request)
     {
         try {
-            $page = $request->get('paginate', 10);
+            $page = $request->get('paginate', 100);
             $q = trim($request->get('q', ''));
             $sort_field = $request->get('sort_field', 'id');
             $sort_direction = $request->get('sort_direction', 'desc');
