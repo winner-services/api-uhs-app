@@ -119,7 +119,7 @@ class PointEauController extends Controller
         $rules = [
             'lat'             => ['nullable'],
             'long'            => ['nullable'],
-            'numero_compteur' => ['nullable'],
+            'numero_compteur' => ['required'],
             'status'          => ['nullable'],
             'village'          => ['nullable'],
             'quartier'          => ['nullable'],

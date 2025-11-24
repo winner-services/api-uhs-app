@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('num_parcelle')->nullable();
             $table->string('nom_chef')->nullable();
             $table->string('contact')->nullable();
-            $table->string('numero_compteur')->nullable();
+            $table->string('numero_compteur');
             $table->string('status')->default('Actif');
             $table->string('matricule')->nullable();
             $table->text('entite')->nullable();
