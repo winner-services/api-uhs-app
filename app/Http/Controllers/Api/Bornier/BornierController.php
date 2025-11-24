@@ -311,4 +311,27 @@ class BornierController extends Controller
             'message' => 'Bornier supprimé avec succès.'
         ]);
     }
+
+    /**
+     * @OA\Get(
+     * path="/api/rapportBornier.gettAllData",
+     * summary="Liste des borniers",
+     * tags={"Borniers"},
+     * @OA\Response(response=200, description="Liste récupérée avec succès"),
+     * )
+     */
+    public function rapportBornier()
+    {
+        $data = Bornier::join('point_eaus', 'borniers.borne_id', '=', 'point_eaus.id')
+            ->join('users', 'borniers.addedBy', '=', 'users.id')
+            ->select('borniers.*', 'point_eaus.matricule', 'point_eaus.numero_compteur', 'point_eaus.lat', 'point_eaus.long', 'users.name as addedBy')
+            ->latest()->get();
+        $result = [
+            'message' => "OK",
+            'success' => true,
+            'data' => $data,
+            'status' => 200
+        ];
+        return response()->json($result);
+    }
 }

@@ -187,6 +187,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/borniers.store', 'storeBornier');
         Route::put('/borniers.update/{id}', 'updateBornier');
         Route::delete('/borniers.delete/{id}', 'destroyBornier');
+        Route::get('/rapportBornier.gettAllData','rapportBornier');
     });
 
     Route::controller(LogistiqueController::class)->group(function () {
