@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\PointEau;
 use App\Http\Controllers\Controller;
 use App\Models\PointEau;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -143,7 +144,7 @@ class PointEauController extends Controller
 
         try {
             DB::beginTransaction();
-
+            $user = Auth::user();
             $pointEau = PointEau::create([
                 'lat'             => $request->input('lat'),
                 'long'            => $request->input('long'),
@@ -156,7 +157,8 @@ class PointEauController extends Controller
                 'nom_chef'          => $request->input('nom_chef'),
                 'contact'          => $request->input('contact'),
                 'entity' => $request->input('entity'),
-                'matricule'       => fake()->unique()->numerify('BRN-#####')
+                'matricule'       => fake()->unique()->numerify('BRN-#####'),
+                'addedBy'      => $user->id
             ]);
 
             DB::commit();

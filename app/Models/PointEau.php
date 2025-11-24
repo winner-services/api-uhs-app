@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class PointEau extends Model
 {
-    protected $fillable = ['lat', 'long', 'numero_compteur', 'status', 'matricule', 'village', 'quartier', 'num_avenue', 'num_parcelle', 'nom_chef', 'contact','entity'];
+    protected $fillable = ['lat', 'long', 'numero_compteur', 'status', 'matricule', 'village', 'quartier', 'num_avenue', 'num_parcelle', 'nom_chef', 'contact','entity','addedBy'];
 
     public function scopeSearh($query, $term)
     {
