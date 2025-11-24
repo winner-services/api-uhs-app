@@ -49,9 +49,9 @@ class ReportController extends Controller
         // $data = PointEau::where('status', 'Actif')
         //     ->latest()
         //     ->get();
-        $data = PointEau::latest()
+        $data = PointEau::join('users', 'point_eaus.agent', '=', 'users.id')
+            ->select('point_eaus.*', 'users.name as addedBy')->latest()
             ->get();
-
         return response()->json([
             'message' => 'success',
             'success' => true,

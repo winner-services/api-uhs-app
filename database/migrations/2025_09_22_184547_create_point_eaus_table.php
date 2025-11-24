@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('status')->default('Actif');
             $table->string('matricule')->nullable();
             $table->text('entite')->nullable();
-            $table->unsignedBigInteger('addedBy')->nullable();
+            $table->unsignedBigInteger('agent')->nullable();
             $table->timestamps();
         });
     }
