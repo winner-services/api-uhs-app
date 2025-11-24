@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Bornier;
 
 use App\Http\Controllers\Controller;
+use App\Models\About;
 use App\Models\Bornier;
 use App\Models\PointEauAbonne;
 use Illuminate\Http\Request;
@@ -322,6 +323,22 @@ class BornierController extends Controller
      */
     public function rapportBornier()
     {
+        $about = About::first();
+
+        // 🔧 Vérifier si le logo existe et générer base64
+        if ($about && $about->logo) {
+            $path = storage_path('app/public/' . $about->logo);
+
+            if (file_exists($path)) {
+                $mime = mime_content_type($path);
+                $data = base64_encode(file_get_contents($path));
+                $about->logo = "data:$mime;base64,$data";
+            } else {
+                // Si fichier manquant, on peut utiliser une image par défaut
+                $about->logo = asset('images/default-logo.png');
+            }
+        }
+
         $data = Bornier::join('point_eaus', 'borniers.borne_id', '=', 'point_eaus.id')
             ->join('users', 'borniers.addedBy', '=', 'users.id')
             ->select('borniers.*', 'point_eaus.matricule', 'point_eaus.numero_compteur', 'point_eaus.lat', 'point_eaus.long', 'users.name as addedBy')
@@ -330,6 +347,7 @@ class BornierController extends Controller
             'message' => "OK",
             'success' => true,
             'data' => $data,
+            'company_info' => $about,
             'status' => 200
         ];
         return response()->json($result);
