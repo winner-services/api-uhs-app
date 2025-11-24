@@ -25,7 +25,8 @@ class PointEauController extends Controller
         $q = request("q", "");
         $sort_direction = request('sort_direction', 'desc');
         $sort_field = request('sort_field', 'id');
-        $data = PointEau::latest()
+        $data = PointEau::join('users', 'point_eaus.agent', '=', 'users.id')
+            ->select('point_eaus.*', 'users.name as addedBy')->latest()
             ->searh(trim($q))
             ->orderBy($sort_field, $sort_direction)
             ->paginate($page);
@@ -158,7 +159,7 @@ class PointEauController extends Controller
                 'contact'          => $request->input('contact'),
                 'entity' => $request->input('entity'),
                 'matricule'       => fake()->unique()->numerify('BRN-#####'),
-                'addedBy'      => $user->id
+                'agent'      => $user->id
             ]);
 
             DB::commit();
