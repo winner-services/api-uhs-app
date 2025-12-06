@@ -243,8 +243,8 @@ class ReportController extends Controller
         $date_end = request('date_end', date('Y-m-d'));
         $data = Versement::join('tresoreries', 'versements.account_id', '=', 'tresoreries.id')
             ->join('users as u1', 'versements.addedBy', '=', 'u1.id')
-            ->join('users as u2', 'versements.agent_id', '=', 'u2.id')
-            ->select('versements.*', 'u2.name as agent', 'u1.name as addedBy', 'tresoreries.designation as tresorerie')
+            ->join('borniers', 'versements.agent_id', '=', 'borniers.id')
+            ->select('versements.*', 'borniers.nom as agent', 'u1.name as addedBy', 'tresoreries.designation as tresorerie')
             ->latest()
             ->whereBetween('versements.transaction_date', [$date_start, $date_end])->get();
         $result = [
