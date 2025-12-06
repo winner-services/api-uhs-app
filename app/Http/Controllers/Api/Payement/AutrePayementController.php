@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Payement;
 
 use App\Http\Controllers\Controller;
+use App\Models\About;
 use App\Models\Bornier;
 use App\Models\TrasactionTresorerie;
 use App\Models\Versement;
@@ -100,6 +101,20 @@ class AutrePayementController extends Controller
         ]);
 
         return DB::transaction(function () use ($validated) {
+            $about = About::first();
+
+            if ($about && $about->logo) {
+                $path = storage_path('app/public/' . $about->logo);
+
+                if (file_exists($path)) {
+                    $mime = mime_content_type($path);
+                    $data = base64_encode(file_get_contents($path));
+                    $about->logo = "data:$mime;base64,$data";
+                } else {
+                    // Si fichier manquant, on peut utiliser une image par défaut
+                    $about->logo = asset('images/default-logo.png');
+                }
+            }
             $totalAmount = round($validated['amount'] - $validated['paid_amount'], 2);
 
             $lastTransaction = TrasactionTresorerie::where('account_id', $validated['account_id'])
@@ -131,11 +146,19 @@ class AutrePayementController extends Controller
                 'solde'            => $solde + $totalAmount
             ]);
 
+            $data = Versement::join('borniers', '', '=', 'borniers.id')
+                ->join('tresoreries', 'versements.account_id', '=', 'tresoreries.id')
+                ->join('users as u1', 'versements.addedBy', '=', 'u1.id')
+                ->select('versements.*', 'borniers.nom as bornier_nom', 'borniers.adresse as bornier_adresse', 'borniers.phone as bornier_phone', 'u1.name as addedBy')
+                ->where('versements.id', $versement->id)
+                ->first();
+
             return response()->json([
                 'message' => 'Versement créé avec succès.',
                 'status'  => 201,
                 'success' => true,
-                'data'    => $versement
+                'data'    => $data,
+                'company_info' => $about
             ], 201);
         });
     }
