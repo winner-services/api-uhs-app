@@ -245,8 +245,8 @@ class ReportController extends Controller
             ->join('users as u1', 'versements.addedBy', '=', 'u1.id')
             ->join('users as u2', 'versements.agent_id', '=', 'u2.id')
             ->select('versements.*', 'u2.name as agent', 'u1.name as addedBy', 'tresoreries.designation as tresorerie')
-            ->latest()->get();
-            // ->whereBetween('versements.transaction_date', [$date_start, $date_end])->get();
+            ->latest()
+            ->whereBetween('versements.transaction_date', [$date_start, $date_end])->get();
         $result = [
             'message' => "OK",
             'success' => true,
