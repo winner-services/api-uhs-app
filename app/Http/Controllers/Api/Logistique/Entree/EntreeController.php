@@ -188,18 +188,18 @@ class EntreeController extends Controller
             $produit->increment('quantite', $request->quantite);
             $produit->refresh();
 
-            $prix_achat = $request->prix_unit_achat * $request->quantite;
+            // $prix_achat = $request->prix_unit_achat * $request->quantite;
             // Enregistrement dans la trésorerie
-            TrasactionTresorerie::create([
-                'motif'            => 'Paiement Approvisionnement',
-                'transaction_type' => 'DEPENSE',
-                'amount'           => $prix_achat,
-                'account_id'       => $request->account_id,
-                'transaction_date' => now()->toDateString(),
-                'addedBy'          => $userId,
-                'reference'        => fake()->unique()->numerify('TRANS-#####'),
-                'solde'            => $solde - $prix_achat
-            ]);
+            // TrasactionTresorerie::create([
+            //     'motif'            => 'Paiement Approvisionnement',
+            //     'transaction_type' => 'DEPENSE',
+            //     'amount'           => $prix_achat,
+            //     'account_id'       => $request->account_id,
+            //     'transaction_date' => now()->toDateString(),
+            //     'addedBy'          => $userId,
+            //     'reference'        => fake()->unique()->numerify('TRANS-#####'),
+            //     'solde'            => $solde - $prix_achat
+            // ]);
 
             DB::commit();
 
