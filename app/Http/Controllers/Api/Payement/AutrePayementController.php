@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class AutrePayementController extends Controller
 {
@@ -176,7 +177,8 @@ class AutrePayementController extends Controller
     // }
     public function storeVersement(Request $request)
     {
-        $validated = $request->validate([
+        // ---- VALIDATION PERSONNALISÉE ----
+        $validated = Validator::make($request->all(), [
             'transaction_date' => ['required', 'date'],
             'amount'           => ['required', 'numeric', 'min:0'],
             'paid_amount'      => ['required', 'numeric', 'min:0'],
@@ -185,9 +187,20 @@ class AutrePayementController extends Controller
             'agent_id'         => ['nullable', 'exists:borniers,id']
         ]);
 
+        // ---- SI VALIDATION ÉCHOUE ----
+        if ($validated->fails()) {
+            return response()->json([
+                'message' => 'Les données envoyées ne sont pas valides.',
+                'errors'  => $validated->errors(),
+                'status'  => 422
+            ], 422);
+        }
+
         try {
 
             return DB::transaction(function () use ($validated) {
+
+                $dataVal = $validated->validated();
 
                 $about = About::first();
 
@@ -203,46 +216,44 @@ class AutrePayementController extends Controller
                     }
                 }
 
-                $amount = (float) $validated['amount'];
-                $paidAmount = (float) $validated['paid_amount'];
+                $amount = (float) $dataVal['amount'];
+                $paidAmount = (float) $dataVal['paid_amount'];
                 $totalAmount = round($amount - $paidAmount, 2);
 
-                $lastTransaction = TrasactionTresorerie::where('account_id', $validated['account_id'])
+                $lastTransaction = TrasactionTresorerie::where('account_id', $dataVal['account_id'])
                     ->latest('id')
                     ->first();
 
                 $solde = (float) ($lastTransaction->solde ?? 0);
 
-                // Bornier peut être null
-                $bornier = !empty($validated['agent_id'])
-                    ? Bornier::find($validated['agent_id'])
+                $bornier = !empty($dataVal['agent_id'])
+                    ? Bornier::find($dataVal['agent_id'])
                     : null;
 
                 $versement = Versement::create([
-                    'transaction_date' => $validated['transaction_date'],
+                    'transaction_date' => $dataVal['transaction_date'],
                     'amount'           => $amount,
                     'paid_amount'      => $paidAmount,
-                    'taux'             => $validated['taux'] ?? 30.00,
+                    'taux'             => $dataVal['taux'] ?? 30.00,
                     'reference'        => fake()->unique()->numerify('VERS-#####'),
-                    'account_id'       => $validated['account_id'],
-                    'agent_id'         => $validated['agent_id'] ?? null,
+                    'account_id'       => $dataVal['account_id'],
+                    'agent_id'         => $dataVal['agent_id'] ?? null,
                     'addedBy'          => Auth::user()->id
                 ]);
 
-                $referenceTrans = fake()->unique()->numerify('TRANS-#####');
-
+                $refTrans = fake()->unique()->numerify('TRANS-#####');
                 if ($bornier) {
-                    $referenceTrans .= '-' . $bornier->nom;
+                    $refTrans .= '-' . $bornier->nom;
                 }
 
                 TrasactionTresorerie::create([
                     'motif'            => 'Paiement de la facture du Bornier',
                     'transaction_type' => 'RECETTE',
                     'amount'           => $totalAmount,
-                    'account_id'       => $validated['account_id'],
-                    'transaction_date' => $validated['transaction_date'],
+                    'account_id'       => $dataVal['account_id'],
+                    'transaction_date' => $dataVal['transaction_date'],
                     'addedBy'          => Auth::user()->id,
-                    'reference'        => $referenceTrans,
+                    'reference'        => $refTrans,
                     'solde'            => $solde + $totalAmount
                 ]);
 
@@ -269,7 +280,6 @@ class AutrePayementController extends Controller
             });
         } catch (\Throwable $e) {
 
-            // Log pour débogage
             Log::error("Erreur storeVersement : " . $e->getMessage(), [
                 'line' => $e->getLine(),
                 'file' => $e->getFile(),
@@ -277,12 +287,13 @@ class AutrePayementController extends Controller
 
             return response()->json([
                 'message' => 'Une erreur est survenue lors du traitement.',
-                'error'   => $e->getMessage(),  // utile en dev, peut être retiré en production
+                'error'   => $e->getMessage(),
                 'success' => false,
                 'status'  => 500
             ], 500);
         }
     }
+
 
 
     /**
@@ -353,6 +364,20 @@ class AutrePayementController extends Controller
         }
 
         return DB::transaction(function () use ($versement, $validated) {
+
+            $about = About::first();
+
+            if ($about && $about->logo) {
+                $path = storage_path('app/public/' . $about->logo);
+
+                if (file_exists($path)) {
+                    $mime = mime_content_type($path);
+                    $data = base64_encode(file_get_contents($path));
+                    $about->logo = "data:$mime;base64,$data";
+                } else {
+                    $about->logo = asset('images/default-logo.png');
+                }
+            }
             // Calcul du nouveau total
             $totalAmount = round($validated['amount'] - $validated['paid_amount'], 2);
 
@@ -400,12 +425,25 @@ class AutrePayementController extends Controller
                     'solde'            => $solde + $totalAmount
                 ]);
             }
+            $data = Versement::leftJoin('borniers', 'versements.agent_id', '=', 'borniers.id')
+                ->leftJoin('tresoreries', 'versements.account_id', '=', 'tresoreries.id')
+                ->leftJoin('users as u1', 'versements.addedBy', '=', 'u1.id')
+                ->select(
+                    'versements.*',
+                    'borniers.nom as bornier_nom',
+                    'borniers.adresse as bornier_adresse',
+                    'borniers.phone as bornier_phone',
+                    'u1.name as addedBy'
+                )
+                ->where('versements.id', $versement->id)
+                ->first();
 
             return response()->json([
                 'message' => 'Versement mis à jour avec succès.',
                 'status'  => 200,
                 'success' => true,
-                'data'    => $versement
+                'data'    => $data,
+                'company_info' => $about
             ], 200);
         });
     }
