@@ -145,13 +145,24 @@ class AutrePayementController extends Controller
                 'reference'        => fake()->unique()->numerify('TRANS-#####') . '-' . $bornier->nom,
                 'solde'            => $solde + $totalAmount
             ]);
-
-            $data = Versement::join('borniers', 'versements.agent_id', '=', 'borniers.id')
-                ->join('tresoreries', 'versements.account_id', '=', 'tresoreries.id')
-                ->join('users as u1', 'versements.addedBy', '=', 'u1.id')
-                ->select('versements.*', 'borniers.nom as bornier_nom', 'borniers.adresse as bornier_adresse', 'borniers.phone as bornier_phone', 'u1.name as addedBy')
+            $data = Versement::leftJoin('borniers', 'versements.agent_id', '=', 'borniers.id')
+                ->leftJoin('tresoreries', 'versements.account_id', '=', 'tresoreries.id')
+                ->leftJoin('users as u1', 'versements.addedBy', '=', 'u1.id')
+                ->select(
+                    'versements.*',
+                    'borniers.nom as bornier_nom',
+                    'borniers.adresse as bornier_adresse',
+                    'borniers.phone as bornier_phone',
+                    'u1.name as addedBy'
+                )
                 ->where('versements.id', $versement->id)
                 ->first();
+            // $data = Versement::join('borniers', 'versements.agent_id', '=', 'borniers.id')
+            //     ->join('tresoreries', 'versements.account_id', '=', 'tresoreries.id')
+            //     ->join('users as u1', 'versements.addedBy', '=', 'u1.id')
+            //     ->select('versements.*', 'borniers.nom as bornier_nom', 'borniers.adresse as bornier_adresse', 'borniers.phone as bornier_phone', 'u1.name as addedBy')
+            //     ->where('versements.id', $versement->id)
+            //     ->first();
 
             return response()->json([
                 'message' => 'Versement créé avec succès.',
