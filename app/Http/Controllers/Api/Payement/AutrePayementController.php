@@ -8,6 +8,7 @@ use App\Models\Bornier;
 use App\Models\TrasactionTresorerie;
 use App\Models\Versement;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -398,31 +399,55 @@ class AutrePayementController extends Controller
                 'updatedBy'        => Auth::user()->id
             ]);
 
-            // Mise à jour de la transaction correspondante (si elle existe)
-            $transaction = TrasactionTresorerie::where('reference', 'like', '%TRANS-%')
-                ->where('account_id', $versement->account_id)
+            // // Mise à jour de la transaction correspondante (si elle existe)
+            // $transaction = TrasactionTresorerie::where('reference', 'like', '%TRANS-%')
+            //     ->where('account_id', $versement->account_id)
+            //     ->where('transaction_type', 'RECETTE')
+            //     ->whereDate('transaction_date', $versement->transaction_date)
+            //     ->first();
+
+            // --- Prépare les valeurs "propres" à utiliser pour la recherche ---
+            $searchAccountId = $validated['account_id'] ?? $versement->account_id;
+            $searchDate = isset($validated['transaction_date'])
+                ? Carbon::parse($validated['transaction_date'])->toDateString()
+                : ($versement->transaction_date ? Carbon::parse($versement->transaction_date)->toDateString() : null);
+
+            // Recalcule le solde actuel du compte (dernier enregistrement avant la modification)
+            $lastTransactionBefore = TrasactionTresorerie::where('account_id', $searchAccountId)
+                ->latest('id')
+                ->first();
+            $soldeBefore = $lastTransactionBefore ? $lastTransactionBefore->solde : 0;
+
+            // Cherche la transaction existante de façon plus robuste
+            $transaction = TrasactionTresorerie::where('account_id', $searchAccountId)
                 ->where('transaction_type', 'RECETTE')
-                ->whereDate('transaction_date', $versement->transaction_date)
+                ->where(function ($q) use ($searchDate) {
+                    if ($searchDate) {
+                        // whereDate évite les mismatchs à cause des heures
+                        $q->whereDate('transaction_date', $searchDate);
+                    }
+                })
+                ->where('reference', 'like', 'TRANS-%') // recherche references commençant par TRANS-
                 ->first();
 
             if ($transaction) {
+                // Si tu veux recalculer proprement le solde : prends le solde avant + nouveau montant
                 $transaction->update([
                     'amount'           => $totalAmount,
                     'transaction_date' => $validated['transaction_date'],
-                    'solde'            => $solde + $totalAmount,
+                    'solde'            => $soldeBefore + $totalAmount,
                     'updatedBy'        => Auth::user()->id
                 ]);
             } else {
-                // Si aucune transaction liée n'existe, on en crée une nouvelle
                 TrasactionTresorerie::create([
                     'motif'            => 'Mise à jour du versement du Bornier',
                     'transaction_type' => 'RECETTE',
                     'amount'           => $totalAmount,
-                    'account_id'       => $validated['account_id'],
+                    'account_id'       => $searchAccountId,
                     'transaction_date' => $validated['transaction_date'],
                     'addedBy'          => Auth::user()->id,
                     'reference'        => fake()->unique()->numerify('TRANS-#####'),
-                    'solde'            => $solde + $totalAmount
+                    'solde'            => $soldeBefore + $totalAmount
                 ]);
             }
             $data = Versement::leftJoin('borniers', 'versements.agent_id', '=', 'borniers.id')
